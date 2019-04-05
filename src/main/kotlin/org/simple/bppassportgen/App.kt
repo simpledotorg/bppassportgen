@@ -6,6 +6,7 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPageContentStream
+import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import java.io.File
 import java.nio.file.FileSystems
@@ -46,11 +47,13 @@ class App {
 
     val pdfInput = File("./bp_passport_template.pdf")
     val pdfOutput = File("./bp_passport_out.pdf")
+    val fontPath = File("Metropolis-Medium.ttf")
 
     logger.info(imagePath.toString())
     PDDocument.load(pdfInput).use { document ->
       val page = document.getPage(0)
       val image = PDImageXObject.createFromFile(imagePath.toString(), document)
+      val font = PDType0Font.load(document, fontPath)
 
       PDPageContentStream(
           document,
@@ -58,7 +61,16 @@ class App {
           PDPageContentStream.AppendMode.APPEND,
           false
       ).use { contentStream ->
-        contentStream.drawImage(image, 280.0F, 150.0F, 100F, 100F)
+        contentStream.drawImage(image, 280F, 150F, 100F, 100F)
+
+        contentStream.beginText()
+        contentStream.setNonStrokingColor(0F, 0F, 0F, 1F)
+        contentStream.newLineAtOffset(200F, 220F)
+        contentStream.setCharacterSpacing(2.5F)
+        contentStream.setFont(font, 12F)
+        contentStream.showText(shortCode)
+
+        contentStream.endText()
       }
 
       document.save(pdfOutput)
