@@ -2,11 +2,15 @@ package org.simple.bppassportgen
 
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
+import com.google.zxing.client.j2se.MatrixToImageConfig
+import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
+import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.font.PDType0Font
+import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import java.io.File
 import java.nio.file.FileSystems
@@ -37,13 +41,13 @@ class App {
     )
 
     val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, 256, 256, hints)
-    val imagePath = FileSystems.getDefault().getPath("./barcode.png")
-    //    MatrixToImageWriter.writeToPath(
-    //        bitMatrix,
-    //        "PNG",
-    //        imagePath,
-    //        MatrixToImageConfig(black, transparent)
-    //    )
+    val imagePath = FileSystems.getDefault().getPath("./barcode.jpg")
+        MatrixToImageWriter.writeToPath(
+            bitMatrix,
+            "JPEG",
+            imagePath,
+            MatrixToImageConfig()
+        )
 
     val pdfInput = File("./bp_passport_template.pdf")
     val pdfOutput = File("./bp_passport_out.pdf")
@@ -53,6 +57,7 @@ class App {
     PDDocument.load(pdfInput).use { document ->
       val page = document.getPage(0)
       val image = PDImageXObject.createFromFile(imagePath.toString(), document)
+      image.colorSpace = PDColorSpace.create(COSName.DEVICECMYK)
       val font = PDType0Font.load(document, fontPath)
 
       PDPageContentStream(

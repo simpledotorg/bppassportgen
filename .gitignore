@@ -159,3 +159,4 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 /barcode.png
 /bp_passport_out.pdf
+/barcode.jpg
