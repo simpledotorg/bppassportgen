@@ -2,24 +2,15 @@ package org.simple.bppassportgen
 
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
-import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
-import com.twelvemonkeys.imageio.color.ColorSpaces
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.font.PDType0Font
-import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace
-import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
-import java.awt.Transparency
-import java.awt.image.BufferedImage
-import java.awt.image.ColorConvertOp
-import java.awt.image.ComponentColorModel
-import java.awt.image.DataBuffer
+import org.apache.pdfbox.pdmodel.graphics.color.PDColor
+import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import java.io.File
-import java.nio.file.FileSystems
 import java.util.UUID
 import java.util.logging.Logger
 import javax.imageio.ImageIO
@@ -35,8 +26,11 @@ class App {
   val uuid = UUID.fromString("89dd227d-8c78-4310-9e1f-5cf5e67de2d3")
   val shortCode = "892 2787"
 
-  val black = 0xFF000000.toInt()
-  val transparent = 0x00FFFFFF.toInt()
+  val foregroundColor = PDColor(
+      floatArrayOf(0F, 0F, 0F, 1F),
+      COSName.DEVICECMYK,
+      PDDeviceCMYK.INSTANCE
+  )
 
   fun run() {
     logger.info(ImageIO.getWriterFormatNames().joinToString())
@@ -46,41 +40,15 @@ class App {
         EncodeHintType.MARGIN to 0
     )
 
-    val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, 256, 256, hints)
-    val imagePath = FileSystems.getDefault().getPath("./barcode.jpg")
-    //    MatrixToImageWriter.writeToPath(
-    //        bitMatrix,
-    //        "JPEG",
-    //        imagePath,
-    //        MatrixToImageConfig()
-    //    )
-
-    val qrCode = MatrixToImageWriter.toBufferedImage(bitMatrix)
-        .let { rgbImage ->
-          val cmykColorSpace = ColorSpaces.getColorSpace(ColorSpaces.CS_GENERIC_CMYK)
-          val colorModel = ComponentColorModel(cmykColorSpace, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE)
-
-          val cmykImage = BufferedImage(colorModel, colorModel.createCompatibleWritableRaster(rgbImage.width, rgbImage.height), colorModel.isAlphaPremultiplied, null)
-          val colorConvertOp = ColorConvertOp(null)
-          colorConvertOp.filter(rgbImage, cmykImage)
-
-          cmykImage
-        }
-
-    ImageIO.write(qrCode, "JPEG", File("./image.jpg"))
+    val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, 80, 80, hints)
+    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix)
 
     val pdfInput = File("./bp_passport_template.pdf")
     val pdfOutput = File("./bp_passport_out.pdf")
     val fontPath = File("Metropolis-Medium.ttf")
 
-    logger.info(imagePath.toString())
     PDDocument.load(pdfInput).use { document ->
       val page = document.getPage(0)
-//      val image = PDImageXObject.createFromFile(imagePath.toString(), document)
-//      image.colorSpace = PDColorSpace.create(COSName.DEVICECMYK)
-
-      val image = JPEGFactory.createFromImage(document, qrCode)
-
       val font = PDType0Font.load(document, fontPath)
 
       PDPageContentStream(
@@ -89,16 +57,21 @@ class App {
           PDPageContentStream.AppendMode.APPEND,
           false
       ).use { contentStream ->
-        contentStream.drawImage(image, 280F, 150F, 100F, 100F)
-
         contentStream.beginText()
         contentStream.setNonStrokingColor(0F, 0F, 0F, 1F)
         contentStream.newLineAtOffset(200F, 220F)
         contentStream.setCharacterSpacing(2.5F)
         contentStream.setFont(font, 12F)
         contentStream.showText(shortCode)
-
         contentStream.endText()
+
+        bitMatrixRenderable.render(
+            contentStream,
+            280F,
+            150F,
+            drawBackground = false,
+            applyForegroundColor = { it.setStrokingColor(foregroundColor) }
+        )
       }
 
       document.save(pdfOutput)

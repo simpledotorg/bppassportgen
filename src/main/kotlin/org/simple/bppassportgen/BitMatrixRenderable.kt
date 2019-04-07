@@ -2,6 +2,8 @@ package org.simple.bppassportgen
 
 import com.google.zxing.common.BitArray
 import com.google.zxing.common.BitMatrix
+import org.apache.pdfbox.pdmodel.PDPageContentStream
+import java.awt.Color
 
 class BitMatrixRenderable(bitMatrix: BitMatrix) {
   val lines: List<Line>
@@ -61,6 +63,47 @@ class BitMatrixRenderable(bitMatrix: BitMatrix) {
         }.lines
   }
 
+  fun render(
+      contentStream: PDPageContentStream,
+      x: Float,
+      y: Float,
+      drawBackground: Boolean = true,
+      applyForegroundColor: (PDPageContentStream) -> Unit = { it.setStrokingColor(Color.BLACK) },
+      applyBackgroundColor: (PDPageContentStream) -> Unit = { it.setStrokingColor(Color.WHITE) }
+  ) {
+    val (foregroundLines, backgroundLines) = lines.partition { it.state == Line.State.ON }
+
+    contentStream.setLineCapStyle(2)
+
+    applyForegroundColor(contentStream)
+    foregroundLines.forEach { line ->
+      drawLine(line, x, y, contentStream)
+    }
+
+    if (drawBackground) {
+      applyBackgroundColor(contentStream)
+      backgroundLines.forEach { line ->
+        drawLine(line, x, y, contentStream)
+      }
+    }
+  }
+
+  private fun drawLine(
+      line: Line,
+      x: Float,
+      y: Float,
+      contentStream: PDPageContentStream
+  ) {
+    val lineStartX = line.xStart + x
+    val lineStartY = line.yStart + y
+    val lineEndX = line.xEnd + x
+    val lineEndY = line.yEnd + y
+
+    contentStream.moveTo(lineStartX, lineStartY)
+    contentStream.lineTo(lineEndX, lineEndY)
+    contentStream.stroke()
+  }
+
   private data class LineAccumulator(
       var lineStart: Int,
       var state: Line.State,
@@ -68,7 +111,7 @@ class BitMatrixRenderable(bitMatrix: BitMatrix) {
   )
 
   private fun BitArray.state(index: Int): Line.State {
-    return when(get(index)) {
+    return when (get(index)) {
       true -> Line.State.ON
       false -> Line.State.OFF
     }
