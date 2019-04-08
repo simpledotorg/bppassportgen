@@ -8,7 +8,7 @@ class SaveBpPassportTask(
     val document: PDDocument,
     val uuid: UUID,
     val directory: File
-): Runnable {
+) : Runnable {
 
   override fun run() {
     val outputFile = File(directory, "$uuid.pdf")
