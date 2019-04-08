@@ -74,6 +74,7 @@ class BitMatrixRenderable(bitMatrix: BitMatrix) {
     val (foregroundLines, backgroundLines) = lines.partition { it.state == Line.State.ON }
 
     contentStream.setLineCapStyle(2)
+    contentStream.setLineWidth(1.1F)
 
     applyForegroundColor(contentStream)
     foregroundLines.forEach { line ->
