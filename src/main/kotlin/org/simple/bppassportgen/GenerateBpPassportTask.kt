@@ -48,18 +48,19 @@ class GenerateBpPassportTask(
     ).use { contentStream ->
       contentStream.beginText()
       contentStream.setNonStrokingColor(shortCodeColor)
-      contentStream.newLineAtOffset(200F, 220F)
-      contentStream.setCharacterSpacing(2.5F)
+      contentStream.newLineAtOffset(72.5F, 210F)
+      contentStream.setCharacterSpacing(2.4F)
       contentStream.setFont(font, 12F)
       contentStream.showText(shortCode)
       contentStream.endText()
 
       bitMatrixRenderable.render(
           contentStream,
-          280F,
-          150F,
+          196F,
+          107.5F,
           drawBackground = false,
-          applyForegroundColor = { it.setStrokingColor(barcodeColor) }
+          applyForegroundColor = { it.setStrokingColor(barcodeColor) },
+          applyBackgroundColor = { it.setStrokingColor(barcodeColor) }
       )
     }
 

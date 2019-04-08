@@ -45,7 +45,7 @@ class App {
   val logger = Logger.getLogger("App")
 
   fun run(numberOfPassports: Int, outDirectory: File) {
-    if(numberOfPassports <= 0) {
+    if (numberOfPassports <= 0) {
       throw IllegalArgumentException("Number of passports must be > 0!")
     }
     val computationThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())

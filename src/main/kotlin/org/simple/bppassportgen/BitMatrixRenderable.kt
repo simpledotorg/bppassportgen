@@ -3,6 +3,7 @@ package org.simple.bppassportgen
 import com.google.zxing.common.BitArray
 import com.google.zxing.common.BitMatrix
 import org.apache.pdfbox.pdmodel.PDPageContentStream
+import org.apache.pdfbox.util.Matrix
 import java.awt.Color
 
 class BitMatrixRenderable(bitMatrix: BitMatrix) {
@@ -71,6 +72,11 @@ class BitMatrixRenderable(bitMatrix: BitMatrix) {
       applyForegroundColor: (PDPageContentStream) -> Unit = { it.setStrokingColor(Color.BLACK) },
       applyBackgroundColor: (PDPageContentStream) -> Unit = { it.setStrokingColor(Color.WHITE) }
   ) {
+    val matrix = Matrix()
+    matrix.scale(1.35F, 1.35F)
+
+    contentStream.saveGraphicsState()
+    contentStream.transform(matrix)
     val (foregroundLines, backgroundLines) = lines.partition { it.state == Line.State.ON }
 
     contentStream.setLineCapStyle(2)
@@ -87,6 +93,7 @@ class BitMatrixRenderable(bitMatrix: BitMatrix) {
         drawLine(line, x, y, contentStream)
       }
     }
+    contentStream.restoreGraphicsState()
   }
 
   private fun drawLine(
