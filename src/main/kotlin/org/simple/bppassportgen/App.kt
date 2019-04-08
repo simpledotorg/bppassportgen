@@ -59,8 +59,8 @@ class App {
         PDDeviceCMYK.INSTANCE
     )
 
-    val pdfInputBytes = File("./bp_passport_template.pdf").readBytes()
-    val fontInputBytes = File("./Metropolis-Medium.ttf").readBytes()
+    val pdfInputBytes = javaClass.getResourceAsStream("/bp_passport_template.pdf").readBytes()
+    val fontInputBytes = javaClass.getResourceAsStream("/Metropolis-Medium.ttf").readBytes()
 
     val uuids = (0 until numberOfPassports)
         .map { UUID.randomUUID() }
