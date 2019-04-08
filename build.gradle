@@ -13,9 +13,7 @@ repositories {
 dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
   implementation "com.google.zxing:core:3.3.3"
-  implementation "com.google.zxing:javase:3.3.3"
   implementation 'org.apache.pdfbox:pdfbox:2.0.14'
-  implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.4.1'
   testImplementation 'junit:junit:4.12'
   testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
   testImplementation "io.strikt:strikt-core:0.19.7"
