@@ -11,6 +11,7 @@ repositories {
 }
 
 dependencies {
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
   implementation "com.google.zxing:core:3.3.3"
   implementation 'org.apache.pdfbox:pdfbox:2.0.14'

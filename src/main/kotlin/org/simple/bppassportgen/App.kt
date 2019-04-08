@@ -3,6 +3,9 @@ package org.simple.bppassportgen
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
+import org.apache.commons.cli.DefaultParser
+import org.apache.commons.cli.HelpFormatter
+import org.apache.commons.cli.Options
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
@@ -13,21 +16,38 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.logging.Logger
 
-fun main() {
-  App().run()
+fun main(args: Array<String>) {
+  val options = Options()
+      .apply {
+        addRequiredOption("c", "count", true, "Number of BP Passports to generate")
+        addOption("o", "output", true, "Directory to save the generated BP passports")
+        addOption("h", "help", false, "Print this message")
+      }
+
+  val helpFormatter = HelpFormatter()
+
+  if (args.isEmpty()) {
+    helpFormatter.printHelp("bppassportgen", options)
+  } else {
+
+    val parser = DefaultParser()
+    val cmd = parser.parse(options, args)
+
+    val numberOfPassports = cmd.getOptionValue("c").toInt()
+    val outDirectory = File(cmd.getOptionValue("o", "./out"))
+
+    App().run(numberOfPassports, outDirectory)
+  }
 }
 
 class App {
 
   val logger = Logger.getLogger("App")
 
-  fun run() {
+  fun run(numberOfPassports: Int, outDirectory: File) {
     val computationThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
     val ioThreadPool = Executors.newCachedThreadPool()
 
-    val numberOfPassports = 5
-
-    val outDirectory = File("./out")
     outDirectory.mkdirs()
 
     val blackCmyk = PDColor(
