@@ -13,7 +13,6 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import java.io.File
 import java.util.UUID
 import java.util.logging.Logger
-import javax.imageio.ImageIO
 
 fun main() {
   App().run()
@@ -33,7 +32,6 @@ class App {
   )
 
   fun run() {
-    logger.info(ImageIO.getWriterFormatNames().joinToString())
     val qrCodeWriter = QRCodeWriter()
     val hints = mapOf(
         EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.Q,
