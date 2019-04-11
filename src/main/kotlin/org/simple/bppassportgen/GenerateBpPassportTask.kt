@@ -19,9 +19,9 @@ class GenerateBpPassportTask(
     val hints: Map<EncodeHintType, Any>,
     val shortCodeColor: PDColor,
     val barcodeColor: PDColor
-) : Callable<PDDocument> {
+) : Callable<Output> {
 
-  override fun call(): PDDocument {
+  override fun call(): Output {
     val shortCode = uuid
         .toString()
         .filter { it.isDigit() }
@@ -64,6 +64,6 @@ class GenerateBpPassportTask(
       )
     }
 
-    return document
+    return Output(document, document)
   }
 }

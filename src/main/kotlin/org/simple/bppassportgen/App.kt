@@ -59,7 +59,7 @@ class App {
         PDDeviceCMYK.INSTANCE
     )
 
-    val pdfInputBytes = javaClass.getResourceAsStream("/bp_passport_template.pdf").readBytes()
+    val pdfInputBytes = javaClass.getResourceAsStream("/bp_passport_template_2.pdf").readBytes()
     val fontInputBytes = javaClass.getResourceAsStream("/Metropolis-Medium.ttf").readBytes()
 
     val uuids = (0 until numberOfPassports)
@@ -72,15 +72,26 @@ class App {
         EncodeHintType.MARGIN to 0
     )
 
-    val generatingPdfTasks = mutableMapOf<UUID, Future<PDDocument>>()
+    val generatingPdfTasks = mutableMapOf<UUID, Future<Output>>()
     val savePdfTasks = mutableListOf<Future<Any>>()
 
-    uuids
+    listOf(UUID.fromString("124dfe9d-323a-4c54-84ce-95f8e765add2"))
         .map { uuid ->
-          GenerateBpPassportTask(
+//          GenerateBpPassportTask(
+//              pdfBytes = pdfInputBytes,
+//              fontBytes = fontInputBytes,
+//              uuid = uuid,
+//              qrCodeWriter = qrCodeWriter,
+//              hints = hints,
+//              shortCodeColor = blackCmyk,
+//              barcodeColor = blackCmyk
+//          )
+
+          GenerateBpPassportTask2(
               pdfBytes = pdfInputBytes,
               fontBytes = fontInputBytes,
-              uuid = uuid,
+              uuid1 = uuid,
+              uuid2 = UUID.randomUUID(),
               qrCodeWriter = qrCodeWriter,
               hints = hints,
               shortCodeColor = blackCmyk,
@@ -88,7 +99,7 @@ class App {
           )
         }
         .forEach { task ->
-          generatingPdfTasks[task.uuid] = computationThreadPool.submit(task)
+          generatingPdfTasks[task.uuid1] = computationThreadPool.submit(task)
         }
 
     var tasksComplete = false
@@ -98,9 +109,9 @@ class App {
 
       generated
           .map { it.key to it.value.get() }
-          .map { (uuid, document) ->
+          .map { (uuid, output) ->
             SaveBpPassportTask(
-                document = document,
+                output = output,
                 uuid = uuid,
                 directory = outDirectory
             )
