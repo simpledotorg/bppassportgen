@@ -19,6 +19,7 @@ fun main(args: Array<String>) {
   val options = Options()
       .apply {
         addRequiredOption("c", "count", true, "Number of BP Passports to generate")
+        addRequiredOption("t", "template", true, "Path to the template file")
         addOption("o", "output", true, "Directory to save the generated BP passports")
         addOption("p", "pages", true, "Number of pages in a passport")
         addOption("rc", "row-count", true, "Number of rows in a page")
@@ -39,6 +40,7 @@ fun main(args: Array<String>) {
       helpFormatter.printHelp("bppassportgen", options)
     } else {
       val numberOfPassports = cmd.getOptionValue("c").toInt()
+      val templateFilePath = cmd.getOptionValue("t")
       val outDirectory = File(cmd.getOptionValue("o", "./out"))
       val pageCount = cmd.getOptionValue("p", "1").toInt()
       val rowCount = cmd.getOptionValue("rc", "1").toInt()
@@ -46,6 +48,7 @@ fun main(args: Array<String>) {
 
       App().run(
           numberOfPassports = numberOfPassports,
+          templateFilePath = templateFilePath,
           outDirectory = outDirectory,
           pageCount = pageCount,
           rowCount = rowCount,
@@ -61,6 +64,7 @@ class App {
 
   fun run(
       numberOfPassports: Int,
+      templateFilePath: String,
       outDirectory: File,
       pageCount: Int,
       rowCount: Int,
@@ -87,7 +91,7 @@ class App {
         PDDeviceCMYK.INSTANCE
     )
 
-    val pdfInputBytes = javaClass.getResourceAsStream("/bp_passport_template.pdf").readBytes()
+    val pdfInputBytes = File(templateFilePath).readBytes()
     val fontInputBytes = javaClass.getResourceAsStream("/Metropolis-Medium.ttf").readBytes()
 
     val uuidBatches = (0 until numberOfPassports)
