@@ -40,7 +40,8 @@ fun main(args: Array<String>) {
       val outDirectory = File(cmd.getOptionValue("o", "./out"))
       val mergePassportCount = cmd.getOptionValue("m", "1").toInt()
 
-      App().run(numberOfPassports, outDirectory, mergePassportCount)
+      //      App().run(numberOfPassports, outDirectory, mergePassportCount)
+      App().run(50, outDirectory, 5)
     }
   }
 }

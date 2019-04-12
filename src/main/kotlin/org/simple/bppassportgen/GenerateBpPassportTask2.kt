@@ -119,13 +119,15 @@ class GenerateBpPassportTask2(
         false
     ).use { contentStream ->
 
-      val matrix = Matrix()
       val pageWidth = pages.first().page.mediaBox.width
+      val matrix = Matrix()
+          .apply {
+            translate(pageWidth, 0F)
+          }
 
       pageXObjects.forEach { (id, xObject) ->
         target.resources.add(xObject, id.toString())
         contentStream.drawForm(xObject)
-        matrix.translate(pageWidth, 0F)
         contentStream.transform(matrix)
       }
     }
