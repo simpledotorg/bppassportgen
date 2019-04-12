@@ -18,10 +18,10 @@ import java.util.UUID
 import java.util.concurrent.Callable
 
 class GenerateBpPassportTask2(
+    val taskNumber: Int,
     val pdfBytes: ByteArray,
     val fontBytes: ByteArray,
-    val uuid1: UUID,
-    val uuid2: UUID,
+    val uuids: List<UUID>,
     val qrCodeWriter: QRCodeWriter,
     val hints: Map<EncodeHintType, Any>,
     val shortCodeColor: PDColor,
@@ -37,8 +37,6 @@ class GenerateBpPassportTask2(
           val font = PDType0Font.load(document, ByteArrayInputStream(fontBytes))
 
           val newDocument = PDDocument()
-
-          val uuids = listOf(uuid1, uuid2)
 
           val frontPages = uuids
               .map { uuid ->

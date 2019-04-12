@@ -7,7 +7,6 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import org.apache.pdfbox.cos.COSName
-import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import java.io.File
@@ -21,6 +20,7 @@ fun main(args: Array<String>) {
       .apply {
         addRequiredOption("c", "count", true, "Number of BP Passports to generate")
         addOption("o", "output", true, "Directory to save the generated BP passports")
+        addOption("m", "merge", true, "Number of passports to merge into a single page")
         addOption("h", "help", false, "Print this message")
       }
 
@@ -33,10 +33,15 @@ fun main(args: Array<String>) {
     val parser = DefaultParser()
     val cmd = parser.parse(options, args)
 
-    val numberOfPassports = cmd.getOptionValue("c").toInt()
-    val outDirectory = File(cmd.getOptionValue("o", "./out"))
+    if (cmd.hasOption("h")) {
+      helpFormatter.printHelp("bppassportgen", options)
+    } else {
+      val numberOfPassports = cmd.getOptionValue("c").toInt()
+      val outDirectory = File(cmd.getOptionValue("o", "./out"))
+      val mergePassportCount = cmd.getOptionValue("m", "1").toInt()
 
-    App().run(numberOfPassports, outDirectory)
+      App().run(numberOfPassports, outDirectory, mergePassportCount)
+    }
   }
 }
 
@@ -44,10 +49,19 @@ class App {
 
   val logger = Logger.getLogger("App")
 
-  fun run(numberOfPassports: Int, outDirectory: File) {
+  fun run(
+      numberOfPassports: Int,
+      outDirectory: File,
+      mergeCount: Int
+  ) {
     if (numberOfPassports <= 0) {
       throw IllegalArgumentException("Number of passports must be > 0!")
     }
+
+    if (mergeCount > numberOfPassports) {
+      throw IllegalArgumentException("Merge count of passports must be > count!")
+    }
+
     val computationThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
     val ioThreadPool = Executors.newCachedThreadPool()
 
@@ -62,9 +76,10 @@ class App {
     val pdfInputBytes = javaClass.getResourceAsStream("/bp_passport_template_2.pdf").readBytes()
     val fontInputBytes = javaClass.getResourceAsStream("/Metropolis-Medium.ttf").readBytes()
 
-    val uuids = (0 until numberOfPassports)
+    val uuidBatches = (0 until numberOfPassports)
         .map { UUID.randomUUID() }
         .distinct()
+        .windowed(size = mergeCount, step = mergeCount, partialWindows = true)
 
     val qrCodeWriter = QRCodeWriter()
     val hints = mapOf(
@@ -72,26 +87,16 @@ class App {
         EncodeHintType.MARGIN to 0
     )
 
-    val generatingPdfTasks = mutableMapOf<UUID, Future<Output>>()
+    val generatingPdfTasks = mutableMapOf<Int, Future<Output>>()
     val savePdfTasks = mutableListOf<Future<Any>>()
 
-    listOf(UUID.fromString("124dfe9d-323a-4c54-84ce-95f8e765add2"))
-        .map { uuid ->
-//          GenerateBpPassportTask(
-//              pdfBytes = pdfInputBytes,
-//              fontBytes = fontInputBytes,
-//              uuid = uuid,
-//              qrCodeWriter = qrCodeWriter,
-//              hints = hints,
-//              shortCodeColor = blackCmyk,
-//              barcodeColor = blackCmyk
-//          )
-
+    uuidBatches
+        .mapIndexed { index, uuids ->
           GenerateBpPassportTask2(
+              taskNumber = index + 1,
               pdfBytes = pdfInputBytes,
               fontBytes = fontInputBytes,
-              uuid1 = uuid,
-              uuid2 = UUID.randomUUID(),
+              uuids = uuids,
               qrCodeWriter = qrCodeWriter,
               hints = hints,
               shortCodeColor = blackCmyk,
@@ -99,7 +104,7 @@ class App {
           )
         }
         .forEach { task ->
-          generatingPdfTasks[task.uuid1] = computationThreadPool.submit(task)
+          generatingPdfTasks[task.taskNumber] = computationThreadPool.submit(task)
         }
 
     var tasksComplete = false
@@ -109,10 +114,11 @@ class App {
 
       generated
           .map { it.key to it.value.get() }
-          .map { (uuid, output) ->
+          .map { (taskNumber, output) ->
             SaveBpPassportTask(
                 output = output,
-                uuid = uuid,
+                taskNumber = taskNumber,
+                totalSize = uuidBatches.size,
                 directory = outDirectory
             )
           }
@@ -125,9 +131,9 @@ class App {
           .forEach { generatingPdfTasks.remove(it) }
 
       val numberOfSavedPdfs = savePdfTasks.count { it.isDone }
-      println("Finished $numberOfSavedPdfs/${uuids.size} Passports!")
+      println("Finished $numberOfSavedPdfs/${uuidBatches.size} Passports!")
 
-      if (savePdfTasks.size == uuids.size && savePdfTasks.all { it.isDone }) {
+      if (savePdfTasks.size == uuidBatches.size && savePdfTasks.all { it.isDone }) {
         tasksComplete = true
       }
     }
