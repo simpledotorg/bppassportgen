@@ -21,7 +21,7 @@ class GenerateBpPassportTask2(
     val taskNumber: Int,
     val pdfBytes: ByteArray,
     val fontBytes: ByteArray,
-    val uuids: List<UUID>,
+    val uuidBatches: List<List<UUID>>,
     val qrCodeWriter: QRCodeWriter,
     val hints: Map<EncodeHintType, Any>,
     val shortCodeColor: PDColor,
@@ -38,23 +38,26 @@ class GenerateBpPassportTask2(
 
           val newDocument = PDDocument()
 
-          val frontPages = uuids
-              .map { uuid ->
-                Page(
-                    uuid = uuid,
-                    page = frontPage
-                        .clone()
-                        .apply {
-                          renderBpPassportCodeOnPage(this, newDocument, font, uuid)
-                        }
-                )
+          uuidBatches
+              .forEach { uuids ->
+                val frontPages = uuids
+                    .map { uuid ->
+                      Page(
+                          uuid = uuid,
+                          page = frontPage
+                              .clone()
+                              .apply {
+                                renderBpPassportCodeOnPage(this, newDocument, font, uuid)
+                              }
+                      )
+                    }
+
+                val backPages = frontPages
+                    .map { (id, _) -> Page(uuid = id, page = backPage.clone()) }
+
+                mergePages(newDocument, frontPages)
+                mergePages(newDocument, backPages)
               }
-
-          val backPages = frontPages
-              .map { (id, _) -> Page(uuid = id, page = backPage.clone()) }
-
-          mergePages(newDocument, frontPages)
-          mergePages(newDocument, backPages)
 
           Output(source = document, final = newDocument)
         }

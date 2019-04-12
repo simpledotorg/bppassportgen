@@ -41,7 +41,7 @@ fun main(args: Array<String>) {
       val mergePassportCount = cmd.getOptionValue("m", "1").toInt()
 
       //      App().run(numberOfPassports, outDirectory, mergePassportCount)
-      App().run(50, outDirectory, 5)
+      App().run(50, outDirectory, 3, 3)
     }
   }
 }
@@ -53,7 +53,8 @@ class App {
   fun run(
       numberOfPassports: Int,
       outDirectory: File,
-      mergeCount: Int
+      mergeCount: Int,
+      pageCount: Int
   ) {
     if (numberOfPassports <= 0) {
       throw IllegalArgumentException("Number of passports must be > 0!")
@@ -81,6 +82,7 @@ class App {
         .map { UUID.randomUUID() }
         .distinct()
         .windowed(size = mergeCount, step = mergeCount, partialWindows = true)
+        .windowed(size = pageCount, step = pageCount, partialWindows = true)
 
     val qrCodeWriter = QRCodeWriter()
     val hints = mapOf(
@@ -92,12 +94,12 @@ class App {
     val savePdfTasks = mutableListOf<Future<Any>>()
 
     uuidBatches
-        .mapIndexed { index, uuids ->
+        .mapIndexed { index, uuidBatch ->
           GenerateBpPassportTask2(
               taskNumber = index + 1,
               pdfBytes = pdfInputBytes,
               fontBytes = fontInputBytes,
-              uuids = uuids,
+              uuidBatches = uuidBatch,
               qrCodeWriter = qrCodeWriter,
               hints = hints,
               shortCodeColor = blackCmyk,
