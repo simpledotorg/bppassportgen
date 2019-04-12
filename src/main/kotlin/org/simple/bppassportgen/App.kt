@@ -20,7 +20,9 @@ fun main(args: Array<String>) {
       .apply {
         addRequiredOption("c", "count", true, "Number of BP Passports to generate")
         addOption("o", "output", true, "Directory to save the generated BP passports")
-        addOption("m", "merge", true, "Number of passports to merge into a single page")
+        addOption("p", "pages", true, "Number of pages in a passport")
+        addOption("rc", "row-count", true, "Number of rows in a page")
+        addOption("cc", "column-count", true, "Number of columns in a page")
         addOption("h", "help", false, "Print this message")
       }
 
@@ -38,10 +40,17 @@ fun main(args: Array<String>) {
     } else {
       val numberOfPassports = cmd.getOptionValue("c").toInt()
       val outDirectory = File(cmd.getOptionValue("o", "./out"))
-      val mergePassportCount = cmd.getOptionValue("m", "1").toInt()
+      val pageCount = cmd.getOptionValue("p", "1").toInt()
+      val rowCount = cmd.getOptionValue("rc", "1").toInt()
+      val columnCount = cmd.getOptionValue("cc", "1").toInt()
 
-      //      App().run(numberOfPassports, outDirectory, mergePassportCount)
-      App().run(50, outDirectory, 3, 3)
+      App().run(
+          numberOfPassports = numberOfPassports,
+          outDirectory = outDirectory,
+          pageCount = pageCount,
+          rowCount = rowCount,
+          columnCount = columnCount
+      )
     }
   }
 }
@@ -53,16 +62,19 @@ class App {
   fun run(
       numberOfPassports: Int,
       outDirectory: File,
-      mergeCount: Int,
-      pageCount: Int
+      pageCount: Int,
+      rowCount: Int,
+      columnCount: Int
   ) {
     if (numberOfPassports <= 0) {
       throw IllegalArgumentException("Number of passports must be > 0!")
     }
 
-    if (mergeCount > numberOfPassports) {
-      throw IllegalArgumentException("Merge count of passports must be > count!")
+    if (rowCount * columnCount > numberOfPassports) {
+      throw IllegalArgumentException("row count * column count of passports must be > count!")
     }
+
+    val mergeCount = rowCount * columnCount
 
     val computationThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
     val ioThreadPool = Executors.newCachedThreadPool()
@@ -75,14 +87,14 @@ class App {
         PDDeviceCMYK.INSTANCE
     )
 
-    val pdfInputBytes = javaClass.getResourceAsStream("/bp_passport_template_2.pdf").readBytes()
+    val pdfInputBytes = javaClass.getResourceAsStream("/bp_passport_template.pdf").readBytes()
     val fontInputBytes = javaClass.getResourceAsStream("/Metropolis-Medium.ttf").readBytes()
 
     val uuidBatches = (0 until numberOfPassports)
         .map { UUID.randomUUID() }
         .distinct()
-        .windowed(size = mergeCount, step = mergeCount, partialWindows = true)
-        .windowed(size = pageCount, step = pageCount, partialWindows = true)
+        .windowed(size = mergeCount, step = mergeCount)
+        .windowed(size = pageCount, step = pageCount)
 
     val qrCodeWriter = QRCodeWriter()
     val hints = mapOf(
@@ -95,7 +107,7 @@ class App {
 
     uuidBatches
         .mapIndexed { index, uuidBatch ->
-          GenerateBpPassportTask2(
+          GenerateBpPassportTask(
               taskNumber = index + 1,
               pdfBytes = pdfInputBytes,
               fontBytes = fontInputBytes,
@@ -103,7 +115,9 @@ class App {
               qrCodeWriter = qrCodeWriter,
               hints = hints,
               shortCodeColor = blackCmyk,
-              barcodeColor = blackCmyk
+              barcodeColor = blackCmyk,
+              rowCount = rowCount,
+              columnCount = columnCount
           )
         }
         .forEach { task ->
