@@ -70,13 +70,8 @@ class App {
       rowCount: Int,
       columnCount: Int
   ) {
-    if (numberOfPassports <= 0) {
-      throw IllegalArgumentException("Number of passports must be > 0!")
-    }
-
-    if (rowCount * columnCount > numberOfPassports) {
-      throw IllegalArgumentException("row count * column count of passports must be > count!")
-    }
+    require(numberOfPassports > 0) { "Number of passports must be > 0!" }
+    require(rowCount * columnCount <= numberOfPassports) { "row count * column count of passports must be <= count!" }
 
     val mergeCount = rowCount * columnCount
 
