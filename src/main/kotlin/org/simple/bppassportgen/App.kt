@@ -11,6 +11,7 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import java.io.File
 import java.util.UUID
+import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.logging.Logger
@@ -25,7 +26,7 @@ fun main(args: Array<String>) {
         addOption("rc", "row-count", true, "Number of rows in a page")
         addOption("cc", "column-count", true, "Number of columns in a page")
         addOption("h", "help", false, "Print this message")
-        addOption("stickers", false, "Generate stickers instead of the BP Passports")
+        addOption("sticker", false, "Generate stickers instead of the BP Passports")
       }
 
   val helpFormatter = HelpFormatter()
@@ -46,6 +47,7 @@ fun main(args: Array<String>) {
       val pageCount = cmd.getOptionValue("p", "1").toInt()
       val rowCount = cmd.getOptionValue("rc", "1").toInt()
       val columnCount = cmd.getOptionValue("cc", "1").toInt()
+      val isSticker = cmd.hasOption("sticker")
 
       App().run(
           numberOfPassports = numberOfPassports,
@@ -53,7 +55,8 @@ fun main(args: Array<String>) {
           outDirectory = outDirectory,
           pageCount = pageCount,
           rowCount = rowCount,
-          columnCount = columnCount
+          columnCount = columnCount,
+          isSticker = isSticker
       )
     }
   }
@@ -69,7 +72,8 @@ class App {
       outDirectory: File,
       pageCount: Int,
       rowCount: Int,
-      columnCount: Int
+      columnCount: Int,
+      isSticker: Boolean
   ) {
     require(numberOfPassports > 0) { "Number of passports must be > 0!" }
     require(rowCount * columnCount <= numberOfPassports) { "row count * column count of passports must be <= count!" }
@@ -107,21 +111,13 @@ class App {
 
     uuidBatches
         .mapIndexed { index, uuidBatch ->
-          GenerateBpPassportTask(
-              taskNumber = index + 1,
-              pdfBytes = pdfInputBytes,
-              fontBytes = fontInputBytes,
-              uuidBatches = uuidBatch,
-              qrCodeWriter = qrCodeWriter,
-              hints = hints,
-              shortCodeColor = blackCmyk,
-              barcodeColor = blackCmyk,
-              rowCount = rowCount,
-              columnCount = columnCount
-          )
+
+          val task = createPassportGenerationTask(isSticker, index, pdfInputBytes, fontInputBytes, uuidBatch, qrCodeWriter, hints, blackCmyk, rowCount, columnCount)
+
+          task to index + 1
         }
-        .forEach { task ->
-          generatingPdfTasks[task.taskNumber] = computationThreadPool.submit(task)
+        .forEach { (task, taskNumber) ->
+          generatingPdfTasks[taskNumber] = computationThreadPool.submit(task)
         }
 
     var tasksComplete = false
@@ -157,5 +153,46 @@ class App {
 
     computationThreadPool.shutdown()
     ioThreadPool.shutdown()
+  }
+
+  private fun createPassportGenerationTask(
+      isSticker: Boolean,
+      index: Int,
+      pdfInputBytes: ByteArray,
+      fontInputBytes: ByteArray,
+      uuidBatch: List<List<UUID>>,
+      qrCodeWriter: QRCodeWriter,
+      hints: Map<EncodeHintType, Any>,
+      blackCmyk: PDColor,
+      rowCount: Int,
+      columnCount: Int
+  ): Callable<Output> {
+    return if (isSticker) {
+      GenerateBpStickerTask(
+          taskNumber = index + 1,
+          pdfBytes = pdfInputBytes,
+          fontBytes = fontInputBytes,
+          uuidBatches = uuidBatch,
+          qrCodeWriter = qrCodeWriter,
+          hints = hints,
+          shortCodeColor = blackCmyk,
+          barcodeColor = blackCmyk,
+          rowCount = rowCount,
+          columnCount = columnCount
+      )
+    } else {
+      GenerateBpPassportTask(
+          taskNumber = index + 1,
+          pdfBytes = pdfInputBytes,
+          fontBytes = fontInputBytes,
+          uuidBatches = uuidBatch,
+          qrCodeWriter = qrCodeWriter,
+          hints = hints,
+          shortCodeColor = blackCmyk,
+          barcodeColor = blackCmyk,
+          rowCount = rowCount,
+          columnCount = columnCount
+      )
+    }
   }
 }
