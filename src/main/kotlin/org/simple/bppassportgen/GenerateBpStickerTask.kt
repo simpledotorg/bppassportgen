@@ -78,9 +78,9 @@ class GenerateBpStickerTask(
     ).use { contentStream ->
       contentStream.beginText()
       contentStream.setNonStrokingColor(shortCodeColor)
-      contentStream.newLineAtOffset(72.5F, 210F)
-      contentStream.setCharacterSpacing(2.4F)
-      contentStream.setFont(font, 12F)
+      contentStream.newLineAtOffset(16F, 8F)
+      contentStream.setCharacterSpacing(1.2F)
+      contentStream.setFont(font, 8F)
       contentStream.showText(shortCode)
       contentStream.endText()
 
