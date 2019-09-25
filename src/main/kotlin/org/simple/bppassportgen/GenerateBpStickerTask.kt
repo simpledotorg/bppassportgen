@@ -33,8 +33,7 @@ class GenerateBpStickerTask(
   override fun call(): Output {
     return PDDocument.load(pdfBytes)
         .let { document ->
-          val frontPage = document.getPage(0)
-          val backPage = document.getPage(1)
+          val singleStickerPage = document.getPage(0)
 
           val font = PDType0Font.load(document, ByteArrayInputStream(fontBytes))
 
@@ -42,11 +41,11 @@ class GenerateBpStickerTask(
 
           uuidBatches
               .forEach { uuids ->
-                val frontPages = uuids
+                val pages = uuids
                     .map { uuid ->
                       Page(
                           uuid = uuid,
-                          page = frontPage
+                          page = singleStickerPage
                               .clone()
                               .apply {
                                 renderBpPassportCodeOnPage(this, newDocument, font, uuid)
@@ -54,11 +53,7 @@ class GenerateBpStickerTask(
                       )
                     }
 
-                val backPages = frontPages
-                    .map { (id, _) -> Page(uuid = id, page = backPage.clone()) }
-
-                mergePages(newDocument, frontPages, rowCount, columnCount)
-                mergePages(newDocument, backPages, rowCount, columnCount)
+                mergePages(newDocument, pages, rowCount, columnCount)
               }
 
           Output(source = document, final = newDocument)
