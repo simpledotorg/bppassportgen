@@ -18,7 +18,7 @@
 3. Navigate in the terminal to the location to where the JAR is present.
 4. To run the tool, run the following command
 
-    `java -jar bppassportgen-1.0.0-all.jar -c 1 -t <path to passport template file> -o ~/Desktop/Passports`
+    `java -jar bppassportgen-{version}-all.jar -c 1 -t <path to passport template file> -o ~/Desktop/Passports`
 
 5. The following options are available to configure the generated PDFs
   * `-c,--count <arg>`           Number of BP Passports to generate
@@ -28,7 +28,12 @@
   * `-rc,--row-count <arg>`      Number of rows in a page
   * `-cc,--column-count <arg>`   Number of columns in a page
   * `-t,--template <arg>`        Path to the template file
+  * `-sticker`                   Generate stickers instead of BP Passports
 
 For example, if you want to generate a total of 10000 passports, with each page 2 X 2 and a total of 40 passports in a single PDF, run the following command:
 
-`java -jar bppassportgen-1.0.0-all.jar -c 10000 -t bppassport-template.pdf -p 10 -rc 2 -cc 2 -o ~/Desktop/Passports`
+`java -jar bppassportgen-{version}-all.jar -c 10000 -t bppassport-template.pdf -p 10 -rc 2 -cc 2 -o ~/Desktop/Passports`
+
+For generating stickers, just add the `-sticker` flag in the command line.
+
+`java -jar bppassportgen-{version}-all.jar -c 10000 -t bppassport-template.pdf -p 10 -rc 2 -cc 2 -sticker -o ~/Desktop/Passports`
