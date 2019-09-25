@@ -23,7 +23,7 @@ class BitMatrixRenderableTest {
   ) {
     val bitMatrix = BitMatrix.parse(image)
 
-    val renderable = BitMatrixRenderable(bitMatrix)
+    val renderable = BitMatrixRenderable(bitMatrix, 1.0F)
 
     expectThat(renderable.lines).isEqualTo(expected)
   }

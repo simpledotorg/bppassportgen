@@ -73,7 +73,7 @@ class GenerateBpPassportTask(
   ) {
     val shortCode = shortCodeForUuid(uuid)
     val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, 80, 80, hints)
-    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix)
+    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = 1.35F)
 
     PDPageContentStream(
         document,

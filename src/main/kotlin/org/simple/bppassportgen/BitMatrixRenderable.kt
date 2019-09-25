@@ -6,7 +6,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.util.Matrix
 import java.awt.Color
 
-class BitMatrixRenderable(bitMatrix: BitMatrix) {
+class BitMatrixRenderable(bitMatrix: BitMatrix, private val matrixScale: Float = 1F) {
   val lines: List<Line>
 
   init {
@@ -73,7 +73,7 @@ class BitMatrixRenderable(bitMatrix: BitMatrix) {
       applyBackgroundColor: (PDPageContentStream) -> Unit = { it.setStrokingColor(Color.WHITE) }
   ) {
     val matrix = Matrix()
-    matrix.scale(1.35F, 1.35F)
+    matrix.scale(matrixScale, matrixScale)
 
     contentStream.saveGraphicsState()
     contentStream.transform(matrix)
