@@ -50,8 +50,13 @@ fun main(args: Array<String>) {
       val columnCount = cmd.getOptionValue("cc", "1").toInt()
       val isSticker = cmd.hasOption("sticker")
 
+      require(numberOfPassports > 0) { "Number of passports must be > 0!" }
+      require(rowCount * columnCount <= numberOfPassports) { "row count * column count of passports must be <= count!" }
+
+      val uuidsToGenerate = (0 until numberOfPassports).map { UUID.randomUUID() }
+
       App().run(
-          numberOfPassports = numberOfPassports,
+          uuidsToGenerate = uuidsToGenerate,
           templateFilePath = templateFilePath,
           outDirectory = outDirectory,
           pageCount = pageCount,
@@ -71,7 +76,7 @@ class App(
   val logger = Logger.getLogger("App")
 
   fun run(
-      numberOfPassports: Int,
+      uuidsToGenerate: List<UUID>,
       templateFilePath: String,
       outDirectory: File,
       pageCount: Int,
@@ -79,8 +84,6 @@ class App(
       columnCount: Int,
       isSticker: Boolean
   ) {
-    require(numberOfPassports > 0) { "Number of passports must be > 0!" }
-    require(rowCount * columnCount <= numberOfPassports) { "row count * column count of passports must be <= count!" }
 
     val mergeCount = rowCount * columnCount
 
@@ -95,8 +98,7 @@ class App(
     val pdfInputBytes = File(templateFilePath).readBytes()
     val fontInputBytes = javaClass.getResourceAsStream("/Metropolis-Medium.ttf").readBytes()
 
-    val uuidBatches = (0 until numberOfPassports)
-        .map { UUID.randomUUID() }
+    val uuidBatches = uuidsToGenerate
         .distinct()
         .windowed(size = mergeCount, step = mergeCount)
         .windowed(size = pageCount, step = pageCount)
