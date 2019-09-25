@@ -68,7 +68,7 @@ class GenerateBpStickerTask(
   ) {
     val shortCode = shortCodeForUuid(uuid)
     val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, 80, 80, hints)
-    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix)
+    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = 0.85F)
 
     PDPageContentStream(
         document,
@@ -86,8 +86,8 @@ class GenerateBpStickerTask(
 
       bitMatrixRenderable.render(
           contentStream,
-          196F,
-          107.5F,
+          4.5F,
+          17F,
           drawBackground = false,
           applyForegroundColor = { it.setStrokingColor(barcodeColor) },
           applyBackgroundColor = { it.setStrokingColor(barcodeColor) }
