@@ -25,6 +25,7 @@ fun main(args: Array<String>) {
         addOption("rc", "row-count", true, "Number of rows in a page")
         addOption("cc", "column-count", true, "Number of columns in a page")
         addOption("h", "help", false, "Print this message")
+        addOption("stickers", false, "Generate stickers instead of the BP Passports")
       }
 
   val helpFormatter = HelpFormatter()
