@@ -15,7 +15,6 @@ import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
-import java.util.logging.Logger
 
 fun main(args: Array<String>) {
   val options = Options()
@@ -72,8 +71,6 @@ class App(
     private val computationThreadPool: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
     private val ioThreadPool: ExecutorService = Executors.newCachedThreadPool()
 ) {
-
-  val logger = Logger.getLogger("App")
 
   fun run(
       uuidsToGenerate: List<UUID>,
