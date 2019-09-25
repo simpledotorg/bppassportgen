@@ -26,6 +26,7 @@ dependencies {
   testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
   testImplementation "io.strikt:strikt-core:0.19.7"
   testImplementation "com.approvaltests:approvaltests:4.0.2"
+  testImplementation "com.google.guava:guava:28.1-jre"
 }
 
 compileKotlin {
