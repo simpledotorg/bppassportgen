@@ -160,3 +160,6 @@ gradle-app.setting
 /barcode.png
 /bp_passport_out.pdf
 /barcode.jpg
+
+# Avoid ignoring manually added libs
+!libs/*.jar
