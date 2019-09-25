@@ -1,0 +1,2 @@
+# Mark approval tests as binary so line endings are not changed by git
+*.approved.* binary

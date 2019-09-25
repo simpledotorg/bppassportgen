@@ -163,3 +163,6 @@ gradle-app.setting
 
 # Avoid ignoring manually added libs
 !libs/*.jar
+
+# For approval tests
+**/*.received.*
