@@ -12,6 +12,7 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import java.io.File
 import java.util.UUID
 import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.logging.Logger
@@ -62,7 +63,10 @@ fun main(args: Array<String>) {
   }
 }
 
-class App {
+class App(
+    private val computationThreadPool: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
+    private val ioThreadPool: ExecutorService = Executors.newCachedThreadPool()
+) {
 
   val logger = Logger.getLogger("App")
 
@@ -79,9 +83,6 @@ class App {
     require(rowCount * columnCount <= numberOfPassports) { "row count * column count of passports must be <= count!" }
 
     val mergeCount = rowCount * columnCount
-
-    val computationThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
-    val ioThreadPool = Executors.newCachedThreadPool()
 
     outDirectory.mkdirs()
 
