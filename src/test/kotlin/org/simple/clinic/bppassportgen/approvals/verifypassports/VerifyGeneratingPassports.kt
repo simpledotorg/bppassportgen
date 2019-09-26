@@ -1,4 +1,4 @@
-package org.simple.clinic.bppassportgen.verifypassports
+package org.simple.clinic.bppassportgen.approvals.verifypassports
 
 import com.google.common.util.concurrent.MoreExecutors
 import org.apache.pdfbox.pdmodel.PDDocument

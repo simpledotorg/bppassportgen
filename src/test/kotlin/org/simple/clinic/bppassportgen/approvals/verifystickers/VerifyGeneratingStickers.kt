@@ -1,4 +1,4 @@
-package org.simple.clinic.bppassportgen.verifystickers
+package org.simple.clinic.bppassportgen.approvals.verifystickers
 
 import com.google.common.util.concurrent.MoreExecutors
 import org.apache.pdfbox.pdmodel.PDDocument
