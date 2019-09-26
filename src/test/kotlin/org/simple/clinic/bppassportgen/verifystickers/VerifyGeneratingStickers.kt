@@ -11,6 +11,8 @@ import org.simple.clinic.bppassportgen.SavePdfToImage
 import java.io.File
 import java.nio.file.Paths
 import java.util.UUID
+import strikt.api.*
+import strikt.assertions.*
 
 class VerifyGeneratingStickers {
 
@@ -42,6 +44,8 @@ class VerifyGeneratingStickers {
         .listFiles { _, name -> name.endsWith(".pdf") }!!
         .map { file -> PDDocument.load(file) }
         .flatMap(SavePdfToImage::save)
+
+    expectThat(generatedPdfPages).hasSize(2)
 
     generatedPdfPages
         .mapIndexed { index, image -> "passport sticker ${index + 1}" to image }
