@@ -1,4 +1,4 @@
-package org.simple.bppassportgen
+package org.simple.bppassportgen.consoleprinter
 
 interface ConsolePrinter {
   fun print(message: String)

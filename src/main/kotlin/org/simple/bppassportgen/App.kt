@@ -9,6 +9,10 @@ import org.apache.commons.cli.Options
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
+import org.simple.bppassportgen.consoleprinter.ConsolePrinter
+import org.simple.bppassportgen.consoleprinter.RealConsolePrinter
+import org.simple.bppassportgen.progresspoll.ProgressPoll
+import org.simple.bppassportgen.progresspoll.RealProgressPoll
 import java.io.File
 import java.time.Duration
 import java.util.UUID
@@ -146,24 +150,16 @@ class App(
           .forEach { generatingPdfTasks.remove(it) }
 
       val numberOfSavedPdfs = savePdfTasks.count { it.isDone }
-      output("Finished $numberOfSavedPdfs/${uuidBatches.size} Passports!")
+      consolePrinter.print("Finished $numberOfSavedPdfs/${uuidBatches.size} Passports!")
 
       if (savePdfTasks.size == uuidBatches.size && savePdfTasks.all { it.isDone }) {
         tasksComplete = true
       }
-      waitForProgress()
+      progressPoll.poll()
     }
 
     computationThreadPool.shutdown()
     ioThreadPool.shutdown()
-  }
-
-  private fun waitForProgress() {
-    progressPoll.poll()
-  }
-
-  private fun output(message: String) {
-    consolePrinter.print(message)
   }
 
   private fun createPassportGenerationTask(

@@ -6,8 +6,8 @@ import org.approvaltests.Approvals
 import org.approvaltests.namer.NamerFactory
 import org.junit.Before
 import org.simple.bppassportgen.App
-import org.simple.bppassportgen.NoOpConsolePrinter
-import org.simple.bppassportgen.NoOpProgressPoll
+import org.simple.clinic.bppassportgen.util.NoOpConsolePrinter
+import org.simple.clinic.bppassportgen.util.NoOpProgressPoll
 import org.simple.clinic.bppassportgen.SavePdfToImage
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
