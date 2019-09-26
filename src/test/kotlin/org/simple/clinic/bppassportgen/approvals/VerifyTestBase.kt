@@ -6,6 +6,7 @@ import org.approvaltests.Approvals
 import org.approvaltests.namer.NamerFactory
 import org.junit.Before
 import org.simple.bppassportgen.App
+import org.simple.bppassportgen.NoOpProgressPoll
 import org.simple.clinic.bppassportgen.SavePdfToImage
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -20,7 +21,8 @@ open class VerifyTestBase(uuidFileResourcePath: String) {
   protected val uuids: List<UUID> = readUuids(uuidFileResourcePath)
   protected val app = App(
       computationThreadPool = MoreExecutors.newDirectExecutorService(),
-      ioThreadPool = MoreExecutors.newDirectExecutorService()
+      ioThreadPool = MoreExecutors.newDirectExecutorService(),
+      progressPoll = NoOpProgressPoll()
   )
 
   @Before

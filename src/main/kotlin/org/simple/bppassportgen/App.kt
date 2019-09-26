@@ -10,6 +10,7 @@ import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import java.io.File
+import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
@@ -69,7 +70,8 @@ fun main(args: Array<String>) {
 
 class App(
     private val computationThreadPool: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
-    private val ioThreadPool: ExecutorService = Executors.newCachedThreadPool()
+    private val ioThreadPool: ExecutorService = Executors.newCachedThreadPool(),
+    private val progressPoll: ProgressPoll = RealProgressPoll(Duration.ofSeconds(1))
 ) {
 
   fun run(
@@ -122,7 +124,6 @@ class App(
 
     var tasksComplete = false
     while (tasksComplete.not()) {
-      Thread.sleep(1000L)
       val generated = generatingPdfTasks.filter { (_, future) -> future.isDone }
 
       generated
@@ -149,10 +150,15 @@ class App(
       if (savePdfTasks.size == uuidBatches.size && savePdfTasks.all { it.isDone }) {
         tasksComplete = true
       }
+      waitForProgress()
     }
 
     computationThreadPool.shutdown()
     ioThreadPool.shutdown()
+  }
+
+  private fun waitForProgress() {
+    progressPoll.poll()
   }
 
   private fun createPassportGenerationTask(
