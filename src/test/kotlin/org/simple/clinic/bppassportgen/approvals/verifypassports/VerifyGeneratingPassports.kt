@@ -17,6 +17,6 @@ class VerifyGeneratingPassports : VerifyTestBase("uuids_passports.txt") {
         isSticker = false
     )
 
-    runApprovals(8) { pageNumber: Int -> "bp passport $pageNumber" }
+    runApprovals(8) { pdfNumber, pageNumber: Int -> "bp passport $pdfNumber.$pageNumber" }
   }
 }

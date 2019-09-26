@@ -12,11 +12,11 @@ class VerifyGeneratingStickers : VerifyTestBase("uuids_stickers.txt") {
         templateFilePath = resourceFilePath("passportsticker-template.pdf"),
         outDirectory = outputDirectory,
         pageCount = 2,
-        rowCount = 4,
-        columnCount = 4,
+        rowCount = 2,
+        columnCount = 2,
         isSticker = true
     )
 
-    runApprovals(2) { pageNumber: Int -> "passport sticker $pageNumber" }
+    runApprovals(8) { pdfNumber, pageNumber: Int -> "passport sticker $pdfNumber.$pageNumber" }
   }
 }
