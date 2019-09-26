@@ -15,7 +15,8 @@ import java.nio.file.Paths
 import java.util.UUID
 
 open class VerifyTestBase(uuidFileResourcePath: String) {
-  protected val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), "bp_passports").toFile()
+  private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
+  protected val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
   protected val uuids: List<UUID> = readUuids(uuidFileResourcePath)
   protected val app = App(
       computationThreadPool = MoreExecutors.newDirectExecutorService(),
