@@ -71,7 +71,8 @@ fun main(args: Array<String>) {
 class App(
     private val computationThreadPool: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
     private val ioThreadPool: ExecutorService = Executors.newCachedThreadPool(),
-    private val progressPoll: ProgressPoll = RealProgressPoll(Duration.ofSeconds(1))
+    private val progressPoll: ProgressPoll = RealProgressPoll(Duration.ofSeconds(1)),
+    private val consolePrinter: ConsolePrinter = RealConsolePrinter()
 ) {
 
   fun run(
@@ -145,7 +146,7 @@ class App(
           .forEach { generatingPdfTasks.remove(it) }
 
       val numberOfSavedPdfs = savePdfTasks.count { it.isDone }
-      println("Finished $numberOfSavedPdfs/${uuidBatches.size} Passports!")
+      output("Finished $numberOfSavedPdfs/${uuidBatches.size} Passports!")
 
       if (savePdfTasks.size == uuidBatches.size && savePdfTasks.all { it.isDone }) {
         tasksComplete = true
@@ -159,6 +160,10 @@ class App(
 
   private fun waitForProgress() {
     progressPoll.poll()
+  }
+
+  private fun output(message: String) {
+    consolePrinter.print(message)
   }
 
   private fun createPassportGenerationTask(
