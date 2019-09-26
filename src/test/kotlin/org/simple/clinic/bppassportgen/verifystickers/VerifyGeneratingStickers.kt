@@ -43,7 +43,7 @@ class VerifyGeneratingStickers {
     val generatedPdfPages = outputDirectory
         .listFiles { _, name -> name.endsWith(".pdf") }!!
         .map { file -> PDDocument.load(file) }
-        .flatMap(SavePdfToImage::save)
+        .flatMap { document -> document.use(SavePdfToImage::save) }
 
     expectThat(generatedPdfPages).hasSize(2)
 
