@@ -8,15 +8,21 @@ import org.junit.Before
 import org.junit.Test
 import org.simple.bppassportgen.App
 import org.simple.clinic.bppassportgen.SavePdfToImage
+import strikt.api.expectThat
+import strikt.assertions.hasSize
+import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Paths
 import java.util.UUID
-import strikt.api.*
-import strikt.assertions.*
 
 class VerifyGeneratingStickers {
 
-  private val outputDirectory = Paths.get(System.getProperty("java.io.tmpdir"), "bp_passports").toFile()
+  private val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), "bp_passports").toFile()
+  private val uuids: List<UUID> = readUuids("uuids_stickers.txt")
+  private val app = App(
+      computationThreadPool = MoreExecutors.newDirectExecutorService(),
+      ioThreadPool = MoreExecutors.newDirectExecutorService()
+  )
 
   @Before
   fun setUp() {
@@ -26,11 +32,7 @@ class VerifyGeneratingStickers {
 
   @Test
   fun `verify generating bp stickers`() {
-    val uuids = readUuids("uuids_stickers.txt")
-    App(
-        computationThreadPool = MoreExecutors.newDirectExecutorService(),
-        ioThreadPool = MoreExecutors.newDirectExecutorService()
-    ).run(
+    app.run(
         uuidsToGenerate = uuids,
         templateFilePath = resourceFilePath("passportsticker-template.pdf"),
         outDirectory = outputDirectory,
@@ -40,19 +42,29 @@ class VerifyGeneratingStickers {
         isSticker = true
     )
 
-    val generatedPdfPages = outputDirectory
-        .listFiles { _, name -> name.endsWith(".pdf") }!!
-        .map { file -> PDDocument.load(file) }
-        .flatMap { document -> document.use(SavePdfToImage::save) }
+    runApprovals(2) { pageNumber: Int -> "passport sticker $pageNumber" }
+  }
 
-    expectThat(generatedPdfPages).hasSize(2)
+  private inline fun runApprovals(
+      expectTotalNumberOfPages: Int,
+      generateApprovalFileName: (Int) -> String
+  ) {
+    val generatedPdfPages = extractPagesFromSavedPdfsAsImages()
 
+    expectThat(generatedPdfPages).hasSize(expectTotalNumberOfPages)
     generatedPdfPages
-        .mapIndexed { index, image -> "passport sticker ${index + 1}" to image }
+        .mapIndexed { index, image -> generateApprovalFileName(index + 1) to image }
         .forEach { (name, image) ->
           NamerFactory.additionalInformation = name
           Approvals.verify(image)
         }
+  }
+
+  private fun extractPagesFromSavedPdfsAsImages(): List<BufferedImage> {
+    return outputDirectory
+        .listFiles { _, name -> name.endsWith(".pdf") }!!
+        .map { file -> PDDocument.load(file) }
+        .flatMap { document -> document.use(SavePdfToImage::save) }
   }
 
   private fun readUuids(fileName: String): List<UUID> {
