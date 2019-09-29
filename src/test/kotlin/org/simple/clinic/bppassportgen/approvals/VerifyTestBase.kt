@@ -6,9 +6,9 @@ import org.approvaltests.Approvals
 import org.approvaltests.namer.NamerFactory
 import org.junit.Before
 import org.simple.bppassportgen.App
+import org.simple.clinic.bppassportgen.SavePdfToImage
 import org.simple.clinic.bppassportgen.util.NoOpConsolePrinter
 import org.simple.clinic.bppassportgen.util.NoOpProgressPoll
-import org.simple.clinic.bppassportgen.SavePdfToImage
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import java.awt.image.BufferedImage
@@ -29,15 +29,6 @@ open class VerifyTestBase(uuidFileResourcePath: String) {
 
   @Before
   fun setUp() {
-    // This is needed because PdfRenderer starts complaining about
-    // inefficient rendering on JDK 8.
-    //
-    // Note: if we remove this, the approvals will need to be generated
-    // again because the renderer will have changed and approvals does
-    // a very basic pixel-by-pixel comparison. The other option is to
-    // write a custom image approval which can handle thresholds of
-    // image diffs.
-    System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider")
     outputDirectory.deleteRecursively()
   }
 
