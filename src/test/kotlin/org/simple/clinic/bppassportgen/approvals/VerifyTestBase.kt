@@ -15,16 +15,16 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Paths
 
-abstract class VerifyTestBase {
+abstract class VerifyTestBase(
+    private val templateFilePath: String,
+    private val pageCount: Int,
+    private val rowCount: Int,
+    private val columnCount: Int,
+    private val isSticker: Boolean
+) {
 
   private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
   private val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
-
-  protected abstract val templateFilePath: String
-  protected abstract val pageCount: Int
-  protected abstract val rowCount: Int
-  protected abstract val columnCount: Int
-  protected abstract val isSticker: Boolean
 
   protected val app: App by lazy {
     App(

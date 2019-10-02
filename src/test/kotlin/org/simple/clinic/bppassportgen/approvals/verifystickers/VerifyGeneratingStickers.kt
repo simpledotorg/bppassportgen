@@ -5,17 +5,13 @@ import org.simple.clinic.bppassportgen.approvals.VerifyTestBase
 import org.simple.clinic.bppassportgen.util.readUuids
 import org.simple.clinic.bppassportgen.util.resourceFilePath
 
-class VerifyGeneratingStickers : VerifyTestBase() {
-
-  override val templateFilePath: String = resourceFilePath("passportsticker-template.pdf")
-
-  override val pageCount: Int = 2
-
-  override val rowCount: Int = 2
-
-  override val columnCount: Int = 2
-
-  override val isSticker: Boolean = true
+class VerifyGeneratingStickers : VerifyTestBase(
+    templateFilePath = resourceFilePath("passportsticker-template.pdf"),
+    pageCount = 2,
+    rowCount = 2,
+    columnCount = 2,
+    isSticker = true
+) {
 
   @Test
   fun `verify generating bp stickers`() {
