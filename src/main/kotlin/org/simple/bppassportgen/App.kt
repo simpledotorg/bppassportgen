@@ -166,9 +166,9 @@ class App(
       qrCodeGenerator: QrCodeGenerator
   ): Callable<Output> {
     val barcodeRenderSpec = if (isSticker) {
-      BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F)
+      BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = blackCmyk)
     } else {
-      BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F)
+      BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = blackCmyk)
     }
 
     val shortcodeRenderSpec = if (isSticker) {
@@ -182,7 +182,6 @@ class App(
         fontBytes = fontInputBytes,
         uuidsGroupedByPage = uuidBatch,
         shortCodeColor = blackCmyk,
-        barcodeColor = blackCmyk,
         rowCount = rowCount,
         columnCount = columnCount,
         barcodeRenderSpec = barcodeRenderSpec,

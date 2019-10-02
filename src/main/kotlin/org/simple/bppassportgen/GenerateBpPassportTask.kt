@@ -14,7 +14,6 @@ class GenerateBpPassportTask(
     private val fontBytes: ByteArray,
     private val uuidsGroupedByPage: List<List<UUID>>,
     private val shortCodeColor: PDColor,
-    private val barcodeColor: PDColor,
     private val rowCount: Int,
     private val columnCount: Int,
     private val barcodeRenderSpec: BarcodeRenderSpec,
@@ -85,7 +84,7 @@ class GenerateBpPassportTask(
           contentStream,
           barcodeRenderSpec.positionX,
           barcodeRenderSpec.positionY,
-          applyForegroundColor = { it.setStrokingColor(barcodeColor) }
+          applyForegroundColor = { it.setStrokingColor(barcodeRenderSpec.color) }
       )
     }
   }
