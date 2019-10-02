@@ -13,6 +13,8 @@ import org.simple.bppassportgen.consoleprinter.ConsolePrinter
 import org.simple.bppassportgen.consoleprinter.RealConsolePrinter
 import org.simple.bppassportgen.progresspoll.ProgressPoll
 import org.simple.bppassportgen.progresspoll.RealProgressPoll
+import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
+import org.simple.bppassportgen.qrcodegen.QrCodeGeneratorImpl
 import java.io.File
 import java.time.Duration
 import java.util.UUID
@@ -113,10 +115,12 @@ class App(
     val generatingPdfTasks = mutableMapOf<Int, Future<Output>>()
     val savePdfTasks = mutableListOf<Future<Any>>()
 
+    val qrCodeGenerator = QrCodeGeneratorImpl(errorCorrectionLevel = ErrorCorrectionLevel.Q, margin = 0)
+
     uuidBatches
         .mapIndexed { index, uuidBatch ->
 
-          val task = createPassportGenerationTask(isSticker, pdfInputBytes, fontInputBytes, uuidBatch, qrCodeWriter, hints, blackCmyk, rowCount, columnCount)
+          val task = createPassportGenerationTask(isSticker, pdfInputBytes, fontInputBytes, uuidBatch, qrCodeWriter, hints, blackCmyk, rowCount, columnCount, qrCodeGenerator)
 
           task to index + 1
         }
@@ -168,7 +172,8 @@ class App(
       hints: Map<EncodeHintType, Any>,
       blackCmyk: PDColor,
       rowCount: Int,
-      columnCount: Int
+      columnCount: Int,
+      qrCodeGenerator: QrCodeGenerator
   ): Callable<Output> {
     val barcodeRenderSpec = if (isSticker) {
       BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F)
@@ -195,7 +200,8 @@ class App(
         barcodeRenderSpec = barcodeRenderSpec,
         shortcodeRenderSpec = shortcodeRenderSpec,
         templatePageIndexToRenderCode = 0,
-        templatePageIndexToRenderShortCode = 0
+        templatePageIndexToRenderShortCode = 0,
+        qrCodeGenerator = qrCodeGenerator
     )
   }
 }

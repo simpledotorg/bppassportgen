@@ -7,6 +7,7 @@ import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
+import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import java.io.ByteArrayInputStream
 import java.util.UUID
 import java.util.concurrent.Callable
@@ -24,7 +25,8 @@ class GenerateBpPassportTask(
     private val barcodeRenderSpec: BarcodeRenderSpec,
     private val shortcodeRenderSpec: ShortcodeRenderSpec,
     private val templatePageIndexToRenderCode: Int,
-    private val templatePageIndexToRenderShortCode: Int
+    private val templatePageIndexToRenderShortCode: Int,
+    private val qrCodeGenerator: QrCodeGenerator
 ) : Callable<Output> {
 
   override fun call(): Output {
@@ -79,7 +81,7 @@ class GenerateBpPassportTask(
   }
 
   private fun renderQrCode(uuid: UUID, document: PDDocument, page: PDPage) {
-    val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, barcodeRenderSpec.width, barcodeRenderSpec.height, hints)
+    val bitMatrix = qrCodeGenerator.generateQrCode(uuid.toString(), barcodeRenderSpec.width, barcodeRenderSpec.height)
     val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = barcodeRenderSpec.matrixScale)
 
     PdfUtil.streamForPage(document, page).use { contentStream ->
