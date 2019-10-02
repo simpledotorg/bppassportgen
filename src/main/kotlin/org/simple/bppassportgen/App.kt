@@ -194,7 +194,8 @@ class App(
         columnCount = columnCount,
         barcodeRenderSpec = barcodeRenderSpec,
         shortcodeRenderSpec = shortcodeRenderSpec,
-        templatePageIndexToRenderCode = 0
+        templatePageIndexToRenderCode = 0,
+        templatePageIndexToRenderShortCode = 0
     )
   }
 }

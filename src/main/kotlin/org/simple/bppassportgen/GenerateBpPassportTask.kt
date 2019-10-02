@@ -29,7 +29,8 @@ class GenerateBpPassportTask(
     private val columnCount: Int,
     private val barcodeRenderSpec: BarcodeRenderSpec,
     private val shortcodeRenderSpec: ShortcodeRenderSpec,
-    private val templatePageIndexToRenderCode: Int
+    private val templatePageIndexToRenderCode: Int,
+    private val templatePageIndexToRenderShortCode: Int
 ) : Callable<Output> {
 
   override fun call(): Output {
@@ -70,10 +71,10 @@ class GenerateBpPassportTask(
               .map { sourcePage -> uuidsInOnePage.map { Page(it, sourcePage.clone()) } }
 
           pagesForCurrentBatch[templatePageIndexToRenderCode]
-              .forEach { page ->
-                renderQrCode(page.uuid, newDocument, page.page)
-                renderShortCode(page.uuid, newDocument, page.page, font)
-              }
+              .forEach { page -> renderQrCode(page.uuid, newDocument, page.page) }
+
+          pagesForCurrentBatch[templatePageIndexToRenderShortCode]
+              .forEach { page -> renderShortCode(page.uuid, newDocument, page.page, font) }
 
           pagesForCurrentBatch.forEach { mergePages(newDocument, it, rowCount, columnCount) }
         }
