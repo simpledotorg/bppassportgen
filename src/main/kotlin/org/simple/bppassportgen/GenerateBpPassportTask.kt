@@ -41,9 +41,8 @@ class GenerateBpPassportTask(
 
     check(templatePageIndexToRenderCode < sourceDocument.numberOfPages) { "PDF has only ${sourceDocument.numberOfPages} but asked to render code on $templatePageIndexToRenderCode" }
 
-    val font = PDType0Font.load(sourceDocument, ByteArrayInputStream(fontBytes))
-
     val newDocument = PDDocument()
+    val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontBytes))
 
     uuidBatches
         .forEach { uuids ->
