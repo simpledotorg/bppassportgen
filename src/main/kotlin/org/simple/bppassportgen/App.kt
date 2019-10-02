@@ -64,11 +64,9 @@ fun main(args: Array<String>) {
           outDirectory = outDirectory,
           pageCount = pageCount,
           rowCount = rowCount,
-          columnCount = columnCount
-      ).run(
-          uuidsToGenerate = uuidsToGenerate,
+          columnCount = columnCount,
           isSticker = isSticker
-      )
+      ).run(uuidsToGenerate = uuidsToGenerate)
     }
   }
 }
@@ -82,13 +80,11 @@ class App(
     private val outDirectory: File,
     private val pageCount: Int,
     private val rowCount: Int,
-    private val columnCount: Int
+    private val columnCount: Int,
+    private val isSticker: Boolean
 ) {
 
-  fun run(
-      uuidsToGenerate: List<UUID>,
-      isSticker: Boolean
-  ) {
+  fun run(uuidsToGenerate: List<UUID>) {
 
     val mergeCount = rowCount * columnCount
 

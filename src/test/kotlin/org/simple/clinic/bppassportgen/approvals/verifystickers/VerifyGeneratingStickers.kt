@@ -13,12 +13,11 @@ class VerifyGeneratingStickers : VerifyTestBase("uuids_stickers.txt") {
 
   override val columnCount: Int = 2
 
+  override val isSticker: Boolean = true
+
   @Test
   fun `verify generating bp stickers`() {
-    app.run(
-        uuidsToGenerate = uuids,
-        isSticker = true
-    )
+    app.run(uuidsToGenerate = uuids)
 
     runApprovals(8) { pdfNumber, pageNumber: Int -> "passport sticker $pdfNumber.$pageNumber" }
   }

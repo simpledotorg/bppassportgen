@@ -27,6 +27,7 @@ abstract class VerifyTestBase(uuidFileResourcePath: String) {
   protected abstract val pageCount: Int
   protected abstract val rowCount: Int
   protected abstract val columnCount: Int
+  protected abstract val isSticker: Boolean
 
   protected val app: App by lazy {
     App(
@@ -38,7 +39,8 @@ abstract class VerifyTestBase(uuidFileResourcePath: String) {
         outDirectory = outputDirectory,
         pageCount = pageCount,
         rowCount = rowCount,
-        columnCount = columnCount
+        columnCount = columnCount,
+        isSticker = isSticker
     )
   }
 
