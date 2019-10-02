@@ -68,7 +68,7 @@ class BitMatrixRenderable(bitMatrix: BitMatrix, private val matrixScale: Float =
       contentStream: PDPageContentStream,
       x: Float,
       y: Float,
-      drawBackground: Boolean = true,
+      drawBackground: Boolean = false,
       applyForegroundColor: (PDPageContentStream) -> Unit = { it.setStrokingColor(Color.BLACK) },
       applyBackgroundColor: (PDPageContentStream) -> Unit = { it.setStrokingColor(Color.WHITE) }
   ) {

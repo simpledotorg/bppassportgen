@@ -97,9 +97,7 @@ class GenerateBpPassportTask(
           contentStream,
           barcodeRenderSpec.positionX,
           barcodeRenderSpec.positionY,
-          drawBackground = false,
-          applyForegroundColor = { it.setStrokingColor(barcodeColor) },
-          applyBackgroundColor = { it.setStrokingColor(barcodeColor) }
+          applyForegroundColor = { it.setStrokingColor(barcodeColor) }
       )
     }
   }
