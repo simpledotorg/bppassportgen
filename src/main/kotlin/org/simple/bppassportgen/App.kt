@@ -59,15 +59,14 @@ fun main(args: Array<String>) {
 
       val uuidsToGenerate = (0 until numberOfPassports).map { UUID.randomUUID() }
 
-      App().run(
-          uuidsToGenerate = uuidsToGenerate,
+      App(
           templateFilePath = templateFilePath,
           outDirectory = outDirectory,
           pageCount = pageCount,
           rowCount = rowCount,
           columnCount = columnCount,
           isSticker = isSticker
-      )
+      ).run(uuidsToGenerate = uuidsToGenerate)
     }
   }
 }
@@ -76,18 +75,16 @@ class App(
     private val computationThreadPool: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
     private val ioThreadPool: ExecutorService = Executors.newCachedThreadPool(),
     private val progressPoll: ProgressPoll = RealProgressPoll(Duration.ofSeconds(1)),
-    private val consolePrinter: ConsolePrinter = RealConsolePrinter()
+    private val consolePrinter: ConsolePrinter = RealConsolePrinter(),
+    private val templateFilePath: String,
+    private val outDirectory: File,
+    private val pageCount: Int,
+    private val rowCount: Int,
+    private val columnCount: Int,
+    private val isSticker: Boolean
 ) {
 
-  fun run(
-      uuidsToGenerate: List<UUID>,
-      templateFilePath: String,
-      outDirectory: File,
-      pageCount: Int,
-      rowCount: Int,
-      columnCount: Int,
-      isSticker: Boolean
-  ) {
+  fun run(uuidsToGenerate: List<UUID>) {
 
     val mergeCount = rowCount * columnCount
 

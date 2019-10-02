@@ -14,18 +14,32 @@ import strikt.assertions.isEqualTo
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Paths
-import java.util.UUID
 
-open class VerifyTestBase(uuidFileResourcePath: String) {
+abstract class VerifyTestBase(
+    private val templateFilePath: String,
+    private val pageCount: Int,
+    private val rowCount: Int,
+    private val columnCount: Int,
+    private val isSticker: Boolean
+) {
+
   private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
-  protected val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
-  protected val uuids: List<UUID> = readUuids(uuidFileResourcePath)
-  protected val app = App(
-      computationThreadPool = MoreExecutors.newDirectExecutorService(),
-      ioThreadPool = MoreExecutors.newDirectExecutorService(),
-      progressPoll = NoOpProgressPoll(),
-      consolePrinter = NoOpConsolePrinter()
-  )
+  private val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
+
+  protected val app: App by lazy {
+    App(
+        computationThreadPool = MoreExecutors.newDirectExecutorService(),
+        ioThreadPool = MoreExecutors.newDirectExecutorService(),
+        progressPoll = NoOpProgressPoll(),
+        consolePrinter = NoOpConsolePrinter(),
+        templateFilePath = templateFilePath,
+        outDirectory = outputDirectory,
+        pageCount = pageCount,
+        rowCount = rowCount,
+        columnCount = columnCount,
+        isSticker = isSticker
+    )
+  }
 
   @Before
   fun setUp() {
@@ -59,12 +73,4 @@ open class VerifyTestBase(uuidFileResourcePath: String) {
         .mapIndexed { index, document -> (index + 1) to document.use(SavePdfToImage::save) }
         .toMap()
   }
-
-  private fun readUuids(fileName: String): List<UUID> {
-    return with(File(resourceFilePath(fileName))) {
-      this.readLines().map { UUID.fromString(it) }
-    }
-  }
-
-  protected fun resourceFilePath(fileName: String): String = javaClass.classLoader.getResource(fileName)!!.file
 }
