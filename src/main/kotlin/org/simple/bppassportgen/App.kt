@@ -59,9 +59,10 @@ fun main(args: Array<String>) {
 
       val uuidsToGenerate = (0 until numberOfPassports).map { UUID.randomUUID() }
 
-      App().run(
+      App(
+          templateFilePath = templateFilePath
+      ).run(
           uuidsToGenerate = uuidsToGenerate,
-          templateFilePath = templateFilePath,
           outDirectory = outDirectory,
           pageCount = pageCount,
           rowCount = rowCount,
@@ -76,12 +77,12 @@ class App(
     private val computationThreadPool: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
     private val ioThreadPool: ExecutorService = Executors.newCachedThreadPool(),
     private val progressPoll: ProgressPoll = RealProgressPoll(Duration.ofSeconds(1)),
-    private val consolePrinter: ConsolePrinter = RealConsolePrinter()
+    private val consolePrinter: ConsolePrinter = RealConsolePrinter(),
+    private val templateFilePath: String
 ) {
 
   fun run(
       uuidsToGenerate: List<UUID>,
-      templateFilePath: String,
       outDirectory: File,
       pageCount: Int,
       rowCount: Int,
