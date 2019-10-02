@@ -1,7 +1,5 @@
 package org.simple.bppassportgen
 
-import com.google.zxing.EncodeHintType
-import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
@@ -106,12 +104,6 @@ class App(
         .windowed(size = mergeCount, step = mergeCount)
         .windowed(size = pageCount, step = pageCount)
 
-    val qrCodeWriter = QRCodeWriter()
-    val hints = mapOf(
-        EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.Q,
-        EncodeHintType.MARGIN to 0
-    )
-
     val generatingPdfTasks = mutableMapOf<Int, Future<Output>>()
     val savePdfTasks = mutableListOf<Future<Any>>()
 
@@ -120,7 +112,7 @@ class App(
     uuidBatches
         .mapIndexed { index, uuidBatch ->
 
-          val task = createPassportGenerationTask(isSticker, pdfInputBytes, fontInputBytes, uuidBatch, qrCodeWriter, hints, blackCmyk, rowCount, columnCount, qrCodeGenerator)
+          val task = createPassportGenerationTask(isSticker, pdfInputBytes, fontInputBytes, uuidBatch, blackCmyk, rowCount, columnCount, qrCodeGenerator)
 
           task to index + 1
         }
@@ -168,8 +160,6 @@ class App(
       pdfInputBytes: ByteArray,
       fontInputBytes: ByteArray,
       uuidBatch: List<List<UUID>>,
-      qrCodeWriter: QRCodeWriter,
-      hints: Map<EncodeHintType, Any>,
       blackCmyk: PDColor,
       rowCount: Int,
       columnCount: Int,
@@ -191,8 +181,6 @@ class App(
         pdfBytes = pdfInputBytes,
         fontBytes = fontInputBytes,
         uuidsGroupedByPage = uuidBatch,
-        qrCodeWriter = qrCodeWriter,
-        hints = hints,
         shortCodeColor = blackCmyk,
         barcodeColor = blackCmyk,
         rowCount = rowCount,

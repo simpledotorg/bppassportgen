@@ -1,8 +1,5 @@
 package org.simple.bppassportgen
 
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.EncodeHintType
-import com.google.zxing.qrcode.QRCodeWriter
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.font.PDType0Font
@@ -16,8 +13,6 @@ class GenerateBpPassportTask(
     private val pdfBytes: ByteArray,
     private val fontBytes: ByteArray,
     private val uuidsGroupedByPage: List<List<UUID>>,
-    private val qrCodeWriter: QRCodeWriter,
-    private val hints: Map<EncodeHintType, Any>,
     private val shortCodeColor: PDColor,
     private val barcodeColor: PDColor,
     private val rowCount: Int,
