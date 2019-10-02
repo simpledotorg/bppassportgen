@@ -27,10 +27,45 @@ class GenerateBpPassportTask(
     private val barcodeColor: PDColor,
     private val rowCount: Int,
     private val columnCount: Int,
-    private val barcodeRenderSpec: BarcodeRenderSpec
+    private val barcodeRenderSpec: BarcodeRenderSpec,
+    private val isSticker: Boolean
 ) : Callable<Output> {
 
   override fun call(): Output {
+    return if (!isSticker) generateBpPassports() else generateBpStickers()
+  }
+
+  private fun generateBpStickers(): Output {
+    return PDDocument.load(pdfBytes)
+        .let { document ->
+          val singleStickerPage = document.getPage(0)
+
+          val font = PDType0Font.load(document, ByteArrayInputStream(fontBytes))
+
+          val newDocument = PDDocument()
+
+          uuidBatches
+              .forEach { uuids ->
+                val pages = uuids
+                    .map { uuid ->
+                      Page(
+                          uuid = uuid,
+                          page = singleStickerPage
+                              .clone()
+                              .apply {
+                                renderBpPassportCodeOnPage(this, newDocument, font, uuid)
+                              }
+                      )
+                    }
+
+                mergePages(newDocument, pages, rowCount, columnCount)
+              }
+
+          Output(source = document, final = newDocument)
+        }
+  }
+
+  private fun generateBpPassports(): Output {
     return PDDocument.load(pdfBytes)
         .let { document ->
           val frontPage = document.getPage(0)
@@ -83,9 +118,15 @@ class GenerateBpPassportTask(
     ).use { contentStream ->
       contentStream.beginText()
       contentStream.setNonStrokingColor(shortCodeColor)
-      contentStream.newLineAtOffset(72.5F, 210F)
-      contentStream.setCharacterSpacing(2.4F)
-      contentStream.setFont(font, 12F)
+      if (isSticker) {
+        contentStream.newLineAtOffset(16F, 8F)
+        contentStream.setCharacterSpacing(1.2F)
+        contentStream.setFont(font, 8F)
+      } else {
+        contentStream.newLineAtOffset(72.5F, 210F)
+        contentStream.setCharacterSpacing(2.4F)
+        contentStream.setFont(font, 12F)
+      }
       contentStream.showText(shortCode)
       contentStream.endText()
 

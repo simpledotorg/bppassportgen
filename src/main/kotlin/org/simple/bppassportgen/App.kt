@@ -170,31 +170,24 @@ class App(
       rowCount: Int,
       columnCount: Int
   ): Callable<Output> {
-    return if (isSticker) {
-      GenerateBpStickerTask(
-          pdfBytes = pdfInputBytes,
-          fontBytes = fontInputBytes,
-          uuidBatches = uuidBatch,
-          qrCodeWriter = qrCodeWriter,
-          hints = hints,
-          shortCodeColor = blackCmyk,
-          barcodeColor = blackCmyk,
-          rowCount = rowCount,
-          columnCount = columnCount,
-          barcodeRenderSpec = BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F)
-      )
+    val barcodeRenderSpec = if (isSticker) {
+      BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F)
     } else {
-      GenerateBpPassportTask(
-          pdfBytes = pdfInputBytes,
-          fontBytes = fontInputBytes,
-          uuidBatches = uuidBatch,
-          qrCodeWriter = qrCodeWriter,
-          hints = hints,
-          shortCodeColor = blackCmyk,
-          barcodeColor = blackCmyk,
-          rowCount = rowCount,
-          columnCount = columnCount,
-          barcodeRenderSpec = BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F))
+      BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F)
     }
+
+    return GenerateBpPassportTask(
+        pdfBytes = pdfInputBytes,
+        fontBytes = fontInputBytes,
+        uuidBatches = uuidBatch,
+        qrCodeWriter = qrCodeWriter,
+        hints = hints,
+        shortCodeColor = blackCmyk,
+        barcodeColor = blackCmyk,
+        rowCount = rowCount,
+        columnCount = columnCount,
+        barcodeRenderSpec = barcodeRenderSpec,
+        isSticker = isSticker
+    )
   }
 }
