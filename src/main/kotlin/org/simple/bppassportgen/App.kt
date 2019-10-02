@@ -180,7 +180,8 @@ class App(
           shortCodeColor = blackCmyk,
           barcodeColor = blackCmyk,
           rowCount = rowCount,
-          columnCount = columnCount
+          columnCount = columnCount,
+          barcodeRenderSpec = BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F)
       )
     } else {
       GenerateBpPassportTask(
@@ -192,8 +193,8 @@ class App(
           shortCodeColor = blackCmyk,
           barcodeColor = blackCmyk,
           rowCount = rowCount,
-          columnCount = columnCount
-      )
+          columnCount = columnCount,
+          barcodeRenderSpec = BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F))
     }
   }
 }

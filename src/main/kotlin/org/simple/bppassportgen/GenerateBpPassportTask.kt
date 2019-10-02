@@ -18,15 +18,16 @@ import java.util.UUID
 import java.util.concurrent.Callable
 
 class GenerateBpPassportTask(
-    val pdfBytes: ByteArray,
-    val fontBytes: ByteArray,
-    val uuidBatches: List<List<UUID>>,
-    val qrCodeWriter: QRCodeWriter,
-    val hints: Map<EncodeHintType, Any>,
-    val shortCodeColor: PDColor,
-    val barcodeColor: PDColor,
-    val rowCount: Int,
-    val columnCount: Int
+    private val pdfBytes: ByteArray,
+    private val fontBytes: ByteArray,
+    private val uuidBatches: List<List<UUID>>,
+    private val qrCodeWriter: QRCodeWriter,
+    private val hints: Map<EncodeHintType, Any>,
+    private val shortCodeColor: PDColor,
+    private val barcodeColor: PDColor,
+    private val rowCount: Int,
+    private val columnCount: Int,
+    private val barcodeRenderSpec: BarcodeRenderSpec
 ) : Callable<Output> {
 
   override fun call(): Output {
@@ -71,8 +72,8 @@ class GenerateBpPassportTask(
       uuid: UUID
   ) {
     val shortCode = shortCodeForUuid(uuid)
-    val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, 80, 80, hints)
-    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = 1.35F)
+    val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, barcodeRenderSpec.width, barcodeRenderSpec.height, hints)
+    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = barcodeRenderSpec.matrixScale)
 
     PDPageContentStream(
         document,
@@ -90,8 +91,8 @@ class GenerateBpPassportTask(
 
       bitMatrixRenderable.render(
           contentStream,
-          196F,
-          107.5F,
+          barcodeRenderSpec.positionX,
+          barcodeRenderSpec.positionY,
           drawBackground = false,
           applyForegroundColor = { it.setStrokingColor(barcodeColor) },
           applyBackgroundColor = { it.setStrokingColor(barcodeColor) }
