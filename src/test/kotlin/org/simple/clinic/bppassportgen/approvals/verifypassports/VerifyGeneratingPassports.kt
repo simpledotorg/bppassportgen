@@ -7,11 +7,12 @@ class VerifyGeneratingPassports : VerifyTestBase("uuids_passports.txt") {
 
   override val templateFilePath: String = resourceFilePath("bppassport-template.pdf")
 
+  override val pageCount: Int = 2
+
   @Test
   fun `verify generating bp passports`() {
     app.run(
         uuidsToGenerate = uuids,
-        pageCount = 2,
         rowCount = 2,
         columnCount = 2,
         isSticker = false

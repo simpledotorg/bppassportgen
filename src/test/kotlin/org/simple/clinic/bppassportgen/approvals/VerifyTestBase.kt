@@ -24,6 +24,7 @@ abstract class VerifyTestBase(uuidFileResourcePath: String) {
   protected val uuids: List<UUID> = readUuids(uuidFileResourcePath)
 
   protected abstract val templateFilePath: String
+  protected abstract val pageCount: Int
 
   protected val app: App by lazy {
     App(
@@ -32,7 +33,8 @@ abstract class VerifyTestBase(uuidFileResourcePath: String) {
         progressPoll = NoOpProgressPoll(),
         consolePrinter = NoOpConsolePrinter(),
         templateFilePath = templateFilePath,
-        outDirectory = outputDirectory
+        outDirectory = outputDirectory,
+        pageCount = pageCount
     )
   }
 

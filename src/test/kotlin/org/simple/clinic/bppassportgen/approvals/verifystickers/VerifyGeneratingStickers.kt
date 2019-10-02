@@ -7,11 +7,12 @@ class VerifyGeneratingStickers : VerifyTestBase("uuids_stickers.txt") {
 
   override val templateFilePath: String = resourceFilePath("passportsticker-template.pdf")
 
+  override val pageCount: Int = 2
+
   @Test
   fun `verify generating bp stickers`() {
     app.run(
         uuidsToGenerate = uuids,
-        pageCount = 2,
         rowCount = 2,
         columnCount = 2,
         isSticker = true
