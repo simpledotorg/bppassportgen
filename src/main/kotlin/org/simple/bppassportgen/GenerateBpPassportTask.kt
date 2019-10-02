@@ -18,7 +18,6 @@ import java.util.UUID
 import java.util.concurrent.Callable
 
 class GenerateBpPassportTask(
-    val taskNumber: Int,
     val pdfBytes: ByteArray,
     val fontBytes: ByteArray,
     val uuidBatches: List<List<UUID>>,

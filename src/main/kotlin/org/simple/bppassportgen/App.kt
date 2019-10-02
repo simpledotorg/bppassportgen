@@ -116,7 +116,7 @@ class App(
     uuidBatches
         .mapIndexed { index, uuidBatch ->
 
-          val task = createPassportGenerationTask(isSticker, index, pdfInputBytes, fontInputBytes, uuidBatch, qrCodeWriter, hints, blackCmyk, rowCount, columnCount)
+          val task = createPassportGenerationTask(isSticker, pdfInputBytes, fontInputBytes, uuidBatch, qrCodeWriter, hints, blackCmyk, rowCount, columnCount)
 
           task to index + 1
         }
@@ -161,7 +161,6 @@ class App(
 
   private fun createPassportGenerationTask(
       isSticker: Boolean,
-      index: Int,
       pdfInputBytes: ByteArray,
       fontInputBytes: ByteArray,
       uuidBatch: List<List<UUID>>,
@@ -173,7 +172,6 @@ class App(
   ): Callable<Output> {
     return if (isSticker) {
       GenerateBpStickerTask(
-          taskNumber = index + 1,
           pdfBytes = pdfInputBytes,
           fontBytes = fontInputBytes,
           uuidBatches = uuidBatch,
@@ -186,7 +184,6 @@ class App(
       )
     } else {
       GenerateBpPassportTask(
-          taskNumber = index + 1,
           pdfBytes = pdfInputBytes,
           fontBytes = fontInputBytes,
           uuidBatches = uuidBatch,
