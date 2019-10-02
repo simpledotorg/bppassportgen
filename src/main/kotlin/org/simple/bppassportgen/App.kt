@@ -62,10 +62,10 @@ fun main(args: Array<String>) {
       App(
           templateFilePath = templateFilePath,
           outDirectory = outDirectory,
-          pageCount = pageCount
+          pageCount = pageCount,
+          rowCount = rowCount
       ).run(
           uuidsToGenerate = uuidsToGenerate,
-          rowCount = rowCount,
           columnCount = columnCount,
           isSticker = isSticker
       )
@@ -80,12 +80,12 @@ class App(
     private val consolePrinter: ConsolePrinter = RealConsolePrinter(),
     private val templateFilePath: String,
     private val outDirectory: File,
-    private val pageCount: Int
+    private val pageCount: Int,
+    private val rowCount: Int
 ) {
 
   fun run(
       uuidsToGenerate: List<UUID>,
-      rowCount: Int,
       columnCount: Int,
       isSticker: Boolean
   ) {

@@ -9,11 +9,12 @@ class VerifyGeneratingStickers : VerifyTestBase("uuids_stickers.txt") {
 
   override val pageCount: Int = 2
 
+  override val rowCount: Int = 2
+
   @Test
   fun `verify generating bp stickers`() {
     app.run(
         uuidsToGenerate = uuids,
-        rowCount = 2,
         columnCount = 2,
         isSticker = true
     )

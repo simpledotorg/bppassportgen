@@ -9,11 +9,12 @@ class VerifyGeneratingPassports : VerifyTestBase("uuids_passports.txt") {
 
   override val pageCount: Int = 2
 
+  override val rowCount: Int = 2
+
   @Test
   fun `verify generating bp passports`() {
     app.run(
         uuidsToGenerate = uuids,
-        rowCount = 2,
         columnCount = 2,
         isSticker = false
     )
