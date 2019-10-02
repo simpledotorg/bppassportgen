@@ -28,7 +28,8 @@ class GenerateBpPassportTask(
     private val rowCount: Int,
     private val columnCount: Int,
     private val barcodeRenderSpec: BarcodeRenderSpec,
-    private val isSticker: Boolean
+    private val isSticker: Boolean,
+    private val shortcodeRenderSpec: ShortcodeRenderSpec
 ) : Callable<Output> {
 
   override fun call(): Output {
@@ -118,15 +119,9 @@ class GenerateBpPassportTask(
     ).use { contentStream ->
       contentStream.beginText()
       contentStream.setNonStrokingColor(shortCodeColor)
-      if (isSticker) {
-        contentStream.newLineAtOffset(16F, 8F)
-        contentStream.setCharacterSpacing(1.2F)
-        contentStream.setFont(font, 8F)
-      } else {
-        contentStream.newLineAtOffset(72.5F, 210F)
-        contentStream.setCharacterSpacing(2.4F)
-        contentStream.setFont(font, 12F)
-      }
+      contentStream.newLineAtOffset(shortcodeRenderSpec.positionX, shortcodeRenderSpec.positionY)
+      contentStream.setCharacterSpacing(shortcodeRenderSpec.characterSpacing)
+      contentStream.setFont(font, shortcodeRenderSpec.fontSize)
       contentStream.showText(shortCode)
       contentStream.endText()
 
