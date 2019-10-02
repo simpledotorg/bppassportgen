@@ -33,7 +33,34 @@ class GenerateBpPassportTask(
 ) : Callable<Output> {
 
   override fun call(): Output {
-    return if (!isSticker) generateBpPassports() else generateBpStickers()
+    return generatePages(0)
+  }
+
+  private fun generatePages(pageIndexToRenderCodeOn: Int): Output {
+    val sourceDocument = PDDocument.load(pdfBytes)
+
+    check(pageIndexToRenderCodeOn < sourceDocument.numberOfPages) { "PDF has only ${sourceDocument.numberOfPages} but asked to render code on $pageIndexToRenderCodeOn" }
+
+    val font = PDType0Font.load(sourceDocument, ByteArrayInputStream(fontBytes))
+
+    val newDocument = PDDocument()
+
+    uuidBatches
+        .forEach { uuids ->
+
+          val pagesForCurrentBatch = sourceDocument
+              .pages
+              .map { sourcePage -> uuids.map { Page(it, sourcePage.clone()) } }
+
+          pagesForCurrentBatch[pageIndexToRenderCodeOn]
+              .forEach { page ->
+                renderBpPassportCodeOnPage(page.page, newDocument, font, page.uuid)
+              }
+
+          pagesForCurrentBatch.forEach { mergePages(newDocument, it, rowCount, columnCount) }
+        }
+
+    return Output(source = sourceDocument, final = newDocument)
   }
 
   private fun generateBpStickers(): Output {
