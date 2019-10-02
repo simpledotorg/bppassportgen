@@ -71,7 +71,8 @@ class GenerateBpPassportTask(
 
           pagesForCurrentBatch[templatePageIndexToRenderCode]
               .forEach { page ->
-                renderBpPassportCodeOnPage(page.page, newDocument, font, page.uuid)
+                renderQrCode(page.uuid, newDocument, page.page)
+                renderShortCode(page.uuid, newDocument, page.page, font)
               }
 
           pagesForCurrentBatch.forEach { mergePages(newDocument, it, rowCount, columnCount) }
@@ -80,16 +81,35 @@ class GenerateBpPassportTask(
     return Output(source = sourceDocument, final = newDocument)
   }
 
-  private fun renderBpPassportCodeOnPage(
-      page: PDPage,
-      document: PDDocument,
-      font: PDType0Font,
-      uuid: UUID
-  ) {
-    val shortCode = shortCodeForUuid(uuid)
+  private fun renderQrCode(uuid: UUID, document: PDDocument, page: PDPage) {
     val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, barcodeRenderSpec.width, barcodeRenderSpec.height, hints)
     val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = barcodeRenderSpec.matrixScale)
 
+    PDPageContentStream(
+        document,
+        page,
+        PDPageContentStream.AppendMode.APPEND,
+        false
+    ).use { contentStream ->
+
+      bitMatrixRenderable.render(
+          contentStream,
+          barcodeRenderSpec.positionX,
+          barcodeRenderSpec.positionY,
+          drawBackground = false,
+          applyForegroundColor = { it.setStrokingColor(barcodeColor) },
+          applyBackgroundColor = { it.setStrokingColor(barcodeColor) }
+      )
+    }
+  }
+
+  private fun renderShortCode(
+      uuid: UUID,
+      document: PDDocument,
+      page: PDPage,
+      font: PDType0Font
+  ) {
+    val shortCode = shortCodeForUuid(uuid)
     PDPageContentStream(
         document,
         page,
@@ -103,15 +123,6 @@ class GenerateBpPassportTask(
       contentStream.setFont(font, shortcodeRenderSpec.fontSize)
       contentStream.showText(shortCode)
       contentStream.endText()
-
-      bitMatrixRenderable.render(
-          contentStream,
-          barcodeRenderSpec.positionX,
-          barcodeRenderSpec.positionY,
-          drawBackground = false,
-          applyForegroundColor = { it.setStrokingColor(barcodeColor) },
-          applyBackgroundColor = { it.setStrokingColor(barcodeColor) }
-      )
     }
   }
 
