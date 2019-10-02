@@ -20,7 +20,7 @@ import java.util.concurrent.Callable
 class GenerateBpPassportTask(
     private val pdfBytes: ByteArray,
     private val fontBytes: ByteArray,
-    private val uuidBatches: List<List<UUID>>,
+    private val uuidsGroupedByPage: List<List<UUID>>,
     private val qrCodeWriter: QRCodeWriter,
     private val hints: Map<EncodeHintType, Any>,
     private val shortCodeColor: PDColor,
@@ -28,77 +28,56 @@ class GenerateBpPassportTask(
     private val rowCount: Int,
     private val columnCount: Int,
     private val barcodeRenderSpec: BarcodeRenderSpec,
-    private val isSticker: Boolean,
-    private val shortcodeRenderSpec: ShortcodeRenderSpec
+    private val shortcodeRenderSpec: ShortcodeRenderSpec,
+    private val templatePageIndexToRenderCode: Int
 ) : Callable<Output> {
 
   override fun call(): Output {
-    return if (!isSticker) generateBpPassports() else generateBpStickers()
+    return generatePages()
   }
 
-  private fun generateBpStickers(): Output {
-    return PDDocument.load(pdfBytes)
-        .let { document ->
-          val singleStickerPage = document.getPage(0)
+  private fun generatePages(): Output {
+    val sourceDocument = PDDocument.load(pdfBytes)
 
-          val font = PDType0Font.load(document, ByteArrayInputStream(fontBytes))
+    check(templatePageIndexToRenderCode < sourceDocument.numberOfPages) { "PDF has only ${sourceDocument.numberOfPages} but asked to render code on $templatePageIndexToRenderCode" }
 
-          val newDocument = PDDocument()
+    val newDocument = PDDocument()
+    val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontBytes))
 
-          uuidBatches
-              .forEach { uuids ->
-                val pages = uuids
-                    .map { uuid ->
-                      Page(
-                          uuid = uuid,
-                          page = singleStickerPage
-                              .clone()
-                              .apply {
-                                renderBpPassportCodeOnPage(this, newDocument, font, uuid)
-                              }
-                      )
-                    }
+    uuidsGroupedByPage
+        .forEach { uuidsInOnePage ->
 
-                mergePages(newDocument, pages, rowCount, columnCount)
+          /*
+          * This maintains a clone of each page in the template document
+          * for every UUID that is supposed to go into a single page in
+          * the final document.
+          *
+          * For example, if the template document has three pages, and
+          * we are supposed to render 16 UUIDS in a single page in the
+          * final merged document, this will end up looking something
+          * like:
+          *
+          * [0] -> [page 0, uuid 0] -> [page 0, uuid 1] -> ... [page 0, uuid 15]
+          *  |
+          * [1] -> [page 1, uuid 0] -> [page 1, uuid 1] -> ... [page 1, uuid 15]
+          *  |
+          * [2] -> [page 2, uuid 0] -> [page 2, uuid 1] -> ... [page 2, uuid 15]
+          *
+          * TODO (vs 02-10-2019): Find a better abstraction for this
+          **/
+          val pagesForCurrentBatch = sourceDocument
+              .pages
+              .map { sourcePage -> uuidsInOnePage.map { Page(it, sourcePage.clone()) } }
+
+          pagesForCurrentBatch[templatePageIndexToRenderCode]
+              .forEach { page ->
+                renderBpPassportCodeOnPage(page.page, newDocument, font, page.uuid)
               }
 
-          Output(source = document, final = newDocument)
+          pagesForCurrentBatch.forEach { mergePages(newDocument, it, rowCount, columnCount) }
         }
-  }
 
-  private fun generateBpPassports(): Output {
-    return PDDocument.load(pdfBytes)
-        .let { document ->
-          val frontPage = document.getPage(0)
-          val backPage = document.getPage(1)
-
-          val font = PDType0Font.load(document, ByteArrayInputStream(fontBytes))
-
-          val newDocument = PDDocument()
-
-          uuidBatches
-              .forEach { uuids ->
-                val frontPages = uuids
-                    .map { uuid ->
-                      Page(
-                          uuid = uuid,
-                          page = frontPage
-                              .clone()
-                              .apply {
-                                renderBpPassportCodeOnPage(this, newDocument, font, uuid)
-                              }
-                      )
-                    }
-
-                val backPages = frontPages
-                    .map { (id, _) -> Page(uuid = id, page = backPage.clone()) }
-
-                mergePages(newDocument, frontPages, rowCount, columnCount)
-                mergePages(newDocument, backPages, rowCount, columnCount)
-              }
-
-          Output(source = document, final = newDocument)
-        }
+    return Output(source = sourceDocument, final = newDocument)
   }
 
   private fun renderBpPassportCodeOnPage(

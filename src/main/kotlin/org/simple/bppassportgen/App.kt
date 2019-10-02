@@ -185,7 +185,7 @@ class App(
     return GenerateBpPassportTask(
         pdfBytes = pdfInputBytes,
         fontBytes = fontInputBytes,
-        uuidBatches = uuidBatch,
+        uuidsGroupedByPage = uuidBatch,
         qrCodeWriter = qrCodeWriter,
         hints = hints,
         shortCodeColor = blackCmyk,
@@ -193,7 +193,8 @@ class App(
         rowCount = rowCount,
         columnCount = columnCount,
         barcodeRenderSpec = barcodeRenderSpec,
-        isSticker = isSticker,
-        shortcodeRenderSpec = shortcodeRenderSpec)
+        shortcodeRenderSpec = shortcodeRenderSpec,
+        templatePageIndexToRenderCode = 0
+    )
   }
 }
