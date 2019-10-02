@@ -1,12 +1,9 @@
 package org.simple.bppassportgen
 
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.EncodeHintType
-import com.google.zxing.qrcode.QRCodeWriter
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.font.PDType0Font
-import org.apache.pdfbox.pdmodel.graphics.color.PDColor
+import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import java.io.ByteArrayInputStream
 import java.util.UUID
 import java.util.concurrent.Callable
@@ -15,16 +12,13 @@ class GenerateBpPassportTask(
     private val pdfBytes: ByteArray,
     private val fontBytes: ByteArray,
     private val uuidsGroupedByPage: List<List<UUID>>,
-    private val qrCodeWriter: QRCodeWriter,
-    private val hints: Map<EncodeHintType, Any>,
-    private val shortCodeColor: PDColor,
-    private val barcodeColor: PDColor,
     private val rowCount: Int,
     private val columnCount: Int,
     private val barcodeRenderSpec: BarcodeRenderSpec,
     private val shortcodeRenderSpec: ShortcodeRenderSpec,
     private val templatePageIndexToRenderCode: Int,
-    private val templatePageIndexToRenderShortCode: Int
+    private val templatePageIndexToRenderShortCode: Int,
+    private val qrCodeGenerator: QrCodeGenerator
 ) : Callable<Output> {
 
   override fun call(): Output {
@@ -79,7 +73,7 @@ class GenerateBpPassportTask(
   }
 
   private fun renderQrCode(uuid: UUID, document: PDDocument, page: PDPage) {
-    val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, barcodeRenderSpec.width, barcodeRenderSpec.height, hints)
+    val bitMatrix = qrCodeGenerator.generateQrCode(uuid.toString(), barcodeRenderSpec.width, barcodeRenderSpec.height)
     val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = barcodeRenderSpec.matrixScale)
 
     PdfUtil.streamForPage(document, page).use { contentStream ->
@@ -88,7 +82,7 @@ class GenerateBpPassportTask(
           contentStream,
           barcodeRenderSpec.positionX,
           barcodeRenderSpec.positionY,
-          applyForegroundColor = { it.setStrokingColor(barcodeColor) }
+          applyForegroundColor = { it.setStrokingColor(barcodeRenderSpec.color) }
       )
     }
   }
@@ -102,7 +96,7 @@ class GenerateBpPassportTask(
     val shortCode = shortCodeForUuid(uuid)
     PdfUtil.streamForPage(document, page).use { contentStream ->
       contentStream.beginText()
-      contentStream.setNonStrokingColor(shortCodeColor)
+      contentStream.setNonStrokingColor(shortcodeRenderSpec.color)
       contentStream.newLineAtOffset(shortcodeRenderSpec.positionX, shortcodeRenderSpec.positionY)
       contentStream.setCharacterSpacing(shortcodeRenderSpec.characterSpacing)
       contentStream.setFont(font, shortcodeRenderSpec.fontSize)
