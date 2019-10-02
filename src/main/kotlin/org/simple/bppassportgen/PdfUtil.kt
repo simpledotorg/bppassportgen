@@ -4,6 +4,7 @@ import org.apache.pdfbox.cos.COSDictionary
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
+import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode
 import org.apache.pdfbox.pdmodel.PDResources
 import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject
@@ -49,12 +50,7 @@ object PdfUtil {
           pageMatrix
         }
 
-    PDPageContentStream(
-        document,
-        target,
-        PDPageContentStream.AppendMode.APPEND,
-        false
-    ).use { contentStream ->
+    streamForPage(document, target).use { contentStream ->
 
       val (pageWidth, pageHeight) = pdPages
           .first()
@@ -93,5 +89,14 @@ object PdfUtil {
     xObject.bBox = page.cropBox
 
     return xObject
+  }
+
+  fun streamForPage(
+      document: PDDocument,
+      page: PDPage,
+      appendMode: AppendMode = AppendMode.APPEND,
+      compress: Boolean = false
+  ): PDPageContentStream {
+    return PDPageContentStream(document, page, appendMode, compress)
   }
 }

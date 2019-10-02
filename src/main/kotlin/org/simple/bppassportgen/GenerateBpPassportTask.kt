@@ -5,7 +5,6 @@ import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
-import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import java.io.ByteArrayInputStream
@@ -83,12 +82,7 @@ class GenerateBpPassportTask(
     val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, barcodeRenderSpec.width, barcodeRenderSpec.height, hints)
     val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = barcodeRenderSpec.matrixScale)
 
-    PDPageContentStream(
-        document,
-        page,
-        PDPageContentStream.AppendMode.APPEND,
-        false
-    ).use { contentStream ->
+    PdfUtil.streamForPage(document, page).use { contentStream ->
 
       bitMatrixRenderable.render(
           contentStream,
@@ -106,12 +100,7 @@ class GenerateBpPassportTask(
       font: PDType0Font
   ) {
     val shortCode = shortCodeForUuid(uuid)
-    PDPageContentStream(
-        document,
-        page,
-        PDPageContentStream.AppendMode.APPEND,
-        false
-    ).use { contentStream ->
+    PdfUtil.streamForPage(document, page).use { contentStream ->
       contentStream.beginText()
       contentStream.setNonStrokingColor(shortCodeColor)
       contentStream.newLineAtOffset(shortcodeRenderSpec.positionX, shortcodeRenderSpec.positionY)
