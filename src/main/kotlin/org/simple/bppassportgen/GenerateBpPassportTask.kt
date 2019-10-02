@@ -20,7 +20,7 @@ import java.util.concurrent.Callable
 class GenerateBpPassportTask(
     private val pdfBytes: ByteArray,
     private val fontBytes: ByteArray,
-    private val uuidBatches: List<List<UUID>>,
+    private val uuidsGroupedByPage: List<List<UUID>>,
     private val qrCodeWriter: QRCodeWriter,
     private val hints: Map<EncodeHintType, Any>,
     private val shortCodeColor: PDColor,
@@ -44,12 +44,30 @@ class GenerateBpPassportTask(
     val newDocument = PDDocument()
     val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontBytes))
 
-    uuidBatches
-        .forEach { uuids ->
+    uuidsGroupedByPage
+        .forEach { uuidsInOnePage ->
 
+          /*
+          * This maintains a clone of each page in the template document
+          * for every UUID that is supposed to go into a single page in
+          * the final document.
+          *
+          * For example, if the template document has three pages, and
+          * we are supposed to render 16 UUIDS in a single page in the
+          * final merged document, this will end up looking something
+          * like:
+          *
+          * [0] -> [page 0, uuid 0] -> [page 0, uuid 1] -> ... [page 0, uuid 15]
+          *  |
+          * [1] -> [page 1, uuid 0] -> [page 1, uuid 1] -> ... [page 1, uuid 15]
+          *  |
+          * [2] -> [page 2, uuid 0] -> [page 2, uuid 1] -> ... [page 2, uuid 15]
+          *
+          * TODO (vs 02-10-2019): Find a better abstraction for this
+          **/
           val pagesForCurrentBatch = sourceDocument
               .pages
-              .map { sourcePage -> uuids.map { Page(it, sourcePage.clone()) } }
+              .map { sourcePage -> uuidsInOnePage.map { Page(it, sourcePage.clone()) } }
 
           pagesForCurrentBatch[templatePageIndexToRenderCode]
               .forEach { page ->

@@ -185,7 +185,7 @@ class App(
     return GenerateBpPassportTask(
         pdfBytes = pdfInputBytes,
         fontBytes = fontInputBytes,
-        uuidBatches = uuidBatch,
+        uuidsGroupedByPage = uuidBatch,
         qrCodeWriter = qrCodeWriter,
         hints = hints,
         shortCodeColor = blackCmyk,
