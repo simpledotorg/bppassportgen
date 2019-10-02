@@ -29,7 +29,8 @@ class GenerateBpPassportTask(
     private val columnCount: Int,
     private val barcodeRenderSpec: BarcodeRenderSpec,
     private val shortcodeRenderSpec: ShortcodeRenderSpec,
-    private val templatePageIndexToRenderCode: Int
+    private val templatePageIndexToRenderCode: Int,
+    private val templatePageIndexToRenderShortCode: Int
 ) : Callable<Output> {
 
   override fun call(): Output {
@@ -67,12 +68,13 @@ class GenerateBpPassportTask(
           **/
           val pagesForCurrentBatch = sourceDocument
               .pages
-              .map { sourcePage -> uuidsInOnePage.map { Page(it, sourcePage.clone()) } }
+              .map { sourcePage -> uuidsInOnePage.map { RenderContent(it, sourcePage.clone()) } }
 
           pagesForCurrentBatch[templatePageIndexToRenderCode]
-              .forEach { page ->
-                renderBpPassportCodeOnPage(page.page, newDocument, font, page.uuid)
-              }
+              .forEach { page -> renderQrCode(page.uuid, newDocument, page.pdPage) }
+
+          pagesForCurrentBatch[templatePageIndexToRenderShortCode]
+              .forEach { page -> renderShortCode(page.uuid, newDocument, page.pdPage, font) }
 
           pagesForCurrentBatch.forEach { mergePages(newDocument, it, rowCount, columnCount) }
         }
@@ -80,16 +82,33 @@ class GenerateBpPassportTask(
     return Output(source = sourceDocument, final = newDocument)
   }
 
-  private fun renderBpPassportCodeOnPage(
-      page: PDPage,
-      document: PDDocument,
-      font: PDType0Font,
-      uuid: UUID
-  ) {
-    val shortCode = shortCodeForUuid(uuid)
+  private fun renderQrCode(uuid: UUID, document: PDDocument, page: PDPage) {
     val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, barcodeRenderSpec.width, barcodeRenderSpec.height, hints)
     val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = barcodeRenderSpec.matrixScale)
 
+    PDPageContentStream(
+        document,
+        page,
+        PDPageContentStream.AppendMode.APPEND,
+        false
+    ).use { contentStream ->
+
+      bitMatrixRenderable.render(
+          contentStream,
+          barcodeRenderSpec.positionX,
+          barcodeRenderSpec.positionY,
+          applyForegroundColor = { it.setStrokingColor(barcodeColor) }
+      )
+    }
+  }
+
+  private fun renderShortCode(
+      uuid: UUID,
+      document: PDDocument,
+      page: PDPage,
+      font: PDType0Font
+  ) {
+    val shortCode = shortCodeForUuid(uuid)
     PDPageContentStream(
         document,
         page,
@@ -103,22 +122,13 @@ class GenerateBpPassportTask(
       contentStream.setFont(font, shortcodeRenderSpec.fontSize)
       contentStream.showText(shortCode)
       contentStream.endText()
-
-      bitMatrixRenderable.render(
-          contentStream,
-          barcodeRenderSpec.positionX,
-          barcodeRenderSpec.positionY,
-          drawBackground = false,
-          applyForegroundColor = { it.setStrokingColor(barcodeColor) },
-          applyBackgroundColor = { it.setStrokingColor(barcodeColor) }
-      )
     }
   }
 
-  private fun mergePages(document: PDDocument, pages: List<Page>, rowCount: Int, columnCount: Int): PDPage {
-    val targetRectangle = pages
+  private fun mergePages(document: PDDocument, renderContents: List<RenderContent>, rowCount: Int, columnCount: Int): PDPage {
+    val targetRectangle = renderContents
         .first()
-        .page
+        .pdPage
         .mediaBox
         .let { sourceRectangle ->
           PDRectangle(sourceRectangle.width * columnCount, sourceRectangle.height * rowCount)
@@ -129,8 +139,8 @@ class GenerateBpPassportTask(
     target.resources = PDResources()
     document.addPage(target)
 
-    val pageMatrix = pages
-        .map { page -> page.uuid to asXObject(document, page.page) }
+    val pageMatrix = renderContents
+        .map { page -> page.uuid to asXObject(document, page.pdPage) }
         .toMutableList()
         .let { pageXObjects ->
           val pageMatrix: MutableList<MutableList<Pair<UUID, PDFormXObject>?>> = mutableListOf()
@@ -154,9 +164,9 @@ class GenerateBpPassportTask(
         false
     ).use { contentStream ->
 
-      val (pageWidth, pageHeight) = pages
+      val (pageWidth, pageHeight) = renderContents
           .first()
-          .page
+          .pdPage
           .mediaBox
           .let { sourceRectangle ->
             sourceRectangle.width to sourceRectangle.height
@@ -215,5 +225,5 @@ class GenerateBpPassportTask(
     return PDPage(clonedDictionary)
   }
 
-  private data class Page(val uuid: UUID, val page: PDPage)
+  private data class RenderContent(val uuid: UUID, val pdPage: PDPage)
 }
