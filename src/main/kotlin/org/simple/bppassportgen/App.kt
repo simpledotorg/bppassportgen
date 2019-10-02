@@ -116,7 +116,7 @@ class App(
     uuidBatches
         .mapIndexed { index, uuidBatch ->
 
-          val task = createPassportGenerationTask(isSticker, index, pdfInputBytes, fontInputBytes, uuidBatch, qrCodeWriter, hints, blackCmyk, rowCount, columnCount)
+          val task = createPassportGenerationTask(isSticker, pdfInputBytes, fontInputBytes, uuidBatch, qrCodeWriter, hints, blackCmyk, rowCount, columnCount)
 
           task to index + 1
         }
@@ -161,7 +161,6 @@ class App(
 
   private fun createPassportGenerationTask(
       isSticker: Boolean,
-      index: Int,
       pdfInputBytes: ByteArray,
       fontInputBytes: ByteArray,
       uuidBatch: List<List<UUID>>,
@@ -171,32 +170,30 @@ class App(
       rowCount: Int,
       columnCount: Int
   ): Callable<Output> {
-    return if (isSticker) {
-      GenerateBpStickerTask(
-          taskNumber = index + 1,
-          pdfBytes = pdfInputBytes,
-          fontBytes = fontInputBytes,
-          uuidBatches = uuidBatch,
-          qrCodeWriter = qrCodeWriter,
-          hints = hints,
-          shortCodeColor = blackCmyk,
-          barcodeColor = blackCmyk,
-          rowCount = rowCount,
-          columnCount = columnCount
-      )
+    val barcodeRenderSpec = if (isSticker) {
+      BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F)
     } else {
-      GenerateBpPassportTask(
-          taskNumber = index + 1,
-          pdfBytes = pdfInputBytes,
-          fontBytes = fontInputBytes,
-          uuidBatches = uuidBatch,
-          qrCodeWriter = qrCodeWriter,
-          hints = hints,
-          shortCodeColor = blackCmyk,
-          barcodeColor = blackCmyk,
-          rowCount = rowCount,
-          columnCount = columnCount
-      )
+      BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F)
     }
+
+    val shortcodeRenderSpec = if (isSticker) {
+      ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F)
+    } else {
+      ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F)
+    }
+
+    return GenerateBpPassportTask(
+        pdfBytes = pdfInputBytes,
+        fontBytes = fontInputBytes,
+        uuidBatches = uuidBatch,
+        qrCodeWriter = qrCodeWriter,
+        hints = hints,
+        shortCodeColor = blackCmyk,
+        barcodeColor = blackCmyk,
+        rowCount = rowCount,
+        columnCount = columnCount,
+        barcodeRenderSpec = barcodeRenderSpec,
+        isSticker = isSticker,
+        shortcodeRenderSpec = shortcodeRenderSpec)
   }
 }

@@ -18,19 +18,55 @@ import java.util.UUID
 import java.util.concurrent.Callable
 
 class GenerateBpPassportTask(
-    val taskNumber: Int,
-    val pdfBytes: ByteArray,
-    val fontBytes: ByteArray,
-    val uuidBatches: List<List<UUID>>,
-    val qrCodeWriter: QRCodeWriter,
-    val hints: Map<EncodeHintType, Any>,
-    val shortCodeColor: PDColor,
-    val barcodeColor: PDColor,
-    val rowCount: Int,
-    val columnCount: Int
+    private val pdfBytes: ByteArray,
+    private val fontBytes: ByteArray,
+    private val uuidBatches: List<List<UUID>>,
+    private val qrCodeWriter: QRCodeWriter,
+    private val hints: Map<EncodeHintType, Any>,
+    private val shortCodeColor: PDColor,
+    private val barcodeColor: PDColor,
+    private val rowCount: Int,
+    private val columnCount: Int,
+    private val barcodeRenderSpec: BarcodeRenderSpec,
+    private val isSticker: Boolean,
+    private val shortcodeRenderSpec: ShortcodeRenderSpec
 ) : Callable<Output> {
 
   override fun call(): Output {
+    return if (!isSticker) generateBpPassports() else generateBpStickers()
+  }
+
+  private fun generateBpStickers(): Output {
+    return PDDocument.load(pdfBytes)
+        .let { document ->
+          val singleStickerPage = document.getPage(0)
+
+          val font = PDType0Font.load(document, ByteArrayInputStream(fontBytes))
+
+          val newDocument = PDDocument()
+
+          uuidBatches
+              .forEach { uuids ->
+                val pages = uuids
+                    .map { uuid ->
+                      Page(
+                          uuid = uuid,
+                          page = singleStickerPage
+                              .clone()
+                              .apply {
+                                renderBpPassportCodeOnPage(this, newDocument, font, uuid)
+                              }
+                      )
+                    }
+
+                mergePages(newDocument, pages, rowCount, columnCount)
+              }
+
+          Output(source = document, final = newDocument)
+        }
+  }
+
+  private fun generateBpPassports(): Output {
     return PDDocument.load(pdfBytes)
         .let { document ->
           val frontPage = document.getPage(0)
@@ -72,8 +108,8 @@ class GenerateBpPassportTask(
       uuid: UUID
   ) {
     val shortCode = shortCodeForUuid(uuid)
-    val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, 80, 80, hints)
-    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = 1.35F)
+    val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, barcodeRenderSpec.width, barcodeRenderSpec.height, hints)
+    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = barcodeRenderSpec.matrixScale)
 
     PDPageContentStream(
         document,
@@ -83,16 +119,16 @@ class GenerateBpPassportTask(
     ).use { contentStream ->
       contentStream.beginText()
       contentStream.setNonStrokingColor(shortCodeColor)
-      contentStream.newLineAtOffset(72.5F, 210F)
-      contentStream.setCharacterSpacing(2.4F)
-      contentStream.setFont(font, 12F)
+      contentStream.newLineAtOffset(shortcodeRenderSpec.positionX, shortcodeRenderSpec.positionY)
+      contentStream.setCharacterSpacing(shortcodeRenderSpec.characterSpacing)
+      contentStream.setFont(font, shortcodeRenderSpec.fontSize)
       contentStream.showText(shortCode)
       contentStream.endText()
 
       bitMatrixRenderable.render(
           contentStream,
-          196F,
-          107.5F,
+          barcodeRenderSpec.positionX,
+          barcodeRenderSpec.positionY,
           drawBackground = false,
           applyForegroundColor = { it.setStrokingColor(barcodeColor) },
           applyBackgroundColor = { it.setStrokingColor(barcodeColor) }
