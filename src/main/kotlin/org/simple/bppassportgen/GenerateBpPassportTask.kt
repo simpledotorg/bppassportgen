@@ -3,16 +3,10 @@ package org.simple.bppassportgen
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
-import org.apache.pdfbox.cos.COSDictionary
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
-import org.apache.pdfbox.pdmodel.PDPageContentStream
-import org.apache.pdfbox.pdmodel.PDResources
-import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
-import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject
-import org.apache.pdfbox.util.Matrix
 import java.io.ByteArrayInputStream
 import java.util.UUID
 import java.util.concurrent.Callable
@@ -68,7 +62,7 @@ class GenerateBpPassportTask(
           **/
           val pagesForCurrentBatch = sourceDocument
               .pages
-              .map { sourcePage -> uuidsInOnePage.map { RenderContent(it, sourcePage.clone()) } }
+              .map { sourcePage -> uuidsInOnePage.map { RenderContent(it, PdfUtil.clone(sourcePage)) } }
 
           pagesForCurrentBatch[templatePageIndexToRenderCode]
               .forEach { page -> renderQrCode(page.uuid, newDocument, page.pdPage) }
@@ -76,7 +70,9 @@ class GenerateBpPassportTask(
           pagesForCurrentBatch[templatePageIndexToRenderShortCode]
               .forEach { page -> renderShortCode(page.uuid, newDocument, page.pdPage, font) }
 
-          pagesForCurrentBatch.forEach { mergePages(newDocument, it, rowCount, columnCount) }
+          pagesForCurrentBatch
+              .map { renderContents -> renderContents.map { it.pdPage } }
+              .forEach { PdfUtil.mergePagesIntoOne(newDocument, it, rowCount, columnCount) }
         }
 
     return Output(source = sourceDocument, final = newDocument)
@@ -86,12 +82,7 @@ class GenerateBpPassportTask(
     val bitMatrix = qrCodeWriter.encode(uuid.toString(), BarcodeFormat.QR_CODE, barcodeRenderSpec.width, barcodeRenderSpec.height, hints)
     val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = barcodeRenderSpec.matrixScale)
 
-    PDPageContentStream(
-        document,
-        page,
-        PDPageContentStream.AppendMode.APPEND,
-        false
-    ).use { contentStream ->
+    PdfUtil.streamForPage(document, page).use { contentStream ->
 
       bitMatrixRenderable.render(
           contentStream,
@@ -109,12 +100,7 @@ class GenerateBpPassportTask(
       font: PDType0Font
   ) {
     val shortCode = shortCodeForUuid(uuid)
-    PDPageContentStream(
-        document,
-        page,
-        PDPageContentStream.AppendMode.APPEND,
-        false
-    ).use { contentStream ->
+    PdfUtil.streamForPage(document, page).use { contentStream ->
       contentStream.beginText()
       contentStream.setNonStrokingColor(shortCodeColor)
       contentStream.newLineAtOffset(shortcodeRenderSpec.positionX, shortcodeRenderSpec.positionY)
@@ -123,86 +109,6 @@ class GenerateBpPassportTask(
       contentStream.showText(shortCode)
       contentStream.endText()
     }
-  }
-
-  private fun mergePages(document: PDDocument, renderContents: List<RenderContent>, rowCount: Int, columnCount: Int): PDPage {
-    val targetRectangle = renderContents
-        .first()
-        .pdPage
-        .mediaBox
-        .let { sourceRectangle ->
-          PDRectangle(sourceRectangle.width * columnCount, sourceRectangle.height * rowCount)
-        }
-
-    val target = PDPage(targetRectangle)
-
-    target.resources = PDResources()
-    document.addPage(target)
-
-    val pageMatrix = renderContents
-        .map { page -> page.uuid to asXObject(document, page.pdPage) }
-        .toMutableList()
-        .let { pageXObjects ->
-          val pageMatrix: MutableList<MutableList<Pair<UUID, PDFormXObject>?>> = mutableListOf()
-          (0 until rowCount).forEach { rowIndex ->
-            pageMatrix.add(MutableList(columnCount) { null })
-          }
-
-          (0 until columnCount).forEach { columnIndex ->
-            (0 until rowCount).forEach { rowIndex ->
-              pageMatrix[rowIndex][columnIndex] = if (pageXObjects.isNotEmpty()) pageXObjects.removeAt(0) else null
-            }
-          }
-
-          pageMatrix
-        }
-
-    PDPageContentStream(
-        document,
-        target,
-        PDPageContentStream.AppendMode.APPEND,
-        false
-    ).use { contentStream ->
-
-      val (pageWidth, pageHeight) = renderContents
-          .first()
-          .pdPage
-          .mediaBox
-          .let { sourceRectangle ->
-            sourceRectangle.width to sourceRectangle.height
-          }
-
-      pageMatrix.forEach { row ->
-
-        row
-            .filter { it != null }
-            .forEach { page ->
-              val (id, xObject) = page!!
-              target.resources.add(xObject, id.toString())
-              contentStream.drawForm(xObject)
-              contentStream.transform(Matrix.getTranslateInstance(pageWidth, 0F))
-            }
-
-        contentStream.transform(Matrix.getTranslateInstance(-pageWidth * columnCount, pageHeight))
-      }
-    }
-
-    return target
-  }
-
-  private fun asXObject(document: PDDocument, page: PDPage): PDFormXObject {
-    val xObject = PDFormXObject(document)
-
-    xObject.stream.createOutputStream().use { outputStream ->
-      page.contents.use { inputStream ->
-        inputStream.copyTo(outputStream)
-      }
-    }
-
-    xObject.resources = page.resources
-    xObject.bBox = page.cropBox
-
-    return xObject
   }
 
   private fun shortCodeForUuid(uuid: UUID): String {
@@ -216,13 +122,6 @@ class GenerateBpPassportTask(
 
           "$prefix $suffix"
         }
-  }
-
-  private fun PDPage.clone(): PDPage {
-    val pageDictionary = this.cosObject
-    val clonedDictionary = COSDictionary(pageDictionary)
-
-    return PDPage(clonedDictionary)
   }
 
   private data class RenderContent(val uuid: UUID, val pdPage: PDPage)
