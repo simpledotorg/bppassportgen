@@ -17,18 +17,24 @@ import java.nio.file.Paths
 import java.util.UUID
 
 abstract class VerifyTestBase(uuidFileResourcePath: String) {
-  private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
-  protected val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
-  protected val uuids: List<UUID> = readUuids(uuidFileResourcePath)
-  abstract val templateFilePath: String
 
-  protected val app = App(
-      computationThreadPool = MoreExecutors.newDirectExecutorService(),
-      ioThreadPool = MoreExecutors.newDirectExecutorService(),
-      progressPoll = NoOpProgressPoll(),
-      consolePrinter = NoOpConsolePrinter(),
-      templateFilePath = templateFilePath
-  )
+  private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
+  private val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
+
+  protected val uuids: List<UUID> = readUuids(uuidFileResourcePath)
+
+  protected abstract val templateFilePath: String
+
+  protected val app: App by lazy {
+    App(
+        computationThreadPool = MoreExecutors.newDirectExecutorService(),
+        ioThreadPool = MoreExecutors.newDirectExecutorService(),
+        progressPoll = NoOpProgressPoll(),
+        consolePrinter = NoOpConsolePrinter(),
+        templateFilePath = templateFilePath,
+        outDirectory = outputDirectory
+    )
+  }
 
   @Before
   fun setUp() {

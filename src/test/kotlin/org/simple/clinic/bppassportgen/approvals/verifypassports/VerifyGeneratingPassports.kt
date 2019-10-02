@@ -5,14 +5,12 @@ import org.simple.clinic.bppassportgen.approvals.VerifyTestBase
 
 class VerifyGeneratingPassports : VerifyTestBase("uuids_passports.txt") {
 
-  override val templateFilePath: String
-    get() = resourceFilePath("bppassport-template.pdf")
+  override val templateFilePath: String = resourceFilePath("bppassport-template.pdf")
 
   @Test
   fun `verify generating bp passports`() {
     app.run(
         uuidsToGenerate = uuids,
-        outDirectory = outputDirectory,
         pageCount = 2,
         rowCount = 2,
         columnCount = 2,
