@@ -9,6 +9,7 @@ import org.simple.bppassportgen.App
 import org.simple.clinic.bppassportgen.SavePdfToImage
 import org.simple.clinic.bppassportgen.util.NoOpConsolePrinter
 import org.simple.clinic.bppassportgen.util.NoOpProgressPoll
+import org.simple.clinic.bppassportgen.util.readUuids
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import java.awt.image.BufferedImage
@@ -76,12 +77,4 @@ abstract class VerifyTestBase(uuidFileResourcePath: String) {
         .mapIndexed { index, document -> (index + 1) to document.use(SavePdfToImage::save) }
         .toMap()
   }
-
-  private fun readUuids(fileName: String): List<UUID> {
-    return with(File(resourceFilePath(fileName))) {
-      this.readLines().map { UUID.fromString(it) }
-    }
-  }
-
-  protected fun resourceFilePath(fileName: String): String = javaClass.classLoader.getResource(fileName)!!.file
 }

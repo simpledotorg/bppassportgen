@@ -2,6 +2,7 @@ package org.simple.clinic.bppassportgen.approvals.verifystickers
 
 import org.junit.Test
 import org.simple.clinic.bppassportgen.approvals.VerifyTestBase
+import org.simple.clinic.bppassportgen.util.resourceFilePath
 
 class VerifyGeneratingStickers : VerifyTestBase("uuids_stickers.txt") {
 

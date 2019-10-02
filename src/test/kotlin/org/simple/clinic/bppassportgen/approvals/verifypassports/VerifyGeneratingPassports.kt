@@ -2,6 +2,7 @@ package org.simple.clinic.bppassportgen.approvals.verifypassports
 
 import org.junit.Test
 import org.simple.clinic.bppassportgen.approvals.VerifyTestBase
+import org.simple.clinic.bppassportgen.util.resourceFilePath
 
 class VerifyGeneratingPassports : VerifyTestBase("uuids_passports.txt") {
 
