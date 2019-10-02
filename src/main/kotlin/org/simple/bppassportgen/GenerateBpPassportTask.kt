@@ -28,17 +28,18 @@ class GenerateBpPassportTask(
     private val rowCount: Int,
     private val columnCount: Int,
     private val barcodeRenderSpec: BarcodeRenderSpec,
-    private val shortcodeRenderSpec: ShortcodeRenderSpec
+    private val shortcodeRenderSpec: ShortcodeRenderSpec,
+    private val templatePageIndexToRenderCode: Int
 ) : Callable<Output> {
 
   override fun call(): Output {
-    return generatePages(0)
+    return generatePages()
   }
 
-  private fun generatePages(pageIndexToRenderCodeOn: Int): Output {
+  private fun generatePages(): Output {
     val sourceDocument = PDDocument.load(pdfBytes)
 
-    check(pageIndexToRenderCodeOn < sourceDocument.numberOfPages) { "PDF has only ${sourceDocument.numberOfPages} but asked to render code on $pageIndexToRenderCodeOn" }
+    check(templatePageIndexToRenderCode < sourceDocument.numberOfPages) { "PDF has only ${sourceDocument.numberOfPages} but asked to render code on $templatePageIndexToRenderCode" }
 
     val font = PDType0Font.load(sourceDocument, ByteArrayInputStream(fontBytes))
 
@@ -51,7 +52,7 @@ class GenerateBpPassportTask(
               .pages
               .map { sourcePage -> uuids.map { Page(it, sourcePage.clone()) } }
 
-          pagesForCurrentBatch[pageIndexToRenderCodeOn]
+          pagesForCurrentBatch[templatePageIndexToRenderCode]
               .forEach { page ->
                 renderBpPassportCodeOnPage(page.page, newDocument, font, page.uuid)
               }
