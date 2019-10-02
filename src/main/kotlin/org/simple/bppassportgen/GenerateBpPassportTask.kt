@@ -68,7 +68,7 @@ class GenerateBpPassportTask(
           **/
           val pagesForCurrentBatch = sourceDocument
               .pages
-              .map { sourcePage -> uuidsInOnePage.map { RenderContent(it, sourcePage.clone()) } }
+              .map { sourcePage -> uuidsInOnePage.map { RenderContent(it, PdfUtil.clone(sourcePage)) } }
 
           pagesForCurrentBatch[templatePageIndexToRenderCode]
               .forEach { page -> renderQrCode(page.uuid, newDocument, page.pdPage) }
@@ -216,13 +216,6 @@ class GenerateBpPassportTask(
 
           "$prefix $suffix"
         }
-  }
-
-  private fun PDPage.clone(): PDPage {
-    val pageDictionary = this.cosObject
-    val clonedDictionary = COSDictionary(pageDictionary)
-
-    return PDPage(clonedDictionary)
   }
 
   private data class RenderContent(val uuid: UUID, val pdPage: PDPage)
