@@ -9,20 +9,16 @@ import org.simple.bppassportgen.App
 import org.simple.clinic.bppassportgen.SavePdfToImage
 import org.simple.clinic.bppassportgen.util.NoOpConsolePrinter
 import org.simple.clinic.bppassportgen.util.NoOpProgressPoll
-import org.simple.clinic.bppassportgen.util.readUuids
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Paths
-import java.util.UUID
 
-abstract class VerifyTestBase(uuidFileResourcePath: String) {
+abstract class VerifyTestBase {
 
   private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
   private val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
-
-  protected val uuids: List<UUID> = readUuids(uuidFileResourcePath)
 
   protected abstract val templateFilePath: String
   protected abstract val pageCount: Int

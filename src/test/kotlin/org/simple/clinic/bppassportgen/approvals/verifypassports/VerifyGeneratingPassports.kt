@@ -2,9 +2,10 @@ package org.simple.clinic.bppassportgen.approvals.verifypassports
 
 import org.junit.Test
 import org.simple.clinic.bppassportgen.approvals.VerifyTestBase
+import org.simple.clinic.bppassportgen.util.readUuids
 import org.simple.clinic.bppassportgen.util.resourceFilePath
 
-class VerifyGeneratingPassports : VerifyTestBase("uuids_passports.txt") {
+class VerifyGeneratingPassports : VerifyTestBase() {
 
   override val templateFilePath: String = resourceFilePath("bppassport-template.pdf")
 
@@ -18,7 +19,7 @@ class VerifyGeneratingPassports : VerifyTestBase("uuids_passports.txt") {
 
   @Test
   fun `verify generating bp passports`() {
-    app.run(uuidsToGenerate = uuids)
+    app.run(uuidsToGenerate = readUuids("uuids_passports.txt"))
 
     runApprovals(8) { pdfNumber, pageNumber: Int -> "bp passport $pdfNumber.$pageNumber" }
   }
