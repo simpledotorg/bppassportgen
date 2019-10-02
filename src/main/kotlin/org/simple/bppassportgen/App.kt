@@ -63,10 +63,10 @@ fun main(args: Array<String>) {
           templateFilePath = templateFilePath,
           outDirectory = outDirectory,
           pageCount = pageCount,
-          rowCount = rowCount
+          rowCount = rowCount,
+          columnCount = columnCount
       ).run(
           uuidsToGenerate = uuidsToGenerate,
-          columnCount = columnCount,
           isSticker = isSticker
       )
     }
@@ -81,12 +81,12 @@ class App(
     private val templateFilePath: String,
     private val outDirectory: File,
     private val pageCount: Int,
-    private val rowCount: Int
+    private val rowCount: Int,
+    private val columnCount: Int
 ) {
 
   fun run(
       uuidsToGenerate: List<UUID>,
-      columnCount: Int,
       isSticker: Boolean
   ) {
 
