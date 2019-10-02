@@ -193,7 +193,6 @@ class App(
         rowCount = rowCount,
         columnCount = columnCount,
         barcodeRenderSpec = barcodeRenderSpec,
-        isSticker = isSticker,
         shortcodeRenderSpec = shortcodeRenderSpec)
   }
 }

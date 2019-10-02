@@ -28,7 +28,6 @@ class GenerateBpPassportTask(
     private val rowCount: Int,
     private val columnCount: Int,
     private val barcodeRenderSpec: BarcodeRenderSpec,
-    private val isSticker: Boolean,
     private val shortcodeRenderSpec: ShortcodeRenderSpec
 ) : Callable<Output> {
 
