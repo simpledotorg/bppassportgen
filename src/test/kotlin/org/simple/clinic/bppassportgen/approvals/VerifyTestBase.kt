@@ -7,6 +7,7 @@ import org.approvaltests.namer.NamerFactory
 import org.junit.Before
 import org.simple.bppassportgen.App
 import org.simple.clinic.bppassportgen.SavePdfToImage
+import org.simple.clinic.bppassportgen.util.ImageApprover
 import org.simple.clinic.bppassportgen.util.NoOpConsolePrinter
 import org.simple.clinic.bppassportgen.util.NoOpProgressPoll
 import strikt.api.expectThat
@@ -62,7 +63,7 @@ abstract class VerifyTestBase(
         }
         .forEach { (name, image) ->
           NamerFactory.additionalInformation = name
-          Approvals.verify(image)
+          Approvals.verify(ImageApprover.create(image, minimumSimilarity = 0.99))
         }
   }
 
