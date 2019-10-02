@@ -3,7 +3,6 @@ package org.simple.bppassportgen
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.font.PDType0Font
-import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import java.io.ByteArrayInputStream
 import java.util.UUID
@@ -13,7 +12,6 @@ class GenerateBpPassportTask(
     private val pdfBytes: ByteArray,
     private val fontBytes: ByteArray,
     private val uuidsGroupedByPage: List<List<UUID>>,
-    private val shortCodeColor: PDColor,
     private val rowCount: Int,
     private val columnCount: Int,
     private val barcodeRenderSpec: BarcodeRenderSpec,
@@ -98,7 +96,7 @@ class GenerateBpPassportTask(
     val shortCode = shortCodeForUuid(uuid)
     PdfUtil.streamForPage(document, page).use { contentStream ->
       contentStream.beginText()
-      contentStream.setNonStrokingColor(shortCodeColor)
+      contentStream.setNonStrokingColor(shortcodeRenderSpec.color)
       contentStream.newLineAtOffset(shortcodeRenderSpec.positionX, shortcodeRenderSpec.positionY)
       contentStream.setCharacterSpacing(shortcodeRenderSpec.characterSpacing)
       contentStream.setFont(font, shortcodeRenderSpec.fontSize)

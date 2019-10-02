@@ -172,16 +172,15 @@ class App(
     }
 
     val shortcodeRenderSpec = if (isSticker) {
-      ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F)
+      ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk)
     } else {
-      ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F)
+      ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk)
     }
 
     return GenerateBpPassportTask(
         pdfBytes = pdfInputBytes,
         fontBytes = fontInputBytes,
         uuidsGroupedByPage = uuidBatch,
-        shortCodeColor = blackCmyk,
         rowCount = rowCount,
         columnCount = columnCount,
         barcodeRenderSpec = barcodeRenderSpec,
