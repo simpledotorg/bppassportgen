@@ -63,7 +63,7 @@ abstract class VerifyTestBase(
         }
         .forEach { (name, image) ->
           NamerFactory.additionalInformation = name
-          Approvals.verify(ImageApprover.create(image, minimumSimilarity = 0.99))
+          Approvals.verify(ImageApprover.create(image, minimumSimilarity = 0.985))
         }
   }
 
