@@ -2,26 +2,15 @@ package org.simple.bppassportgen
 
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
-import org.apache.pdfbox.pdmodel.font.PDType0Font
-import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.renderable.Renderable
-import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
-import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
-import java.io.ByteArrayInputStream
 import java.util.UUID
 import java.util.concurrent.Callable
 
 class GenerateBpPassportTask(
     private val pdfBytes: ByteArray,
-    private val fontBytes: ByteArray,
     private val uuidsGroupedByPage: List<List<UUID>>,
     private val rowCount: Int,
     private val columnCount: Int,
-    private val barcodeRenderSpec: BarcodeRenderSpec,
-    private val shortcodeRenderSpec: ShortcodeRenderSpec,
-    private val templatePageIndexToRenderCode: Int,
-    private val templatePageIndexToRenderShortCode: Int,
-    private val qrCodeGenerator: QrCodeGenerator,
     private val pageSpecs: List<List<PageSpec>>,
     private val newDocument: PDDocument
 ) : Callable<Output> {
@@ -32,10 +21,6 @@ class GenerateBpPassportTask(
 
   private fun generatePages(): Output {
     val sourceDocument = PDDocument.load(pdfBytes)
-
-    check(templatePageIndexToRenderCode < sourceDocument.numberOfPages) { "PDF has only ${sourceDocument.numberOfPages} but asked to render code on $templatePageIndexToRenderCode" }
-
-    val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontBytes))
 
     uuidsGroupedByPage
         .forEachIndexed { pageIndex, uuidsInOnePage ->

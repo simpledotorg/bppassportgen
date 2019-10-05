@@ -202,15 +202,9 @@ class App(
 
     return GenerateBpPassportTask(
         pdfBytes = pdfInputBytes,
-        fontBytes = fontInputBytes,
         uuidsGroupedByPage = uuidBatch,
         rowCount = rowCount,
         columnCount = columnCount,
-        barcodeRenderSpec = barcodeRenderSpec,
-        shortcodeRenderSpec = shortcodeRenderSpec,
-        templatePageIndexToRenderCode = 0,
-        templatePageIndexToRenderShortCode = 0,
-        qrCodeGenerator = qrCodeGenerator,
         pageSpecs = pageSpecs,
         newDocument = newDocument
     )
