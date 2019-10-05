@@ -40,9 +40,6 @@ class GenerateBpPassportTask(
     uuidsGroupedByPage
         .forEachIndexed { pageIndex, uuidsInOnePage ->
 
-          // Only required until generation of renderables is moved
-          val pageSpecsForThisBatch = pageSpecs.getOrElse(pageIndex) { emptyList() }
-
           /*
           * This maintains a clone of each page in the template document
           * for every UUID that is supposed to go into a single page in
@@ -66,10 +63,7 @@ class GenerateBpPassportTask(
               .mapIndexed { sourcePageIndex, sourcePage ->
                 uuidsInOnePage.mapIndexed { uuidIndex, uuid ->
 
-                  val renderablesForPageIndex = pageSpecsForThisBatch
-                      // Only required until generation of renderables is moved
-                      .getOrElse(uuidIndex) { PageSpec(emptyMap()) }
-                      .renderablesForPageIndex(sourcePageIndex)
+                  val renderablesForPageIndex = pageSpecs[pageIndex][uuidIndex].renderablesForPageIndex(sourcePageIndex)
 
                   RenderContent(
                       pdPage = PdfUtil.clone(sourcePage),
