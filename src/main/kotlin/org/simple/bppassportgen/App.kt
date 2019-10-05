@@ -122,6 +122,31 @@ class App(
         .mapIndexed { index, uuidBatch ->
           val openedDocument = documentFactory.emptyDocument()
 
+          val barcodeRenderSpec = if (isSticker) {
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = blackCmyk)
+          } else {
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = blackCmyk)
+          }
+
+          val shortcodeRenderSpec = if (isSticker) {
+            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk, fontId = fontId)
+          } else {
+            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk, fontId = fontId)
+          }
+
+          val pageSpecs = uuidBatch
+              .map { uuidsInEachPage ->
+                uuidsInEachPage.map { uuid ->
+                  PageSpec(mapOf(
+                      0 to listOf(
+                          QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec),
+                          ShortcodeRenderable(uuid, shortcodeRenderSpec)
+                      )
+                  ))
+                }
+              }
+              .toList()
+
           val task = createPassportGenerationTask(
               isSticker = isSticker,
               pdfInputBytes = pdfInputBytes,
@@ -132,7 +157,7 @@ class App(
               qrCodeGenerator = qrCodeGenerator,
               openedDocument = openedDocument,
               fontId = fontId,
-              pageSpecs = emptyList()
+              pageSpecs = pageSpecs
           )
 
           task to index + 1
@@ -200,18 +225,7 @@ class App(
       ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk, fontId = fontId)
     }
 
-    val pageSpecs_old = uuidBatch
-        .map { uuidsInEachPage ->
-          uuidsInEachPage.map { uuid ->
-            PageSpec(mapOf(
-                0 to listOf(
-                    QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec),
-                    ShortcodeRenderable(uuid, shortcodeRenderSpec)
-                )
-            ))
-          }
-        }
-        .toList()
+    val pageSpecs_old = emptyList<List<PageSpec>>()
 
     return GenerateBpPassportTask(
         pdfBytes = pdfInputBytes,
