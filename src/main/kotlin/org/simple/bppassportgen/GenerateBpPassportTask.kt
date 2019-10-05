@@ -40,7 +40,10 @@ class GenerateBpPassportTask(
     val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontBytes))
 
     uuidsGroupedByPage
-        .forEach { uuidsInOnePage ->
+        .forEachIndexed { pageIndex, uuidsInOnePage ->
+
+          // Only required until generation of renderables is moved
+          val pageSpecsForThisBatch = pageSpecs.getOrElse(pageIndex) { emptyList() }
 
           /*
           * This maintains a clone of each page in the template document
@@ -63,10 +66,16 @@ class GenerateBpPassportTask(
           val pagesForCurrentBatch = sourceDocument
               .pages
               .mapIndexed { sourcePageIndex, sourcePage ->
-                uuidsInOnePage.map { uuid ->
+                uuidsInOnePage.mapIndexed { uuidIndex, uuid ->
+
+                  val renderablesForPageIndex = pageSpecsForThisBatch
+                      // Only required until generation of renderables is moved
+                      .getOrElse(uuidIndex) { PageSpec(emptyMap()) }
+                      .renderablesForPageIndex(sourcePageIndex)
+
                   RenderContent(
                       pdPage = PdfUtil.clone(sourcePage),
-                      renderables = generateRenderables(sourcePageIndex, uuid, font)
+                      renderables = generateRenderables(sourcePageIndex, uuid, font) + renderablesForPageIndex
                   )
                 }
               }
