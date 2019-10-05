@@ -7,7 +7,6 @@ import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.renderable.Renderable
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
-import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderable
 import java.io.ByteArrayInputStream
 import java.util.UUID
 import java.util.concurrent.Callable
@@ -100,10 +99,7 @@ class GenerateBpPassportTask(
       uuid: UUID,
       font: PDType0Font
   ): List<Renderable> {
-    return when (sourcePageIndex) {
-      templatePageIndexToRenderShortCode -> listOf(ShortcodeRenderable(uuid, font, shortcodeRenderSpec))
-      else -> emptyList()
-    }
+    return emptyList()
   }
 
   private data class RenderContent(
