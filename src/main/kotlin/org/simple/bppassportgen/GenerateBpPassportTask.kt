@@ -66,6 +66,7 @@ class GenerateBpPassportTask(
 
                   val renderables: List<Renderable> = when (sourcePageIndex) {
                     templatePageIndexToRenderCode -> listOf(QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec))
+                    templatePageIndexToRenderShortCode -> listOf(ShortcodeRenderable(uuid, font, shortcodeRenderSpec))
                     else -> emptyList()
                   }
 
@@ -84,9 +85,6 @@ class GenerateBpPassportTask(
                     .renderables
                     .forEach { it.render(newDocument, renderContent.pdPage) }
               }
-
-          pagesForCurrentBatch[templatePageIndexToRenderShortCode]
-              .forEach { page -> ShortcodeRenderable(page.uuid, font, shortcodeRenderSpec).render(newDocument, page.pdPage) }
 
           pagesForCurrentBatch
               .map { renderContents -> renderContents.map { it.pdPage } }
