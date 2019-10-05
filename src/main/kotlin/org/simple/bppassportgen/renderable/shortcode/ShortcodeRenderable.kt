@@ -6,15 +6,13 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.simple.bppassportgen.PdfUtil
 import java.util.UUID
 
-class ShortcodeRenderable {
+class ShortcodeRenderable(
+    private val uuid: UUID,
+    private val font: PDType0Font,
+    private val spec: ShortcodeRenderSpec
+) {
 
-  fun render(
-      uuid: UUID,
-      document: PDDocument,
-      page: PDPage,
-      font: PDType0Font,
-      spec: ShortcodeRenderSpec
-  ) {
+  fun render(document: PDDocument, page: PDPage) {
     val shortCode = shortCodeForUuid(uuid)
     PdfUtil.streamForPage(document, page).use { contentStream ->
       contentStream.beginText()
