@@ -13,6 +13,9 @@ import org.simple.bppassportgen.progresspoll.ProgressPoll
 import org.simple.bppassportgen.progresspoll.RealProgressPoll
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.qrcodegen.QrCodeGeneratorImpl
+import org.simple.bppassportgen.renderable.Renderable.Type
+import org.simple.bppassportgen.renderable.Renderable.Type.PassportQrCode
+import org.simple.bppassportgen.renderable.Renderable.Type.PassportShortcode
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
 import org.simple.bppassportgen.renderable.qrcode.QrCodeRenderable
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
@@ -89,7 +92,10 @@ class App(
     private val rowCount: Int,
     private val columnCount: Int,
     private val isSticker: Boolean,
-    private val fonts: Map<String, String> = mapOf(FONT_ID to FONT_PATH)
+    private val fonts: Map<String, String> = mapOf(FONT_ID to FONT_PATH),
+    private val renderOnPage: Map<Int, List<Type>> = mapOf(
+        0 to listOf(PassportQrCode, PassportShortcode)
+    )
 ) {
 
   fun run(uuidsToGenerate: List<UUID>) {
