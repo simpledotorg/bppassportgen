@@ -58,7 +58,7 @@ class GenerateBpPassportTask(
               .forEach { renderContent ->
                 renderContent
                     .renderables
-                    .forEach { it.render(openedDocument.document, renderContent.pdPage) }
+                    .forEach { it.render(openedDocument, renderContent.pdPage) }
               }
 
           pagesForCurrentBatch

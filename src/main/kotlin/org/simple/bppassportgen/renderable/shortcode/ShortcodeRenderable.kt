@@ -1,7 +1,7 @@
 package org.simple.bppassportgen.renderable.shortcode
 
-import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
+import org.simple.bppassportgen.OpenedDocument
 import org.simple.bppassportgen.PdfUtil
 import org.simple.bppassportgen.renderable.Renderable
 import java.util.UUID
@@ -11,9 +11,9 @@ class ShortcodeRenderable(
     private val spec: ShortcodeRenderSpec
 ): Renderable {
 
-  override fun render(document: PDDocument, page: PDPage) {
+  override fun render(document: OpenedDocument, page: PDPage) {
     val shortCode = shortCodeForUuid(uuid)
-    PdfUtil.streamForPage(document, page).use { contentStream ->
+    PdfUtil.streamForPage(document.document, page).use { contentStream ->
       contentStream.beginText()
       contentStream.setNonStrokingColor(spec.color)
       contentStream.newLineAtOffset(spec.positionX, spec.positionY)
