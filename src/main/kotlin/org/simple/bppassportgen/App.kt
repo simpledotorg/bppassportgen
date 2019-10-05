@@ -202,7 +202,6 @@ class App(
 
     return GenerateBpPassportTask(
         pdfBytes = pdfInputBytes,
-        uuidsGroupedByPage = uuidBatch,
         rowCount = rowCount,
         columnCount = columnCount,
         pageSpecs = pageSpecs,

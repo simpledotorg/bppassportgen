@@ -3,12 +3,10 @@ package org.simple.bppassportgen
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.simple.bppassportgen.renderable.Renderable
-import java.util.UUID
 import java.util.concurrent.Callable
 
 class GenerateBpPassportTask(
     private val pdfBytes: ByteArray,
-    private val uuidsGroupedByPage: List<List<UUID>>,
     private val rowCount: Int,
     private val columnCount: Int,
     private val pageSpecs: List<List<PageSpec>>,
