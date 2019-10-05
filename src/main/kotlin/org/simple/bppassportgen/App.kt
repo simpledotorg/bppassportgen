@@ -216,7 +216,11 @@ class App(
       barcodeRenderSpec: BarcodeRenderSpec,
       shortcodeRenderSpec: ShortcodeRenderSpec
   ): Map<Int, List<Renderable>> {
-    return renderOnPage
+    return renderSpecs
+        .map { it.pageNumber to generateRenderable(uuid, qrCodeGenerator, it) }
+        .groupBy({ (pageNumber, _) -> pageNumber }, { (_, renderable) -> renderable })
+
+    /*return renderOnPage
         .mapValues { (_, types) ->
           types.map {
             when (it) {
@@ -224,7 +228,14 @@ class App(
               PassportShortcode -> ShortcodeRenderable(uuid, shortcodeRenderSpec)
             }
           }
-        }
+        }*/
+  }
+
+  private fun generateRenderable(uuid: UUID, qrCodeGenerator: QrCodeGenerator, spec: RenderableSpec): Renderable {
+    return when (spec.type) {
+      PassportQrCode -> QrCodeRenderable(qrCodeGenerator, uuid, spec.getSpecAs())
+      PassportShortcode -> ShortcodeRenderable(uuid, spec.getSpecAs())
+    }
   }
 
   private fun createPassportGenerationTask(
