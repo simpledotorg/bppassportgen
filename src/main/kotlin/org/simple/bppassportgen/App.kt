@@ -210,7 +210,6 @@ class App(
         rowCount = rowCount,
         columnCount = columnCount,
         pageSpecs = pageSpecs,
-        newDocument = newDocument,
         openedDocument = openedDocument
     )
   }
