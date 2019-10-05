@@ -2,8 +2,6 @@ package org.simple.bppassportgen.renderable.qrcode
 
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
-import org.simple.bppassportgen.BarcodeRenderSpec
-import org.simple.bppassportgen.BitMatrixRenderable
 import org.simple.bppassportgen.PdfUtil
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import java.util.UUID
@@ -18,11 +16,11 @@ class QrCodeRenderable {
       spec: BarcodeRenderSpec
   ) {
     val bitMatrix = qrCodeGenerator.generateQrCode(uuid.toString(), spec.width, spec.height)
-    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = spec.matrixScale)
+    val renderBitMatrix = RenderBitMatrixOnPdContentStream(bitMatrix, matrixScale = spec.matrixScale)
 
     PdfUtil.streamForPage(document, page).use { contentStream ->
 
-      bitMatrixRenderable.render(
+      renderBitMatrix.render(
           contentStream,
           spec.positionX,
           spec.positionY,

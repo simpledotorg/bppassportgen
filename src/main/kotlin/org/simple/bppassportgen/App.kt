@@ -13,6 +13,7 @@ import org.simple.bppassportgen.progresspoll.ProgressPoll
 import org.simple.bppassportgen.progresspoll.RealProgressPoll
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.qrcodegen.QrCodeGeneratorImpl
+import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
 import java.io.File
 import java.time.Duration
 import java.util.UUID

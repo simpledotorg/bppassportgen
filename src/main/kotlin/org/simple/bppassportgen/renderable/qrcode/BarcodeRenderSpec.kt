@@ -1,4 +1,4 @@
-package org.simple.bppassportgen
+package org.simple.bppassportgen.renderable.qrcode
 
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 

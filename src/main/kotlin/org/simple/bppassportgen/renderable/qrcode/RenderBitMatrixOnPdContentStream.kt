@@ -1,4 +1,4 @@
-package org.simple.bppassportgen
+package org.simple.bppassportgen.renderable.qrcode
 
 import com.google.zxing.common.BitArray
 import com.google.zxing.common.BitMatrix
@@ -6,7 +6,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.util.Matrix
 import java.awt.Color
 
-class BitMatrixRenderable(bitMatrix: BitMatrix, private val matrixScale: Float = 1F) {
+class RenderBitMatrixOnPdContentStream(bitMatrix: BitMatrix, private val matrixScale: Float = 1F) {
   val lines: List<Line>
 
   init {
