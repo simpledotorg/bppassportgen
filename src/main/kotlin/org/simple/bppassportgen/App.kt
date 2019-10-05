@@ -101,6 +101,18 @@ class App(
     private val fonts: Map<String, String> = mapOf(FONT_ID to FONT_PATH),
     private val renderOnPage: Map<Int, List<Type>> = mapOf(
         0 to listOf(PassportQrCode, PassportShortcode)
+    ),
+    private val renderSpecs: List<RenderableSpec> = listOf(
+        RenderableSpec(0, PassportQrCode, if (isSticker) {
+          BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = BLACK)
+        } else {
+          BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = BLACK)
+        }),
+        RenderableSpec(0, PassportShortcode, if (isSticker) {
+          ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = BLACK, fontId = FONT_ID)
+        } else {
+          ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = BLACK, fontId = FONT_ID)
+        })
     )
 ) {
 
