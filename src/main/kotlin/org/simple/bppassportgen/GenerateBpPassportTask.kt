@@ -73,7 +73,7 @@ class GenerateBpPassportTask(
 
                   RenderContent(
                       pdPage = PdfUtil.clone(sourcePage),
-                      renderables = generateRenderables(sourcePageIndex, uuid, font) + renderablesForPageIndex
+                      renderables = renderablesForPageIndex
                   )
                 }
               }
@@ -92,14 +92,6 @@ class GenerateBpPassportTask(
         }
 
     return Output(source = sourceDocument, final = newDocument)
-  }
-
-  private fun generateRenderables(
-      sourcePageIndex: Int,
-      uuid: UUID,
-      font: PDType0Font
-  ): List<Renderable> {
-    return emptyList()
   }
 
   private data class RenderContent(
