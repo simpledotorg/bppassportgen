@@ -4,6 +4,7 @@ import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
+import org.simple.bppassportgen.renderable.Renderable
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
 import org.simple.bppassportgen.renderable.qrcode.QrCodeRenderable
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
@@ -60,7 +61,15 @@ class GenerateBpPassportTask(
           **/
           val pagesForCurrentBatch = sourceDocument
               .pages
-              .map { sourcePage -> uuidsInOnePage.map { RenderContent(it, PdfUtil.clone(sourcePage)) } }
+              .map { sourcePage ->
+                uuidsInOnePage.map { uuid ->
+                  RenderContent(
+                      uuid = uuid,
+                      pdPage = PdfUtil.clone(sourcePage),
+                      renderables = emptyList()
+                  )
+                }
+              }
 
           pagesForCurrentBatch[templatePageIndexToRenderCode]
               .forEach { page -> QrCodeRenderable(qrCodeGenerator, page.uuid, barcodeRenderSpec).render(newDocument, page.pdPage) }
@@ -76,6 +85,10 @@ class GenerateBpPassportTask(
     return Output(source = sourceDocument, final = newDocument)
   }
 
-  private data class RenderContent(val uuid: UUID, val pdPage: PDPage)
+  private data class RenderContent(
+      val uuid: UUID,
+      val pdPage: PDPage,
+      val renderables: List<Renderable>
+  )
 }
 
