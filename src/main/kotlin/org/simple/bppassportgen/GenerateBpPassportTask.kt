@@ -4,6 +4,7 @@ import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
+import org.simple.bppassportgen.renderable.qrcode.QrCodeRenderable
 import java.io.ByteArrayInputStream
 import java.util.UUID
 import java.util.concurrent.Callable
@@ -59,7 +60,7 @@ class GenerateBpPassportTask(
               .map { sourcePage -> uuidsInOnePage.map { RenderContent(it, PdfUtil.clone(sourcePage)) } }
 
           pagesForCurrentBatch[templatePageIndexToRenderCode]
-              .forEach { page -> renderQrCode(qrCodeGenerator, page.uuid, newDocument, page.pdPage, barcodeRenderSpec) }
+              .forEach { page -> QrCodeRenderable().render(qrCodeGenerator, page.uuid, newDocument, page.pdPage, barcodeRenderSpec) }
 
           pagesForCurrentBatch[templatePageIndexToRenderShortCode]
               .forEach { page -> renderShortCode(page.uuid, newDocument, page.pdPage, font, shortcodeRenderSpec) }
@@ -73,27 +74,6 @@ class GenerateBpPassportTask(
   }
 
   private data class RenderContent(val uuid: UUID, val pdPage: PDPage)
-}
-
-private fun renderQrCode(
-    qrCodeGenerator: QrCodeGenerator,
-    uuid: UUID,
-    document: PDDocument,
-    page: PDPage,
-    spec: BarcodeRenderSpec
-) {
-  val bitMatrix = qrCodeGenerator.generateQrCode(uuid.toString(), spec.width, spec.height)
-  val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = spec.matrixScale)
-
-  PdfUtil.streamForPage(document, page).use { contentStream ->
-
-    bitMatrixRenderable.render(
-        contentStream,
-        spec.positionX,
-        spec.positionY,
-        applyForegroundColor = { it.setStrokingColor(spec.color) }
-    )
-  }
 }
 
 private fun renderShortCode(
