@@ -2,14 +2,12 @@ package org.simple.bppassportgen.renderable.shortcode
 
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
-import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.simple.bppassportgen.PdfUtil
 import org.simple.bppassportgen.renderable.Renderable
 import java.util.UUID
 
 class ShortcodeRenderable(
     private val uuid: UUID,
-    private val font: PDType0Font,
     private val spec: ShortcodeRenderSpec
 ): Renderable {
 
@@ -20,7 +18,7 @@ class ShortcodeRenderable(
       contentStream.setNonStrokingColor(spec.color)
       contentStream.newLineAtOffset(spec.positionX, spec.positionY)
       contentStream.setCharacterSpacing(spec.characterSpacing)
-      contentStream.setFont(font, spec.fontSize)
+      contentStream.setFont(spec.font, spec.fontSize)
       contentStream.showText(shortCode)
       contentStream.endText()
     }

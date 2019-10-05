@@ -193,7 +193,7 @@ class App(
             PageSpec(mapOf(
                 0 to listOf(
                     QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec),
-                    ShortcodeRenderable(uuid, font, shortcodeRenderSpec)
+                    ShortcodeRenderable(uuid, shortcodeRenderSpec)
                 )
             ))
           }
