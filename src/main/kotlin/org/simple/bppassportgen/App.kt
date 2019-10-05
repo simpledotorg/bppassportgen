@@ -5,8 +5,6 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import org.apache.pdfbox.cos.COSName
-import org.apache.pdfbox.pdmodel.PDDocument
-import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import org.simple.bppassportgen.consoleprinter.ConsolePrinter
@@ -19,7 +17,6 @@ import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
 import org.simple.bppassportgen.renderable.qrcode.QrCodeRenderable
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderable
-import java.io.ByteArrayInputStream
 import java.io.File
 import java.time.Duration
 import java.util.UUID
@@ -104,7 +101,6 @@ class App(
     )
 
     val pdfInputBytes = File(templateFilePath).readBytes()
-    val fontInputBytes = javaClass.getResourceAsStream("/Metropolis-Medium.ttf").readBytes()
 
     val uuidBatches = uuidsToGenerate
         .distinct()
@@ -115,16 +111,16 @@ class App(
     val savePdfTasks = mutableListOf<Future<Any>>()
 
     val qrCodeGenerator = QrCodeGeneratorImpl(errorCorrectionLevel = ErrorCorrectionLevel.Q, margin = 0)
+    val fontId = "Metropolis-Medium"
+    val documentFactory = PdDocumentFactory(
+        fontsToLoad = mapOf(
+            fontId to File(javaClass.classLoader.getResource("Metropolis-Medium.ttf")!!.file)
+        )
+    )
 
     uuidBatches
         .mapIndexed { index, uuidBatch ->
-          // Temporarily added until the document factory is used
-          // TODO: remove this later
-          val fontId = "Metropolis-Medium"
-          val newDocument = PDDocument()
-          val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontInputBytes))
-
-          val openedDocument = OpenedDocument(newDocument, mapOf(fontId to font))
+          val openedDocument = documentFactory.emptyDocument()
 
           val task = createPassportGenerationTask(
               isSticker = isSticker,
