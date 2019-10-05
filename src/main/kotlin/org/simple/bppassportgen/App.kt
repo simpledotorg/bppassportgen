@@ -13,6 +13,7 @@ import org.simple.bppassportgen.progresspoll.ProgressPoll
 import org.simple.bppassportgen.progresspoll.RealProgressPoll
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.qrcodegen.QrCodeGeneratorImpl
+import org.simple.bppassportgen.renderable.Renderable
 import org.simple.bppassportgen.renderable.Renderable.Type
 import org.simple.bppassportgen.renderable.Renderable.Type.PassportQrCode
 import org.simple.bppassportgen.renderable.Renderable.Type.PassportShortcode
@@ -144,12 +145,7 @@ class App(
           val pageSpecs = uuidBatch
               .map { uuidsInEachPage ->
                 uuidsInEachPage.map { uuid ->
-                  PageSpec(mapOf(
-                      0 to listOf(
-                          QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec),
-                          ShortcodeRenderable(uuid, shortcodeRenderSpec)
-                      )
-                  ))
+                  PageSpec(generateRenderables(qrCodeGenerator, uuid, barcodeRenderSpec, shortcodeRenderSpec))
                 }
               }
               .toList()
@@ -201,6 +197,23 @@ class App(
 
     computationThreadPool.shutdown()
     ioThreadPool.shutdown()
+  }
+
+  private fun generateRenderables(
+      qrCodeGenerator: QrCodeGenerator,
+      uuid: UUID,
+      barcodeRenderSpec: BarcodeRenderSpec,
+      shortcodeRenderSpec: ShortcodeRenderSpec
+  ): Map<Int, List<Renderable>> {
+    return renderOnPage
+        .mapValues { (_, types) ->
+          types.map {
+            when (it) {
+              PassportQrCode -> QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec)
+              PassportShortcode -> ShortcodeRenderable(uuid, shortcodeRenderSpec)
+            }
+          }
+        }
   }
 
   private fun createPassportGenerationTask(
