@@ -7,5 +7,6 @@ data class ShortcodeRenderSpec(
     val positionY: Float,
     val fontSize: Float,
     val characterSpacing: Float,
-    val color: PDColor
+    val color: PDColor,
+    val fontId: String
 )

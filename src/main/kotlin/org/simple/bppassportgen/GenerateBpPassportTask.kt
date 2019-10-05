@@ -10,7 +10,7 @@ class GenerateBpPassportTask(
     private val rowCount: Int,
     private val columnCount: Int,
     private val pageSpecs: List<List<PageSpec>>,
-    private val newDocument: PDDocument
+    private val openedDocument: OpenedDocument
 ) : Callable<Output> {
 
   override fun call(): Output {
@@ -58,15 +58,15 @@ class GenerateBpPassportTask(
               .forEach { renderContent ->
                 renderContent
                     .renderables
-                    .forEach { it.render(newDocument, renderContent.pdPage) }
+                    .forEach { it.render(openedDocument, renderContent.pdPage) }
               }
 
           pagesForCurrentBatch
               .map { renderContents -> renderContents.map { it.pdPage } }
-              .forEach { PdfUtil.mergePagesIntoOne(newDocument, it, rowCount, columnCount) }
+              .forEach { PdfUtil.mergePagesIntoOne(openedDocument.document, it, rowCount, columnCount) }
         }
 
-    return Output(source = sourceDocument, final = newDocument)
+    return Output(source = sourceDocument, final = openedDocument.document)
   }
 
   private data class RenderContent(

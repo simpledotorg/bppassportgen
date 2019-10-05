@@ -1,26 +1,24 @@
 package org.simple.bppassportgen.renderable.shortcode
 
-import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
-import org.apache.pdfbox.pdmodel.font.PDType0Font
+import org.simple.bppassportgen.OpenedDocument
 import org.simple.bppassportgen.PdfUtil
 import org.simple.bppassportgen.renderable.Renderable
 import java.util.UUID
 
 class ShortcodeRenderable(
     private val uuid: UUID,
-    private val font: PDType0Font,
     private val spec: ShortcodeRenderSpec
 ): Renderable {
 
-  override fun render(document: PDDocument, page: PDPage) {
+  override fun render(document: OpenedDocument, page: PDPage) {
     val shortCode = shortCodeForUuid(uuid)
-    PdfUtil.streamForPage(document, page).use { contentStream ->
+    PdfUtil.streamForPage(document.document, page).use { contentStream ->
       contentStream.beginText()
       contentStream.setNonStrokingColor(spec.color)
       contentStream.newLineAtOffset(spec.positionX, spec.positionY)
       contentStream.setCharacterSpacing(spec.characterSpacing)
-      contentStream.setFont(font, spec.fontSize)
+      contentStream.setFont(document.fontById(spec.fontId), spec.fontSize)
       contentStream.showText(shortCode)
       contentStream.endText()
     }

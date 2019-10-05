@@ -5,8 +5,6 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import org.apache.pdfbox.cos.COSName
-import org.apache.pdfbox.pdmodel.PDDocument
-import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import org.simple.bppassportgen.consoleprinter.ConsolePrinter
@@ -19,7 +17,6 @@ import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
 import org.simple.bppassportgen.renderable.qrcode.QrCodeRenderable
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderable
-import java.io.ByteArrayInputStream
 import java.io.File
 import java.time.Duration
 import java.util.UUID
@@ -104,7 +101,6 @@ class App(
     )
 
     val pdfInputBytes = File(templateFilePath).readBytes()
-    val fontInputBytes = javaClass.getResourceAsStream("/Metropolis-Medium.ttf").readBytes()
 
     val uuidBatches = uuidsToGenerate
         .distinct()
@@ -114,12 +110,50 @@ class App(
     val generatingPdfTasks = mutableMapOf<Int, Future<Output>>()
     val savePdfTasks = mutableListOf<Future<Any>>()
 
-    val qrCodeGenerator = QrCodeGeneratorImpl(errorCorrectionLevel = ErrorCorrectionLevel.Q, margin = 0)
+    val qrCodeGenerator: QrCodeGenerator = QrCodeGeneratorImpl(errorCorrectionLevel = ErrorCorrectionLevel.Q, margin = 0)
+    val fontId = "Metropolis-Medium"
+    val documentFactory = PdDocumentFactory(
+        fontsToLoad = mapOf(
+            fontId to File(javaClass.classLoader.getResource("Metropolis-Medium.ttf")!!.file)
+        )
+    )
 
     uuidBatches
         .mapIndexed { index, uuidBatch ->
+          val openedDocument = documentFactory.emptyDocument()
 
-          val task = createPassportGenerationTask(isSticker, pdfInputBytes, fontInputBytes, uuidBatch, blackCmyk, rowCount, columnCount, qrCodeGenerator)
+          val barcodeRenderSpec = if (isSticker) {
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = blackCmyk)
+          } else {
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = blackCmyk)
+          }
+
+          val shortcodeRenderSpec = if (isSticker) {
+            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk, fontId = fontId)
+          } else {
+            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk, fontId = fontId)
+          }
+
+          val pageSpecs = uuidBatch
+              .map { uuidsInEachPage ->
+                uuidsInEachPage.map { uuid ->
+                  PageSpec(mapOf(
+                      0 to listOf(
+                          QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec),
+                          ShortcodeRenderable(uuid, shortcodeRenderSpec)
+                      )
+                  ))
+                }
+              }
+              .toList()
+
+          val task = createPassportGenerationTask(
+              pdfInputBytes = pdfInputBytes,
+              rowCount = rowCount,
+              columnCount = columnCount,
+              openedDocument = openedDocument,
+              pageSpecs = pageSpecs
+          )
 
           task to index + 1
         }
@@ -163,49 +197,18 @@ class App(
   }
 
   private fun createPassportGenerationTask(
-      isSticker: Boolean,
       pdfInputBytes: ByteArray,
-      fontInputBytes: ByteArray,
-      uuidBatch: List<List<UUID>>,
-      blackCmyk: PDColor,
       rowCount: Int,
       columnCount: Int,
-      qrCodeGenerator: QrCodeGenerator
+      openedDocument: OpenedDocument,
+      pageSpecs: List<List<PageSpec>>
   ): Callable<Output> {
-    val barcodeRenderSpec = if (isSticker) {
-      BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = blackCmyk)
-    } else {
-      BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = blackCmyk)
-    }
-
-    val shortcodeRenderSpec = if (isSticker) {
-      ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk)
-    } else {
-      ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk)
-    }
-
-    val newDocument = PDDocument()
-    val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontInputBytes))
-
-    val pageSpecs = uuidBatch
-        .map { uuidsInEachPage ->
-          uuidsInEachPage.map { uuid ->
-            PageSpec(mapOf(
-                0 to listOf(
-                    QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec),
-                    ShortcodeRenderable(uuid, font, shortcodeRenderSpec)
-                )
-            ))
-          }
-        }
-        .toList()
-
     return GenerateBpPassportTask(
         pdfBytes = pdfInputBytes,
         rowCount = rowCount,
         columnCount = columnCount,
         pageSpecs = pageSpecs,
-        newDocument = newDocument
+        openedDocument = openedDocument
     )
   }
 }
