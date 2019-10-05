@@ -18,7 +18,7 @@ class ShortcodeRenderable(
       contentStream.setNonStrokingColor(spec.color)
       contentStream.newLineAtOffset(spec.positionX, spec.positionY)
       contentStream.setCharacterSpacing(spec.characterSpacing)
-      contentStream.setFont(spec.font, spec.fontSize)
+      contentStream.setFont(document.fontById(spec.fontId), spec.fontSize)
       contentStream.showText(shortCode)
       contentStream.endText()
     }
