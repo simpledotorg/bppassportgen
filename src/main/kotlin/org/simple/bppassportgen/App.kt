@@ -13,6 +13,9 @@ import org.simple.bppassportgen.progresspoll.ProgressPoll
 import org.simple.bppassportgen.progresspoll.RealProgressPoll
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.qrcodegen.QrCodeGeneratorImpl
+import org.simple.bppassportgen.renderable.Renderable
+import org.simple.bppassportgen.renderable.Renderable.Type.PassportQrCode
+import org.simple.bppassportgen.renderable.Renderable.Type.PassportShortcode
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
 import org.simple.bppassportgen.renderable.qrcode.QrCodeRenderable
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
@@ -24,6 +27,14 @@ import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
+
+private const val FONT_ID = "Metropolis-Medium"
+private val FONT_PATH = ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file
+private val BLACK = PDColor(
+    floatArrayOf(0F, 0F, 0F, 1F),
+    COSName.DEVICECMYK,
+    PDDeviceCMYK.INSTANCE
+)
 
 fun main(args: Array<String>) {
   val options = Options()
@@ -85,7 +96,20 @@ class App(
     private val pageCount: Int,
     private val rowCount: Int,
     private val columnCount: Int,
-    private val isSticker: Boolean
+    private val isSticker: Boolean,
+    private val fonts: Map<String, String> = mapOf(FONT_ID to FONT_PATH),
+    private val renderSpecs: List<RenderableSpec> = listOf(
+        RenderableSpec(0, PassportQrCode, if (isSticker) {
+          BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = BLACK)
+        } else {
+          BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = BLACK)
+        }),
+        RenderableSpec(0, PassportShortcode, if (isSticker) {
+          ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = BLACK, fontId = FONT_ID)
+        } else {
+          ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = BLACK, fontId = FONT_ID)
+        })
+    )
 ) {
 
   fun run(uuidsToGenerate: List<UUID>) {
@@ -93,12 +117,6 @@ class App(
     val mergeCount = rowCount * columnCount
 
     outDirectory.mkdirs()
-
-    val blackCmyk = PDColor(
-        floatArrayOf(0F, 0F, 0F, 1F),
-        COSName.DEVICECMYK,
-        PDDeviceCMYK.INSTANCE
-    )
 
     val pdfInputBytes = File(templateFilePath).readBytes()
 
@@ -111,38 +129,18 @@ class App(
     val savePdfTasks = mutableListOf<Future<Any>>()
 
     val qrCodeGenerator: QrCodeGenerator = QrCodeGeneratorImpl(errorCorrectionLevel = ErrorCorrectionLevel.Q, margin = 0)
-    val fontId = "Metropolis-Medium"
     val documentFactory = PdDocumentFactory(
-        fontsToLoad = mapOf(
-            fontId to File(javaClass.classLoader.getResource("Metropolis-Medium.ttf")!!.file)
-        )
+        fontsToLoad = fonts.mapValues { (_, filePath) -> File(filePath) }
     )
 
     uuidBatches
         .mapIndexed { index, uuidBatch ->
           val openedDocument = documentFactory.emptyDocument()
 
-          val barcodeRenderSpec = if (isSticker) {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = blackCmyk)
-          } else {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = blackCmyk)
-          }
-
-          val shortcodeRenderSpec = if (isSticker) {
-            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk, fontId = fontId)
-          } else {
-            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk, fontId = fontId)
-          }
-
           val pageSpecs = uuidBatch
               .map { uuidsInEachPage ->
                 uuidsInEachPage.map { uuid ->
-                  PageSpec(mapOf(
-                      0 to listOf(
-                          QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec),
-                          ShortcodeRenderable(uuid, shortcodeRenderSpec)
-                      )
-                  ))
+                  PageSpec(generateRenderables(qrCodeGenerator, uuid))
                 }
               }
               .toList()
@@ -194,6 +192,19 @@ class App(
 
     computationThreadPool.shutdown()
     ioThreadPool.shutdown()
+  }
+
+  private fun generateRenderables(qrCodeGenerator: QrCodeGenerator, uuid: UUID): Map<Int, List<Renderable>> {
+    return renderSpecs
+        .map { it.pageNumber to generateRenderable(uuid, qrCodeGenerator, it) }
+        .groupBy({ (pageNumber, _) -> pageNumber }, { (_, renderable) -> renderable })
+  }
+
+  private fun generateRenderable(uuid: UUID, qrCodeGenerator: QrCodeGenerator, spec: RenderableSpec): Renderable {
+    return when (spec.type) {
+      PassportQrCode -> QrCodeRenderable(qrCodeGenerator, uuid, spec.getSpecAs())
+      PassportShortcode -> ShortcodeRenderable(uuid, spec.getSpecAs())
+    }
   }
 
   private fun createPassportGenerationTask(
