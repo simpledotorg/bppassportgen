@@ -88,7 +88,8 @@ class App(
     private val pageCount: Int,
     private val rowCount: Int,
     private val columnCount: Int,
-    private val isSticker: Boolean
+    private val isSticker: Boolean,
+    private val fonts: Map<String, String> = mapOf(FONT_ID to FONT_PATH)
 ) {
 
   fun run(uuidsToGenerate: List<UUID>) {
@@ -115,9 +116,7 @@ class App(
 
     val qrCodeGenerator: QrCodeGenerator = QrCodeGeneratorImpl(errorCorrectionLevel = ErrorCorrectionLevel.Q, margin = 0)
     val documentFactory = PdDocumentFactory(
-        fontsToLoad = mapOf(
-            FONT_ID to File(FONT_PATH)
-        )
+        fontsToLoad = fonts.mapValues { (_, filePath) -> File(filePath) }
     )
 
     uuidBatches
