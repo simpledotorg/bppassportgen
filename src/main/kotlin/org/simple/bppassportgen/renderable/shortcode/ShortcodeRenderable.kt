@@ -4,7 +4,6 @@ import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.simple.bppassportgen.PdfUtil
-import org.simple.bppassportgen.ShortcodeRenderSpec
 import java.util.UUID
 
 class ShortcodeRenderable {

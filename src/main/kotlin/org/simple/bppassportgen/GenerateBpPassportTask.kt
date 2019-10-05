@@ -6,6 +6,7 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
 import org.simple.bppassportgen.renderable.qrcode.QrCodeRenderable
+import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderable
 import java.io.ByteArrayInputStream
 import java.util.UUID
