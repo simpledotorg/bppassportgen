@@ -25,6 +25,9 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
+private const val FONT_ID = "Metropolis-Medium"
+private val FONT_PATH = ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file
+
 fun main(args: Array<String>) {
   val options = Options()
       .apply {
@@ -111,10 +114,9 @@ class App(
     val savePdfTasks = mutableListOf<Future<Any>>()
 
     val qrCodeGenerator: QrCodeGenerator = QrCodeGeneratorImpl(errorCorrectionLevel = ErrorCorrectionLevel.Q, margin = 0)
-    val fontId = "Metropolis-Medium"
     val documentFactory = PdDocumentFactory(
         fontsToLoad = mapOf(
-            fontId to File(javaClass.classLoader.getResource("Metropolis-Medium.ttf")!!.file)
+            FONT_ID to File(FONT_PATH)
         )
     )
 
@@ -129,9 +131,9 @@ class App(
           }
 
           val shortcodeRenderSpec = if (isSticker) {
-            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk, fontId = fontId)
+            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk, fontId = FONT_ID)
           } else {
-            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk, fontId = fontId)
+            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk, fontId = FONT_ID)
           }
 
           val pageSpecs = uuidBatch
