@@ -4,6 +4,11 @@ import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
+import org.simple.bppassportgen.renderable.Renderable
+import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
+import org.simple.bppassportgen.renderable.qrcode.QrCodeRenderable
+import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
+import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderable
 import java.io.ByteArrayInputStream
 import java.util.UUID
 import java.util.concurrent.Callable
@@ -56,13 +61,22 @@ class GenerateBpPassportTask(
           **/
           val pagesForCurrentBatch = sourceDocument
               .pages
-              .map { sourcePage -> uuidsInOnePage.map { RenderContent(it, PdfUtil.clone(sourcePage)) } }
+              .mapIndexed { sourcePageIndex, sourcePage ->
+                uuidsInOnePage.map { uuid ->
+                  RenderContent(
+                      pdPage = PdfUtil.clone(sourcePage),
+                      renderables = generateRenderables(sourcePageIndex, uuid, font)
+                  )
+                }
+              }
 
-          pagesForCurrentBatch[templatePageIndexToRenderCode]
-              .forEach { page -> renderQrCode(page.uuid, newDocument, page.pdPage) }
-
-          pagesForCurrentBatch[templatePageIndexToRenderShortCode]
-              .forEach { page -> renderShortCode(page.uuid, newDocument, page.pdPage, font) }
+          pagesForCurrentBatch
+              .flatten()
+              .forEach { renderContent ->
+                renderContent
+                    .renderables
+                    .forEach { it.render(newDocument, renderContent.pdPage) }
+              }
 
           pagesForCurrentBatch
               .map { renderContents -> renderContents.map { it.pdPage } }
@@ -72,51 +86,21 @@ class GenerateBpPassportTask(
     return Output(source = sourceDocument, final = newDocument)
   }
 
-  private fun renderQrCode(uuid: UUID, document: PDDocument, page: PDPage) {
-    val bitMatrix = qrCodeGenerator.generateQrCode(uuid.toString(), barcodeRenderSpec.width, barcodeRenderSpec.height)
-    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = barcodeRenderSpec.matrixScale)
-
-    PdfUtil.streamForPage(document, page).use { contentStream ->
-
-      bitMatrixRenderable.render(
-          contentStream,
-          barcodeRenderSpec.positionX,
-          barcodeRenderSpec.positionY,
-          applyForegroundColor = { it.setStrokingColor(barcodeRenderSpec.color) }
-      )
-    }
-  }
-
-  private fun renderShortCode(
+  private fun generateRenderables(
+      sourcePageIndex: Int,
       uuid: UUID,
-      document: PDDocument,
-      page: PDPage,
       font: PDType0Font
-  ) {
-    val shortCode = shortCodeForUuid(uuid)
-    PdfUtil.streamForPage(document, page).use { contentStream ->
-      contentStream.beginText()
-      contentStream.setNonStrokingColor(shortcodeRenderSpec.color)
-      contentStream.newLineAtOffset(shortcodeRenderSpec.positionX, shortcodeRenderSpec.positionY)
-      contentStream.setCharacterSpacing(shortcodeRenderSpec.characterSpacing)
-      contentStream.setFont(font, shortcodeRenderSpec.fontSize)
-      contentStream.showText(shortCode)
-      contentStream.endText()
+  ): List<Renderable> {
+    return when (sourcePageIndex) {
+      templatePageIndexToRenderCode -> listOf(QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec))
+      templatePageIndexToRenderShortCode -> listOf(ShortcodeRenderable(uuid, font, shortcodeRenderSpec))
+      else -> emptyList()
     }
   }
 
-  private fun shortCodeForUuid(uuid: UUID): String {
-    return uuid
-        .toString()
-        .filter { it.isDigit() }
-        .take(7)
-        .let { shortCode ->
-          val prefix = shortCode.substring(0, 3)
-          val suffix = shortCode.substring(3)
-
-          "$prefix $suffix"
-        }
-  }
-
-  private data class RenderContent(val uuid: UUID, val pdPage: PDPage)
+  private data class RenderContent(
+      val pdPage: PDPage,
+      val renderables: List<Renderable>
+  )
 }
+

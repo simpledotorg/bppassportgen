@@ -5,10 +5,10 @@ import junitparams.JUnitParamsRunner
 import junitparams.Parameters
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.simple.bppassportgen.BitMatrixRenderable
-import org.simple.bppassportgen.BitMatrixRenderable.Line
-import org.simple.bppassportgen.BitMatrixRenderable.Line.State.OFF
-import org.simple.bppassportgen.BitMatrixRenderable.Line.State.ON
+import org.simple.bppassportgen.renderable.qrcode.RenderBitMatrixOnPdContentStream
+import org.simple.bppassportgen.renderable.qrcode.RenderBitMatrixOnPdContentStream.Line
+import org.simple.bppassportgen.renderable.qrcode.RenderBitMatrixOnPdContentStream.Line.State.OFF
+import org.simple.bppassportgen.renderable.qrcode.RenderBitMatrixOnPdContentStream.Line.State.ON
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
@@ -23,7 +23,7 @@ class BitMatrixRenderableTest {
   ) {
     val bitMatrix = BitMatrix.parse(image)
 
-    val renderable = BitMatrixRenderable(bitMatrix, 1.0F)
+    val renderable = RenderBitMatrixOnPdContentStream(bitMatrix, 1.0F)
 
     expectThat(renderable.lines).isEqualTo(expected)
   }

@@ -1,4 +1,4 @@
-package org.simple.bppassportgen
+package org.simple.bppassportgen.renderable.shortcode
 
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 
