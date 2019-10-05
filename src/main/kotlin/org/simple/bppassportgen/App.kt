@@ -131,7 +131,8 @@ class App(
               columnCount = columnCount,
               qrCodeGenerator = qrCodeGenerator,
               openedDocument = openedDocument,
-              fontId = fontId
+              fontId = fontId,
+              pageSpecs = emptyList()
           )
 
           task to index + 1
@@ -184,7 +185,8 @@ class App(
       columnCount: Int,
       qrCodeGenerator: QrCodeGenerator,
       openedDocument: OpenedDocument,
-      fontId: String
+      fontId: String,
+      pageSpecs: List<List<PageSpec>>
   ): Callable<Output> {
     val barcodeRenderSpec = if (isSticker) {
       BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = blackCmyk)
@@ -198,7 +200,7 @@ class App(
       ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk, fontId = fontId)
     }
 
-    val pageSpecs = uuidBatch
+    val pageSpecs_old = uuidBatch
         .map { uuidsInEachPage ->
           uuidsInEachPage.map { uuid ->
             PageSpec(mapOf(
@@ -215,7 +217,7 @@ class App(
         pdfBytes = pdfInputBytes,
         rowCount = rowCount,
         columnCount = columnCount,
-        pageSpecs = pageSpecs,
+        pageSpecs = pageSpecs + pageSpecs_old,
         openedDocument = openedDocument
     )
   }
