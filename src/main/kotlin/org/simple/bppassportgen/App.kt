@@ -189,7 +189,8 @@ class App(
         shortcodeRenderSpec = shortcodeRenderSpec,
         templatePageIndexToRenderCode = 0,
         templatePageIndexToRenderShortCode = 0,
-        qrCodeGenerator = qrCodeGenerator
+        qrCodeGenerator = qrCodeGenerator,
+        pageSpecs = emptyList()
     )
   }
 }

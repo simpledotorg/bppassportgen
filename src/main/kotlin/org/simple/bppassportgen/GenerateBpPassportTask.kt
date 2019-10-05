@@ -23,7 +23,8 @@ class GenerateBpPassportTask(
     private val shortcodeRenderSpec: ShortcodeRenderSpec,
     private val templatePageIndexToRenderCode: Int,
     private val templatePageIndexToRenderShortCode: Int,
-    private val qrCodeGenerator: QrCodeGenerator
+    private val qrCodeGenerator: QrCodeGenerator,
+    private val pageSpecs: List<List<PageSpec>>
 ) : Callable<Output> {
 
   override fun call(): Output {
