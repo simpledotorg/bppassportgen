@@ -72,27 +72,6 @@ class GenerateBpPassportTask(
     return Output(source = sourceDocument, final = newDocument)
   }
 
-  private fun renderQrCode(
-      qrCodeGenerator: QrCodeGenerator,
-      uuid: UUID,
-      document: PDDocument,
-      page: PDPage,
-      spec: BarcodeRenderSpec
-  ) {
-    val bitMatrix = qrCodeGenerator.generateQrCode(uuid.toString(), spec.width, spec.height)
-    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = spec.matrixScale)
-
-    PdfUtil.streamForPage(document, page).use { contentStream ->
-
-      bitMatrixRenderable.render(
-          contentStream,
-          spec.positionX,
-          spec.positionY,
-          applyForegroundColor = { it.setStrokingColor(spec.color) }
-      )
-    }
-  }
-
   private fun renderShortCode(
       uuid: UUID,
       document: PDDocument,
@@ -126,3 +105,25 @@ class GenerateBpPassportTask(
 
   private data class RenderContent(val uuid: UUID, val pdPage: PDPage)
 }
+
+private fun renderQrCode(
+    qrCodeGenerator: QrCodeGenerator,
+    uuid: UUID,
+    document: PDDocument,
+    page: PDPage,
+    spec: BarcodeRenderSpec
+) {
+  val bitMatrix = qrCodeGenerator.generateQrCode(uuid.toString(), spec.width, spec.height)
+  val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = spec.matrixScale)
+
+  PdfUtil.streamForPage(document, page).use { contentStream ->
+
+    bitMatrixRenderable.render(
+        contentStream,
+        spec.positionX,
+        spec.positionY,
+        applyForegroundColor = { it.setStrokingColor(spec.color) }
+    )
+  }
+}
+
