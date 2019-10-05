@@ -31,6 +31,11 @@ import java.util.concurrent.Future
 
 private const val FONT_ID = "Metropolis-Medium"
 private val FONT_PATH = ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file
+private val BLACK = PDColor(
+    floatArrayOf(0F, 0F, 0F, 1F),
+    COSName.DEVICECMYK,
+    PDDeviceCMYK.INSTANCE
+)
 
 fun main(args: Array<String>) {
   val options = Options()
@@ -105,12 +110,6 @@ class App(
 
     outDirectory.mkdirs()
 
-    val blackCmyk = PDColor(
-        floatArrayOf(0F, 0F, 0F, 1F),
-        COSName.DEVICECMYK,
-        PDDeviceCMYK.INSTANCE
-    )
-
     val pdfInputBytes = File(templateFilePath).readBytes()
 
     val uuidBatches = uuidsToGenerate
@@ -131,15 +130,15 @@ class App(
           val openedDocument = documentFactory.emptyDocument()
 
           val barcodeRenderSpec = if (isSticker) {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = blackCmyk)
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = BLACK)
           } else {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = blackCmyk)
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = BLACK)
           }
 
           val shortcodeRenderSpec = if (isSticker) {
-            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk, fontId = FONT_ID)
+            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = BLACK, fontId = FONT_ID)
           } else {
-            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk, fontId = FONT_ID)
+            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = BLACK, fontId = FONT_ID)
           }
 
           val pageSpecs = uuidBatch
