@@ -72,38 +72,6 @@ class GenerateBpPassportTask(
     return Output(source = sourceDocument, final = newDocument)
   }
 
-  private fun renderShortCode(
-      uuid: UUID,
-      document: PDDocument,
-      page: PDPage,
-      font: PDType0Font,
-      spec: ShortcodeRenderSpec
-  ) {
-    val shortCode = shortCodeForUuid(uuid)
-    PdfUtil.streamForPage(document, page).use { contentStream ->
-      contentStream.beginText()
-      contentStream.setNonStrokingColor(spec.color)
-      contentStream.newLineAtOffset(spec.positionX, spec.positionY)
-      contentStream.setCharacterSpacing(spec.characterSpacing)
-      contentStream.setFont(font, spec.fontSize)
-      contentStream.showText(shortCode)
-      contentStream.endText()
-    }
-  }
-
-  private fun shortCodeForUuid(uuid: UUID): String {
-    return uuid
-        .toString()
-        .filter { it.isDigit() }
-        .take(7)
-        .let { shortCode ->
-          val prefix = shortCode.substring(0, 3)
-          val suffix = shortCode.substring(3)
-
-          "$prefix $suffix"
-        }
-  }
-
   private data class RenderContent(val uuid: UUID, val pdPage: PDPage)
 }
 
@@ -126,5 +94,37 @@ private fun renderQrCode(
         applyForegroundColor = { it.setStrokingColor(spec.color) }
     )
   }
+}
+
+private fun renderShortCode(
+    uuid: UUID,
+    document: PDDocument,
+    page: PDPage,
+    font: PDType0Font,
+    spec: ShortcodeRenderSpec
+) {
+  val shortCode = shortCodeForUuid(uuid)
+  PdfUtil.streamForPage(document, page).use { contentStream ->
+    contentStream.beginText()
+    contentStream.setNonStrokingColor(spec.color)
+    contentStream.newLineAtOffset(spec.positionX, spec.positionY)
+    contentStream.setCharacterSpacing(spec.characterSpacing)
+    contentStream.setFont(font, spec.fontSize)
+    contentStream.showText(shortCode)
+    contentStream.endText()
+  }
+}
+
+private fun shortCodeForUuid(uuid: UUID): String {
+  return uuid
+      .toString()
+      .filter { it.isDigit() }
+      .take(7)
+      .let { shortCode ->
+        val prefix = shortCode.substring(0, 3)
+        val suffix = shortCode.substring(3)
+
+        "$prefix $suffix"
+      }
 }
 
