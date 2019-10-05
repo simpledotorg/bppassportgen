@@ -5,6 +5,8 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import org.apache.pdfbox.cos.COSName
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import org.simple.bppassportgen.consoleprinter.ConsolePrinter
@@ -14,7 +16,10 @@ import org.simple.bppassportgen.progresspoll.RealProgressPoll
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.qrcodegen.QrCodeGeneratorImpl
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
+import org.simple.bppassportgen.renderable.qrcode.QrCodeRenderable
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
+import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderable
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.time.Duration
 import java.util.UUID
@@ -179,17 +184,28 @@ class App(
       ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk)
     }
 
+    val newDocument = PDDocument()
+    val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontInputBytes))
+
+    val pageSpecs = uuidBatch
+        .map { uuidsInEachPage ->
+          uuidsInEachPage.map { uuid ->
+            PageSpec(mapOf(
+                0 to listOf(
+                    QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec),
+                    ShortcodeRenderable(uuid, font, shortcodeRenderSpec)
+                )
+            ))
+          }
+        }
+        .toList()
+
     return GenerateBpPassportTask(
         pdfBytes = pdfInputBytes,
-        fontBytes = fontInputBytes,
-        uuidsGroupedByPage = uuidBatch,
         rowCount = rowCount,
         columnCount = columnCount,
-        barcodeRenderSpec = barcodeRenderSpec,
-        shortcodeRenderSpec = shortcodeRenderSpec,
-        templatePageIndexToRenderCode = 0,
-        templatePageIndexToRenderShortCode = 0,
-        qrCodeGenerator = qrCodeGenerator
+        pageSpecs = pageSpecs,
+        newDocument = newDocument
     )
   }
 }
