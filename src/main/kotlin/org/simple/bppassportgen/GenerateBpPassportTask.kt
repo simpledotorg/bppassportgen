@@ -59,7 +59,7 @@ class GenerateBpPassportTask(
               .map { sourcePage -> uuidsInOnePage.map { RenderContent(it, PdfUtil.clone(sourcePage)) } }
 
           pagesForCurrentBatch[templatePageIndexToRenderCode]
-              .forEach { page -> renderQrCode(page.uuid, newDocument, page.pdPage) }
+              .forEach { page -> renderQrCode(page.uuid, newDocument, page.pdPage, barcodeRenderSpec) }
 
           pagesForCurrentBatch[templatePageIndexToRenderShortCode]
               .forEach { page -> renderShortCode(page.uuid, newDocument, page.pdPage, font) }
@@ -72,17 +72,22 @@ class GenerateBpPassportTask(
     return Output(source = sourceDocument, final = newDocument)
   }
 
-  private fun renderQrCode(uuid: UUID, document: PDDocument, page: PDPage) {
-    val bitMatrix = qrCodeGenerator.generateQrCode(uuid.toString(), barcodeRenderSpec.width, barcodeRenderSpec.height)
-    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = barcodeRenderSpec.matrixScale)
+  private fun renderQrCode(
+      uuid: UUID,
+      document: PDDocument,
+      page: PDPage,
+      spec: BarcodeRenderSpec
+  ) {
+    val bitMatrix = qrCodeGenerator.generateQrCode(uuid.toString(), spec.width, spec.height)
+    val bitMatrixRenderable = BitMatrixRenderable(bitMatrix, matrixScale = spec.matrixScale)
 
     PdfUtil.streamForPage(document, page).use { contentStream ->
 
       bitMatrixRenderable.render(
           contentStream,
-          barcodeRenderSpec.positionX,
-          barcodeRenderSpec.positionY,
-          applyForegroundColor = { it.setStrokingColor(barcodeRenderSpec.color) }
+          spec.positionX,
+          spec.positionY,
+          applyForegroundColor = { it.setStrokingColor(spec.color) }
       )
     }
   }
