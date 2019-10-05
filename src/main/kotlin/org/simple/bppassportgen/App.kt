@@ -14,7 +14,6 @@ import org.simple.bppassportgen.progresspoll.RealProgressPoll
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.qrcodegen.QrCodeGeneratorImpl
 import org.simple.bppassportgen.renderable.Renderable
-import org.simple.bppassportgen.renderable.Renderable.Type
 import org.simple.bppassportgen.renderable.Renderable.Type.PassportQrCode
 import org.simple.bppassportgen.renderable.Renderable.Type.PassportShortcode
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
@@ -99,9 +98,6 @@ class App(
     private val columnCount: Int,
     private val isSticker: Boolean,
     private val fonts: Map<String, String> = mapOf(FONT_ID to FONT_PATH),
-    private val renderOnPage: Map<Int, List<Type>> = mapOf(
-        0 to listOf(PassportQrCode, PassportShortcode)
-    ),
     private val renderSpecs: List<RenderableSpec> = listOf(
         RenderableSpec(0, PassportQrCode, if (isSticker) {
           BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = BLACK)
@@ -141,22 +137,10 @@ class App(
         .mapIndexed { index, uuidBatch ->
           val openedDocument = documentFactory.emptyDocument()
 
-          val barcodeRenderSpec = if (isSticker) {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = BLACK)
-          } else {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = BLACK)
-          }
-
-          val shortcodeRenderSpec = if (isSticker) {
-            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = BLACK, fontId = FONT_ID)
-          } else {
-            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = BLACK, fontId = FONT_ID)
-          }
-
           val pageSpecs = uuidBatch
               .map { uuidsInEachPage ->
                 uuidsInEachPage.map { uuid ->
-                  PageSpec(generateRenderables(qrCodeGenerator, uuid, barcodeRenderSpec, shortcodeRenderSpec))
+                  PageSpec(generateRenderables(qrCodeGenerator, uuid))
                 }
               }
               .toList()
@@ -210,25 +194,10 @@ class App(
     ioThreadPool.shutdown()
   }
 
-  private fun generateRenderables(
-      qrCodeGenerator: QrCodeGenerator,
-      uuid: UUID,
-      barcodeRenderSpec: BarcodeRenderSpec,
-      shortcodeRenderSpec: ShortcodeRenderSpec
-  ): Map<Int, List<Renderable>> {
+  private fun generateRenderables(qrCodeGenerator: QrCodeGenerator, uuid: UUID): Map<Int, List<Renderable>> {
     return renderSpecs
         .map { it.pageNumber to generateRenderable(uuid, qrCodeGenerator, it) }
         .groupBy({ (pageNumber, _) -> pageNumber }, { (_, renderable) -> renderable })
-
-    /*return renderOnPage
-        .mapValues { (_, types) ->
-          types.map {
-            when (it) {
-              PassportQrCode -> QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec)
-              PassportShortcode -> ShortcodeRenderable(uuid, shortcodeRenderSpec)
-            }
-          }
-        }*/
   }
 
   private fun generateRenderable(uuid: UUID, qrCodeGenerator: QrCodeGenerator, spec: RenderableSpec): Renderable {
