@@ -5,6 +5,7 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import org.apache.pdfbox.cos.COSName
+import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import org.simple.bppassportgen.consoleprinter.ConsolePrinter
@@ -201,7 +202,8 @@ class App(
         templatePageIndexToRenderCode = 0,
         templatePageIndexToRenderShortCode = 0,
         qrCodeGenerator = qrCodeGenerator,
-        pageSpecs = pageSpecs
+        pageSpecs = pageSpecs,
+        newDocument = PDDocument()
     )
   }
 }

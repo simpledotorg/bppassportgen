@@ -23,7 +23,8 @@ class GenerateBpPassportTask(
     private val templatePageIndexToRenderCode: Int,
     private val templatePageIndexToRenderShortCode: Int,
     private val qrCodeGenerator: QrCodeGenerator,
-    private val pageSpecs: List<List<PageSpec>>
+    private val pageSpecs: List<List<PageSpec>>,
+    private val newDocument: PDDocument
 ) : Callable<Output> {
 
   override fun call(): Output {
@@ -35,7 +36,6 @@ class GenerateBpPassportTask(
 
     check(templatePageIndexToRenderCode < sourceDocument.numberOfPages) { "PDF has only ${sourceDocument.numberOfPages} but asked to render code on $templatePageIndexToRenderCode" }
 
-    val newDocument = PDDocument()
     val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontBytes))
 
     uuidsGroupedByPage
