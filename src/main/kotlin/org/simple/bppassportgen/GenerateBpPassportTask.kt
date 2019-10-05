@@ -64,7 +64,6 @@ class GenerateBpPassportTask(
               .mapIndexed { sourcePageIndex, sourcePage ->
                 uuidsInOnePage.map { uuid ->
                   RenderContent(
-                      uuid = uuid,
                       pdPage = PdfUtil.clone(sourcePage),
                       renderables = generateRenderables(sourcePageIndex, uuid, font)
                   )
@@ -100,7 +99,6 @@ class GenerateBpPassportTask(
   }
 
   private data class RenderContent(
-      val uuid: UUID,
       val pdPage: PDPage,
       val renderables: List<Renderable>
   )
