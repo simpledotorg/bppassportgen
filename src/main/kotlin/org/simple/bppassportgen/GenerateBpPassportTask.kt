@@ -62,7 +62,7 @@ class GenerateBpPassportTask(
               .forEach { page -> renderQrCode(qrCodeGenerator, page.uuid, newDocument, page.pdPage, barcodeRenderSpec) }
 
           pagesForCurrentBatch[templatePageIndexToRenderShortCode]
-              .forEach { page -> renderShortCode(page.uuid, newDocument, page.pdPage, font) }
+              .forEach { page -> renderShortCode(page.uuid, newDocument, page.pdPage, font, shortcodeRenderSpec) }
 
           pagesForCurrentBatch
               .map { renderContents -> renderContents.map { it.pdPage } }
@@ -76,15 +76,16 @@ class GenerateBpPassportTask(
       uuid: UUID,
       document: PDDocument,
       page: PDPage,
-      font: PDType0Font
+      font: PDType0Font,
+      spec: ShortcodeRenderSpec
   ) {
     val shortCode = shortCodeForUuid(uuid)
     PdfUtil.streamForPage(document, page).use { contentStream ->
       contentStream.beginText()
-      contentStream.setNonStrokingColor(shortcodeRenderSpec.color)
-      contentStream.newLineAtOffset(shortcodeRenderSpec.positionX, shortcodeRenderSpec.positionY)
-      contentStream.setCharacterSpacing(shortcodeRenderSpec.characterSpacing)
-      contentStream.setFont(font, shortcodeRenderSpec.fontSize)
+      contentStream.setNonStrokingColor(spec.color)
+      contentStream.newLineAtOffset(spec.positionX, spec.positionY)
+      contentStream.setCharacterSpacing(spec.characterSpacing)
+      contentStream.setFont(font, spec.fontSize)
       contentStream.showText(shortCode)
       contentStream.endText()
     }
