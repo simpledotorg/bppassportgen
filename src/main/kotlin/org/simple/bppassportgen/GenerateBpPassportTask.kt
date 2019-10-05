@@ -63,17 +63,10 @@ class GenerateBpPassportTask(
               .pages
               .mapIndexed { sourcePageIndex, sourcePage ->
                 uuidsInOnePage.map { uuid ->
-
-                  val renderables: List<Renderable> = when (sourcePageIndex) {
-                    templatePageIndexToRenderCode -> listOf(QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec))
-                    templatePageIndexToRenderShortCode -> listOf(ShortcodeRenderable(uuid, font, shortcodeRenderSpec))
-                    else -> emptyList()
-                  }
-
                   RenderContent(
                       uuid = uuid,
                       pdPage = PdfUtil.clone(sourcePage),
-                      renderables = renderables
+                      renderables = generateRenderables(sourcePageIndex, uuid, font)
                   )
                 }
               }
@@ -92,6 +85,18 @@ class GenerateBpPassportTask(
         }
 
     return Output(source = sourceDocument, final = newDocument)
+  }
+
+  private fun generateRenderables(
+      sourcePageIndex: Int,
+      uuid: UUID,
+      font: PDType0Font
+  ): List<Renderable> {
+    return when (sourcePageIndex) {
+      templatePageIndexToRenderCode -> listOf(QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec))
+      templatePageIndexToRenderShortCode -> listOf(ShortcodeRenderable(uuid, font, shortcodeRenderSpec))
+      else -> emptyList()
+    }
   }
 
   private data class RenderContent(
