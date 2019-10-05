@@ -110,7 +110,7 @@ class App(
     val generatingPdfTasks = mutableMapOf<Int, Future<Output>>()
     val savePdfTasks = mutableListOf<Future<Any>>()
 
-    val qrCodeGenerator = QrCodeGeneratorImpl(errorCorrectionLevel = ErrorCorrectionLevel.Q, margin = 0)
+    val qrCodeGenerator: QrCodeGenerator = QrCodeGeneratorImpl(errorCorrectionLevel = ErrorCorrectionLevel.Q, margin = 0)
     val fontId = "Metropolis-Medium"
     val documentFactory = PdDocumentFactory(
         fontsToLoad = mapOf(
@@ -148,15 +148,10 @@ class App(
               .toList()
 
           val task = createPassportGenerationTask(
-              isSticker = isSticker,
               pdfInputBytes = pdfInputBytes,
-              uuidBatch = uuidBatch,
-              blackCmyk = blackCmyk,
               rowCount = rowCount,
               columnCount = columnCount,
-              qrCodeGenerator = qrCodeGenerator,
               openedDocument = openedDocument,
-              fontId = fontId,
               pageSpecs = pageSpecs
           )
 
@@ -202,36 +197,17 @@ class App(
   }
 
   private fun createPassportGenerationTask(
-      isSticker: Boolean,
       pdfInputBytes: ByteArray,
-      uuidBatch: List<List<UUID>>,
-      blackCmyk: PDColor,
       rowCount: Int,
       columnCount: Int,
-      qrCodeGenerator: QrCodeGenerator,
       openedDocument: OpenedDocument,
-      fontId: String,
       pageSpecs: List<List<PageSpec>>
   ): Callable<Output> {
-    val barcodeRenderSpec = if (isSticker) {
-      BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = blackCmyk)
-    } else {
-      BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = blackCmyk)
-    }
-
-    val shortcodeRenderSpec = if (isSticker) {
-      ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk, fontId = fontId)
-    } else {
-      ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk, fontId = fontId)
-    }
-
-    val pageSpecs_old = emptyList<List<PageSpec>>()
-
     return GenerateBpPassportTask(
         pdfBytes = pdfInputBytes,
         rowCount = rowCount,
         columnCount = columnCount,
-        pageSpecs = pageSpecs + pageSpecs_old,
+        pageSpecs = pageSpecs,
         openedDocument = openedDocument
     )
   }
