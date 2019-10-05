@@ -6,7 +6,6 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.renderable.Renderable
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
-import org.simple.bppassportgen.renderable.qrcode.QrCodeRenderable
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderable
 import java.io.ByteArrayInputStream
@@ -102,7 +101,6 @@ class GenerateBpPassportTask(
       font: PDType0Font
   ): List<Renderable> {
     return when (sourcePageIndex) {
-      templatePageIndexToRenderCode -> listOf(QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec))
       templatePageIndexToRenderShortCode -> listOf(ShortcodeRenderable(uuid, font, shortcodeRenderSpec))
       else -> emptyList()
     }

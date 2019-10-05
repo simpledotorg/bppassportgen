@@ -14,6 +14,7 @@ import org.simple.bppassportgen.progresspoll.RealProgressPoll
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.qrcodegen.QrCodeGeneratorImpl
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
+import org.simple.bppassportgen.renderable.qrcode.QrCodeRenderable
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
 import java.io.File
 import java.time.Duration
@@ -179,6 +180,16 @@ class App(
       ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk)
     }
 
+    val pageSpecs = uuidBatch
+        .map { uuidsInEachPage ->
+          uuidsInEachPage.map { uuid ->
+            PageSpec(mapOf(
+                0 to listOf(QrCodeRenderable(qrCodeGenerator, uuid, barcodeRenderSpec))
+            ))
+          }
+        }
+        .toList()
+
     return GenerateBpPassportTask(
         pdfBytes = pdfInputBytes,
         fontBytes = fontInputBytes,
@@ -190,7 +201,7 @@ class App(
         templatePageIndexToRenderCode = 0,
         templatePageIndexToRenderShortCode = 0,
         qrCodeGenerator = qrCodeGenerator,
-        pageSpecs = emptyList()
+        pageSpecs = pageSpecs
     )
   }
 }
