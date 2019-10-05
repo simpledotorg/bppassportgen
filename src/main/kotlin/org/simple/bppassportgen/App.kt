@@ -172,6 +172,9 @@ class App(
       columnCount: Int,
       qrCodeGenerator: QrCodeGenerator
   ): Callable<Output> {
+    val newDocument = PDDocument()
+    val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontInputBytes))
+
     val barcodeRenderSpec = if (isSticker) {
       BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = blackCmyk)
     } else {
@@ -179,13 +182,10 @@ class App(
     }
 
     val shortcodeRenderSpec = if (isSticker) {
-      ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk)
+      ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk, font = font)
     } else {
-      ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk)
+      ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk, font = font)
     }
-
-    val newDocument = PDDocument()
-    val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontInputBytes))
 
     val pageSpecs = uuidBatch
         .map { uuidsInEachPage ->
