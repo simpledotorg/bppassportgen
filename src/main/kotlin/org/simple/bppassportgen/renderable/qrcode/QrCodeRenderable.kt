@@ -6,15 +6,13 @@ import org.simple.bppassportgen.PdfUtil
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import java.util.UUID
 
-class QrCodeRenderable {
+class QrCodeRenderable(
+    private val qrCodeGenerator: QrCodeGenerator,
+    private val uuid: UUID,
+    private val spec: BarcodeRenderSpec
+) {
 
-  fun render(
-      qrCodeGenerator: QrCodeGenerator,
-      uuid: UUID,
-      document: PDDocument,
-      page: PDPage,
-      spec: BarcodeRenderSpec
-  ) {
+  fun render(document: PDDocument, page: PDPage) {
     val bitMatrix = qrCodeGenerator.generateQrCode(uuid.toString(), spec.width, spec.height)
     val renderBitMatrix = RenderBitMatrixOnPdContentStream(bitMatrix, matrixScale = spec.matrixScale)
 
@@ -28,4 +26,5 @@ class QrCodeRenderable {
       )
     }
   }
+
 }

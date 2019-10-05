@@ -63,7 +63,7 @@ class GenerateBpPassportTask(
               .map { sourcePage -> uuidsInOnePage.map { RenderContent(it, PdfUtil.clone(sourcePage)) } }
 
           pagesForCurrentBatch[templatePageIndexToRenderCode]
-              .forEach { page -> QrCodeRenderable().render(qrCodeGenerator, page.uuid, newDocument, page.pdPage, barcodeRenderSpec) }
+              .forEach { page -> QrCodeRenderable(qrCodeGenerator, page.uuid, barcodeRenderSpec).render(newDocument, page.pdPage) }
 
           pagesForCurrentBatch[templatePageIndexToRenderShortCode]
               .forEach { page -> ShortcodeRenderable().render(page.uuid, newDocument, page.pdPage, font, shortcodeRenderSpec) }
