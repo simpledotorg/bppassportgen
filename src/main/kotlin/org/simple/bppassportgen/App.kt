@@ -172,8 +172,13 @@ class App(
       columnCount: Int,
       qrCodeGenerator: QrCodeGenerator
   ): Callable<Output> {
+    // Temporarily added until the document factory is used
+    // TODO: remove this later
+    val fontId = "Metropolis-Medium"
     val newDocument = PDDocument()
     val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontInputBytes))
+
+    val openedDocument = OpenedDocument(newDocument, mapOf(fontId to font))
 
     val barcodeRenderSpec = if (isSticker) {
       BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = blackCmyk)
@@ -205,7 +210,8 @@ class App(
         rowCount = rowCount,
         columnCount = columnCount,
         pageSpecs = pageSpecs,
-        newDocument = newDocument
+        newDocument = newDocument,
+        openedDocument = openedDocument
     )
   }
 }

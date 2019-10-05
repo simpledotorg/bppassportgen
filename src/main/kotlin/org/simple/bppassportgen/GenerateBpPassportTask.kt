@@ -10,7 +10,8 @@ class GenerateBpPassportTask(
     private val rowCount: Int,
     private val columnCount: Int,
     private val pageSpecs: List<List<PageSpec>>,
-    private val newDocument: PDDocument
+    private val newDocument: PDDocument,
+    private val openedDocument: OpenedDocument
 ) : Callable<Output> {
 
   override fun call(): Output {
