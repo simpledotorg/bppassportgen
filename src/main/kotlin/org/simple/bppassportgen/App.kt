@@ -187,9 +187,9 @@ class App(
     }
 
     val shortcodeRenderSpec = if (isSticker) {
-      ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk, font = font)
+      ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = blackCmyk, font = font, fontId = fontId)
     } else {
-      ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk, font = font)
+      ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = blackCmyk, font = font, fontId = fontId)
     }
 
     val pageSpecs = uuidBatch
