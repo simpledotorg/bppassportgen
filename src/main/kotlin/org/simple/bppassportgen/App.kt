@@ -118,8 +118,25 @@ class App(
 
     uuidBatches
         .mapIndexed { index, uuidBatch ->
+          // Temporarily added until the document factory is used
+          // TODO: remove this later
+          val fontId = "Metropolis-Medium"
+          val newDocument = PDDocument()
+          val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontInputBytes))
 
-          val task = createPassportGenerationTask(isSticker, pdfInputBytes, fontInputBytes, uuidBatch, blackCmyk, rowCount, columnCount, qrCodeGenerator)
+          val openedDocument = OpenedDocument(newDocument, mapOf(fontId to font))
+
+          val task = createPassportGenerationTask(
+              isSticker = isSticker,
+              pdfInputBytes = pdfInputBytes,
+              uuidBatch = uuidBatch,
+              blackCmyk = blackCmyk,
+              rowCount = rowCount,
+              columnCount = columnCount,
+              qrCodeGenerator = qrCodeGenerator,
+              openedDocument = openedDocument,
+              fontId = fontId
+          )
 
           task to index + 1
         }
@@ -165,21 +182,14 @@ class App(
   private fun createPassportGenerationTask(
       isSticker: Boolean,
       pdfInputBytes: ByteArray,
-      fontInputBytes: ByteArray,
       uuidBatch: List<List<UUID>>,
       blackCmyk: PDColor,
       rowCount: Int,
       columnCount: Int,
-      qrCodeGenerator: QrCodeGenerator
+      qrCodeGenerator: QrCodeGenerator,
+      openedDocument: OpenedDocument,
+      fontId: String
   ): Callable<Output> {
-    // Temporarily added until the document factory is used
-    // TODO: remove this later
-    val fontId = "Metropolis-Medium"
-    val newDocument = PDDocument()
-    val font = PDType0Font.load(newDocument, ByteArrayInputStream(fontInputBytes))
-
-    val openedDocument = OpenedDocument(newDocument, mapOf(fontId to font))
-
     val barcodeRenderSpec = if (isSticker) {
       BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = blackCmyk)
     } else {
