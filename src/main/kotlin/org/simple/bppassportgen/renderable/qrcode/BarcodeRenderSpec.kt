@@ -8,5 +8,6 @@ data class BarcodeRenderSpec(
     val matrixScale: Float,
     val positionX: Float,
     val positionY: Float,
-    val color: PDColor
+    val color: PDColor,
+    val colorId: String
 )

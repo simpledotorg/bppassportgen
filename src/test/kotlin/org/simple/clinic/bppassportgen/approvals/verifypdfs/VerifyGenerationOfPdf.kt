@@ -2,6 +2,7 @@ package org.simple.clinic.bppassportgen.approvals.verifypdfs
 
 import org.junit.Test
 import org.simple.bppassportgen.BLACK
+import org.simple.bppassportgen.BLACK_CMYK
 import org.simple.bppassportgen.RenderableSpec
 import org.simple.bppassportgen.renderable.Renderable.Type
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
@@ -40,7 +41,8 @@ class VerifyGenerationOfPdf : VerifyTestBase(
                 matrixScale = 2F,
                 positionX = 10F,
                 positionY = 10F,
-                color = BLACK
+                color = BLACK,
+                colorId = BLACK_CMYK
             )
         )
     ),
