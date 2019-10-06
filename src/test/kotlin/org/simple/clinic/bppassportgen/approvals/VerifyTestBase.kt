@@ -22,9 +22,9 @@ abstract class VerifyTestBase(
     private val pageCount: Int,
     private val rowCount: Int,
     private val columnCount: Int,
-    private val renderSpecs: List<RenderableSpec>
+    private val renderSpecs: List<RenderableSpec>,
+    private val fonts: Map<String, String>
 ) {
-
   private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
   private val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
 
@@ -39,7 +39,8 @@ abstract class VerifyTestBase(
         pageCount = pageCount,
         rowCount = rowCount,
         columnCount = columnCount,
-        renderSpecs = renderSpecs
+        renderSpecs = renderSpecs,
+        fonts = fonts
     )
   }
 

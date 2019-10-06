@@ -2,7 +2,6 @@ package org.simple.clinic.bppassportgen.approvals.verifypdfs
 
 import org.junit.Test
 import org.simple.bppassportgen.BLACK
-import org.simple.bppassportgen.FONT_ID
 import org.simple.bppassportgen.RenderableSpec
 import org.simple.bppassportgen.renderable.Renderable.Type
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
@@ -10,6 +9,9 @@ import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
 import org.simple.clinic.bppassportgen.approvals.VerifyTestBase
 import org.simple.clinic.bppassportgen.util.readUuids
 import org.simple.clinic.bppassportgen.util.resourceFilePath
+
+private const val FONT_ID = "shortcode-font"
+private val FONT_PATH = ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file
 
 class VerifyGenerationOfPdf : VerifyTestBase(
     templateFilePath = resourceFilePath("blank.pdf"),
@@ -41,6 +43,9 @@ class VerifyGenerationOfPdf : VerifyTestBase(
                 color = BLACK
             )
         )
+    ),
+    fonts = mapOf(
+        FONT_ID to FONT_PATH
     )
 ) {
 
