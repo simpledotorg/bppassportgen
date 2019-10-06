@@ -87,7 +87,8 @@ fun main(args: Array<String>) {
           })
       )
       val fonts = mapOf(FONT_ID to FONT_PATH)
-
+      val colors = mapOf(BLACK_CMYK to BLACK)
+      
       App(
           templateFilePath = templateFilePath,
           outDirectory = outDirectory,
@@ -95,7 +96,8 @@ fun main(args: Array<String>) {
           rowCount = rowCount,
           columnCount = columnCount,
           renderSpecs = renderSpecs,
-          fonts = fonts
+          fonts = fonts,
+          colorMap = colors
       ).run(uuidsToGenerate = uuidsToGenerate)
     }
   }
@@ -113,9 +115,7 @@ class App(
     private val columnCount: Int,
     private val fonts: Map<String, String>,
     private val renderSpecs: List<RenderableSpec>,
-    private val colorMap: Map<String, PDColor> = mapOf(
-        BLACK_CMYK to BLACK
-    )
+    private val colorMap: Map<String, PDColor>
 ) {
 
   fun run(uuidsToGenerate: List<UUID>) {
