@@ -22,42 +22,26 @@ abstract class VerifyTestBase(
     private val pageCount: Int,
     private val rowCount: Int,
     private val columnCount: Int,
-    private val isSticker: Boolean = false,
-    private val renderSpecs: List<RenderableSpec> = emptyList()
+    private val renderSpecs: List<RenderableSpec>
 ) {
 
   private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
   private val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
 
   protected val app: App by lazy {
-    if (renderSpecs.isEmpty()) {
-      App(
-          computationThreadPool = MoreExecutors.newDirectExecutorService(),
-          ioThreadPool = MoreExecutors.newDirectExecutorService(),
-          progressPoll = NoOpProgressPoll(),
-          consolePrinter = NoOpConsolePrinter(),
-          templateFilePath = templateFilePath,
-          outDirectory = outputDirectory,
-          pageCount = pageCount,
-          rowCount = rowCount,
-          columnCount = columnCount,
-          isSticker = isSticker
-      )
-    } else {
-      App(
-          computationThreadPool = MoreExecutors.newDirectExecutorService(),
-          ioThreadPool = MoreExecutors.newDirectExecutorService(),
-          progressPoll = NoOpProgressPoll(),
-          consolePrinter = NoOpConsolePrinter(),
-          templateFilePath = templateFilePath,
-          outDirectory = outputDirectory,
-          pageCount = pageCount,
-          rowCount = rowCount,
-          columnCount = columnCount,
-          isSticker = isSticker,
-          renderSpecs = renderSpecs
-      )
-    }
+    App(
+        computationThreadPool = MoreExecutors.newDirectExecutorService(),
+        ioThreadPool = MoreExecutors.newDirectExecutorService(),
+        progressPoll = NoOpProgressPoll(),
+        consolePrinter = NoOpConsolePrinter(),
+        templateFilePath = templateFilePath,
+        outDirectory = outputDirectory,
+        pageCount = pageCount,
+        rowCount = rowCount,
+        columnCount = columnCount,
+        isSticker = false,
+        renderSpecs = renderSpecs
+    )
   }
 
   @Before
