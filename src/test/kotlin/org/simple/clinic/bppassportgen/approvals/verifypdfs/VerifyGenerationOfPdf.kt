@@ -29,7 +29,8 @@ class VerifyGenerationOfPdf : VerifyTestBase(
                 fontSize = 25F,
                 characterSpacing = 1.3F,
                 color = BLACK,
-                fontId = FONT_ID
+                fontId = FONT_ID,
+                colorId = BLACK_CMYK
             )
         ),
         RenderableSpec(
