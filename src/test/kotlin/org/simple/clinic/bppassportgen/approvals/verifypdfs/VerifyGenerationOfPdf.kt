@@ -1,4 +1,4 @@
-package org.simple.clinic.bppassportgen.approvals.verifyv2
+package org.simple.clinic.bppassportgen.approvals.verifypdfs
 
 import org.junit.Test
 import org.simple.bppassportgen.BLACK
