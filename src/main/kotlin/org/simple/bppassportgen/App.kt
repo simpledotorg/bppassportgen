@@ -113,9 +113,9 @@ class App(
     private val columnCount: Int,
     private val fonts: Map<String, String>,
     private val renderSpecs: List<RenderableSpec>,
-    private val colorProvider: ColorProvider = ColorProvider(colorMap = mapOf(
+    private val colorMap: Map<String, PDColor> = mapOf(
         BLACK_CMYK to BLACK
-    ))
+    )
 ) {
 
   fun run(uuidsToGenerate: List<UUID>) {
@@ -138,6 +138,7 @@ class App(
     val documentFactory = PdDocumentFactory(
         fontsToLoad = fonts.mapValues { (_, filePath) -> File(filePath) }
     )
+    val colorProvider = ColorProvider(colorMap)
 
     uuidBatches
         .mapIndexed { index, uuidBatch ->
@@ -146,7 +147,7 @@ class App(
           val pageSpecs = uuidBatch
               .map { uuidsInEachPage ->
                 uuidsInEachPage.map { uuid ->
-                  PageSpec(generateRenderables(qrCodeGenerator, uuid))
+                  PageSpec(generateRenderables(qrCodeGenerator, uuid, colorProvider))
                 }
               }
               .toList()
@@ -200,13 +201,22 @@ class App(
     ioThreadPool.shutdown()
   }
 
-  private fun generateRenderables(qrCodeGenerator: QrCodeGenerator, uuid: UUID): Map<Int, List<Renderable>> {
+  private fun generateRenderables(
+      qrCodeGenerator: QrCodeGenerator,
+      uuid: UUID,
+      colorProvider: ColorProvider
+  ): Map<Int, List<Renderable>> {
     return renderSpecs
-        .map { it.pageNumber to generateRenderable(uuid, qrCodeGenerator, it) }
+        .map { it.pageNumber to generateRenderable(uuid, qrCodeGenerator, it, colorProvider) }
         .groupBy({ (pageNumber, _) -> pageNumber }, { (_, renderable) -> renderable })
   }
 
-  private fun generateRenderable(uuid: UUID, qrCodeGenerator: QrCodeGenerator, spec: RenderableSpec): Renderable {
+  private fun generateRenderable(
+      uuid: UUID,
+      qrCodeGenerator: QrCodeGenerator,
+      spec: RenderableSpec,
+      colorProvider: ColorProvider
+  ): Renderable {
     return when (spec.type) {
       PassportQrCode -> QrCodeRenderable(qrCodeGenerator, uuid, spec.getSpecAs(), colorProvider)
       PassportShortcode -> ShortcodeRenderable(uuid, spec.getSpecAs(), colorProvider)
