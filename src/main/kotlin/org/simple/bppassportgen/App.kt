@@ -85,6 +85,7 @@ fun main(args: Array<String>) {
             ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = BLACK, fontId = FONT_ID)
           })
       )
+      val fonts = mapOf(FONT_ID to FONT_PATH)
 
       App(
           templateFilePath = templateFilePath,
@@ -92,7 +93,8 @@ fun main(args: Array<String>) {
           pageCount = pageCount,
           rowCount = rowCount,
           columnCount = columnCount,
-          renderSpecs = renderSpecs
+          renderSpecs = renderSpecs,
+          fonts = fonts
       ).run(uuidsToGenerate = uuidsToGenerate)
     }
   }
@@ -108,7 +110,7 @@ class App(
     private val pageCount: Int,
     private val rowCount: Int,
     private val columnCount: Int,
-    private val fonts: Map<String, String> = mapOf(FONT_ID to FONT_PATH),
+    private val fonts: Map<String, String>,
     private val renderSpecs: List<RenderableSpec>
 ) {
 
