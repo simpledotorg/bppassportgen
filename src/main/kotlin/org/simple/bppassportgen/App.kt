@@ -209,7 +209,7 @@ class App(
   private fun generateRenderable(uuid: UUID, qrCodeGenerator: QrCodeGenerator, spec: RenderableSpec): Renderable {
     return when (spec.type) {
       PassportQrCode -> QrCodeRenderable(qrCodeGenerator, uuid, spec.getSpecAs(), colorProvider)
-      PassportShortcode -> ShortcodeRenderable(uuid, spec.getSpecAs())
+      PassportShortcode -> ShortcodeRenderable(uuid, spec.getSpecAs(), colorProvider)
     }
   }
 

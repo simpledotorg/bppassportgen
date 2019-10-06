@@ -1,6 +1,7 @@
 package org.simple.bppassportgen.renderable.shortcode
 
 import org.apache.pdfbox.pdmodel.PDPage
+import org.simple.bppassportgen.ColorProvider
 import org.simple.bppassportgen.OpenedDocument
 import org.simple.bppassportgen.PdfUtil
 import org.simple.bppassportgen.renderable.Renderable
@@ -8,7 +9,8 @@ import java.util.UUID
 
 class ShortcodeRenderable(
     private val uuid: UUID,
-    private val spec: ShortcodeRenderSpec
+    private val spec: ShortcodeRenderSpec,
+    private val colorProvider: ColorProvider
 ): Renderable {
 
   override fun render(document: OpenedDocument, page: PDPage) {
