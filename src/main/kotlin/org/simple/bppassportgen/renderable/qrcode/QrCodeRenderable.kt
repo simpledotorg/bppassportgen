@@ -1,6 +1,7 @@
 package org.simple.bppassportgen.renderable.qrcode
 
 import org.apache.pdfbox.pdmodel.PDPage
+import org.simple.bppassportgen.ColorProvider
 import org.simple.bppassportgen.OpenedDocument
 import org.simple.bppassportgen.PdfUtil
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
@@ -10,7 +11,8 @@ import java.util.UUID
 class QrCodeRenderable(
     private val qrCodeGenerator: QrCodeGenerator,
     private val uuid: UUID,
-    private val spec: BarcodeRenderSpec
+    private val spec: BarcodeRenderSpec,
+    private val colorProvider: ColorProvider
 ) : Renderable {
 
   override fun render(document: OpenedDocument, page: PDPage) {
@@ -23,7 +25,7 @@ class QrCodeRenderable(
           contentStream,
           spec.positionX,
           spec.positionY,
-          applyForegroundColor = { it.setStrokingColor(spec.color) }
+          applyForegroundColor = { it.setStrokingColor(colorProvider.colorById(spec.colorId)) }
       )
     }
   }

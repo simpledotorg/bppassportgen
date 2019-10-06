@@ -28,14 +28,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
-const val FONT_ID = "Metropolis-Medium"
-private val FONT_PATH = ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file
-val BLACK = PDColor(
-    floatArrayOf(0F, 0F, 0F, 1F),
-    COSName.DEVICECMYK,
-    PDDeviceCMYK.INSTANCE
-)
-
 fun main(args: Array<String>) {
   val options = Options()
       .apply {
@@ -72,19 +64,28 @@ fun main(args: Array<String>) {
       require(numberOfPassports > 0) { "Number of passports must be > 0!" }
       require(rowCount * columnCount <= numberOfPassports) { "row count * column count of passports must be <= count!" }
 
+      val metropolisFontId = "Metropolis-Medium"
+      val blackCmykId = "cmyk_black"
+
       val uuidsToGenerate = (0 until numberOfPassports).map { UUID.randomUUID() }
       val renderSpecs = listOf(
           RenderableSpec(0, PassportQrCode, if (isSticker) {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = BLACK)
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, colorId = blackCmykId)
           } else {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = BLACK)
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, colorId = blackCmykId)
           }),
           RenderableSpec(0, PassportShortcode, if (isSticker) {
-            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = BLACK, fontId = FONT_ID)
+            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, fontId = metropolisFontId, colorId = blackCmykId)
           } else {
-            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = BLACK, fontId = FONT_ID)
+            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, fontId = metropolisFontId, colorId = blackCmykId)
           })
       )
+      val fonts = mapOf(metropolisFontId to ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file)
+      val colors = mapOf(blackCmykId to PDColor(
+          floatArrayOf(0F, 0F, 0F, 1F),
+          COSName.DEVICECMYK,
+          PDDeviceCMYK.INSTANCE
+      ))
 
       App(
           templateFilePath = templateFilePath,
@@ -92,7 +93,9 @@ fun main(args: Array<String>) {
           pageCount = pageCount,
           rowCount = rowCount,
           columnCount = columnCount,
-          renderSpecs = renderSpecs
+          renderSpecs = renderSpecs,
+          fonts = fonts,
+          colorMap = colors
       ).run(uuidsToGenerate = uuidsToGenerate)
     }
   }
@@ -108,8 +111,9 @@ class App(
     private val pageCount: Int,
     private val rowCount: Int,
     private val columnCount: Int,
-    private val fonts: Map<String, String> = mapOf(FONT_ID to FONT_PATH),
-    private val renderSpecs: List<RenderableSpec>
+    private val fonts: Map<String, String>,
+    private val renderSpecs: List<RenderableSpec>,
+    private val colorMap: Map<String, PDColor>
 ) {
 
   fun run(uuidsToGenerate: List<UUID>) {
@@ -132,6 +136,7 @@ class App(
     val documentFactory = PdDocumentFactory(
         fontsToLoad = fonts.mapValues { (_, filePath) -> File(filePath) }
     )
+    val colorProvider = ColorProvider(colorMap)
 
     uuidBatches
         .mapIndexed { index, uuidBatch ->
@@ -140,7 +145,7 @@ class App(
           val pageSpecs = uuidBatch
               .map { uuidsInEachPage ->
                 uuidsInEachPage.map { uuid ->
-                  PageSpec(generateRenderables(qrCodeGenerator, uuid))
+                  PageSpec(generateRenderables(qrCodeGenerator, uuid, colorProvider))
                 }
               }
               .toList()
@@ -194,16 +199,25 @@ class App(
     ioThreadPool.shutdown()
   }
 
-  private fun generateRenderables(qrCodeGenerator: QrCodeGenerator, uuid: UUID): Map<Int, List<Renderable>> {
+  private fun generateRenderables(
+      qrCodeGenerator: QrCodeGenerator,
+      uuid: UUID,
+      colorProvider: ColorProvider
+  ): Map<Int, List<Renderable>> {
     return renderSpecs
-        .map { it.pageNumber to generateRenderable(uuid, qrCodeGenerator, it) }
+        .map { it.pageNumber to generateRenderable(uuid, qrCodeGenerator, it, colorProvider) }
         .groupBy({ (pageNumber, _) -> pageNumber }, { (_, renderable) -> renderable })
   }
 
-  private fun generateRenderable(uuid: UUID, qrCodeGenerator: QrCodeGenerator, spec: RenderableSpec): Renderable {
+  private fun generateRenderable(
+      uuid: UUID,
+      qrCodeGenerator: QrCodeGenerator,
+      spec: RenderableSpec,
+      colorProvider: ColorProvider
+  ): Renderable {
     return when (spec.type) {
-      PassportQrCode -> QrCodeRenderable(qrCodeGenerator, uuid, spec.getSpecAs())
-      PassportShortcode -> ShortcodeRenderable(uuid, spec.getSpecAs())
+      PassportQrCode -> QrCodeRenderable(qrCodeGenerator, uuid, spec.getSpecAs(), colorProvider)
+      PassportShortcode -> ShortcodeRenderable(uuid, spec.getSpecAs(), colorProvider)
     }
   }
 

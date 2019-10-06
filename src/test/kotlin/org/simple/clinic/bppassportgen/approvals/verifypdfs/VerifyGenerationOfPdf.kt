@@ -1,8 +1,9 @@
 package org.simple.clinic.bppassportgen.approvals.verifypdfs
 
+import org.apache.pdfbox.cos.COSName
+import org.apache.pdfbox.pdmodel.graphics.color.PDColor
+import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import org.junit.Test
-import org.simple.bppassportgen.BLACK
-import org.simple.bppassportgen.FONT_ID
 import org.simple.bppassportgen.RenderableSpec
 import org.simple.bppassportgen.renderable.Renderable.Type
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
@@ -10,6 +11,21 @@ import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
 import org.simple.clinic.bppassportgen.approvals.VerifyTestBase
 import org.simple.clinic.bppassportgen.util.readUuids
 import org.simple.clinic.bppassportgen.util.resourceFilePath
+
+private const val FONT_ID = "Pacifico"
+private val FONT_PATH = ClassLoader.getSystemClassLoader().getResource("Pacifico-Regular.ttf")!!.file
+private val RED = PDColor(
+    floatArrayOf(0F, 1F, 1F, 0F),
+    COSName.DEVICECMYK,
+    PDDeviceCMYK.INSTANCE
+)
+private val BLUE = PDColor(
+    floatArrayOf(1F, 1F, 0F, 0F),
+    COSName.DEVICECMYK,
+    PDDeviceCMYK.INSTANCE
+)
+private const val RED_CMYK = "red_cmyk"
+private const val BLUE_CMYK = "blue_cmyk"
 
 class VerifyGenerationOfPdf : VerifyTestBase(
     templateFilePath = resourceFilePath("blank.pdf"),
@@ -25,8 +41,8 @@ class VerifyGenerationOfPdf : VerifyTestBase(
                 positionY = 115F,
                 fontSize = 25F,
                 characterSpacing = 1.3F,
-                color = BLACK,
-                fontId = FONT_ID
+                fontId = FONT_ID,
+                colorId = RED_CMYK
             )
         ),
         RenderableSpec(
@@ -38,9 +54,16 @@ class VerifyGenerationOfPdf : VerifyTestBase(
                 matrixScale = 2F,
                 positionX = 10F,
                 positionY = 10F,
-                color = BLACK
+                colorId = BLUE_CMYK
             )
         )
+    ),
+    fonts = mapOf(
+        FONT_ID to FONT_PATH
+    ),
+    colors = mapOf(
+        BLUE_CMYK to BLUE,
+        RED_CMYK to RED
     )
 ) {
 
