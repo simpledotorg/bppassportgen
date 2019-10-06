@@ -6,6 +6,7 @@ import org.approvaltests.Approvals
 import org.approvaltests.namer.NamerFactory
 import org.junit.Before
 import org.simple.bppassportgen.App
+import org.simple.bppassportgen.RenderableSpec
 import org.simple.clinic.bppassportgen.SavePdfToImage
 import org.simple.clinic.bppassportgen.util.ImageApprover
 import org.simple.clinic.bppassportgen.util.NoOpConsolePrinter
@@ -21,7 +22,7 @@ abstract class VerifyTestBase(
     private val pageCount: Int,
     private val rowCount: Int,
     private val columnCount: Int,
-    private val isSticker: Boolean
+    private val renderSpecs: List<RenderableSpec>
 ) {
 
   private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
@@ -38,7 +39,7 @@ abstract class VerifyTestBase(
         pageCount = pageCount,
         rowCount = rowCount,
         columnCount = columnCount,
-        isSticker = isSticker
+        renderSpecs = renderSpecs
     )
   }
 
