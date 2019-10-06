@@ -28,15 +28,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
-private const val FONT_ID = "Metropolis-Medium"
-private const val BLACK_CMYK = "cmyk_black"
-private val FONT_PATH = ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file
-private val BLACK = PDColor(
-    floatArrayOf(0F, 0F, 0F, 1F),
-    COSName.DEVICECMYK,
-    PDDeviceCMYK.INSTANCE
-)
-
 fun main(args: Array<String>) {
   val options = Options()
       .apply {
@@ -73,22 +64,29 @@ fun main(args: Array<String>) {
       require(numberOfPassports > 0) { "Number of passports must be > 0!" }
       require(rowCount * columnCount <= numberOfPassports) { "row count * column count of passports must be <= count!" }
 
+      val metropolisFontId = "Metropolis-Medium"
+      val blackCmykId = "cmyk_black"
+
       val uuidsToGenerate = (0 until numberOfPassports).map { UUID.randomUUID() }
       val renderSpecs = listOf(
           RenderableSpec(0, PassportQrCode, if (isSticker) {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, colorId = BLACK_CMYK)
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, colorId = blackCmykId)
           } else {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, colorId = BLACK_CMYK)
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, colorId = blackCmykId)
           }),
           RenderableSpec(0, PassportShortcode, if (isSticker) {
-            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, fontId = FONT_ID, colorId = BLACK_CMYK)
+            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, fontId = metropolisFontId, colorId = blackCmykId)
           } else {
-            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, fontId = FONT_ID, colorId = BLACK_CMYK)
+            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, fontId = metropolisFontId, colorId = blackCmykId)
           })
       )
-      val fonts = mapOf(FONT_ID to FONT_PATH)
-      val colors = mapOf(BLACK_CMYK to BLACK)
-      
+      val fonts = mapOf(metropolisFontId to ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file)
+      val colors = mapOf(blackCmykId to PDColor(
+          floatArrayOf(0F, 0F, 0F, 1F),
+          COSName.DEVICECMYK,
+          PDDeviceCMYK.INSTANCE
+      ))
+
       App(
           templateFilePath = templateFilePath,
           outDirectory = outDirectory,
