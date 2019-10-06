@@ -41,7 +41,6 @@ class VerifyGenerationOfPdf : VerifyTestBase(
                 matrixScale = 2F,
                 positionX = 10F,
                 positionY = 10F,
-                color = BLACK,
                 colorId = BLACK_CMYK
             )
         )

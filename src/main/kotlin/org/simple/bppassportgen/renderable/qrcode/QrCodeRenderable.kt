@@ -25,7 +25,7 @@ class QrCodeRenderable(
           contentStream,
           spec.positionX,
           spec.positionY,
-          applyForegroundColor = { it.setStrokingColor(spec.color) }
+          applyForegroundColor = { it.setStrokingColor(colorProvider.colorById(spec.colorId)) }
       )
     }
   }

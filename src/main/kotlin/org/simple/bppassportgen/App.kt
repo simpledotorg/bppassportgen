@@ -76,9 +76,9 @@ fun main(args: Array<String>) {
       val uuidsToGenerate = (0 until numberOfPassports).map { UUID.randomUUID() }
       val renderSpecs = listOf(
           RenderableSpec(0, PassportQrCode, if (isSticker) {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = BLACK, colorId = BLACK_CMYK)
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, colorId = BLACK_CMYK)
           } else {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = BLACK, colorId = BLACK_CMYK)
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, colorId = BLACK_CMYK)
           }),
           RenderableSpec(0, PassportShortcode, if (isSticker) {
             ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = BLACK, fontId = FONT_ID)
