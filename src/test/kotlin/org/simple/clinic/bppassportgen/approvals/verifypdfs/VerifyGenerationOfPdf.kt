@@ -12,14 +12,20 @@ import org.simple.clinic.bppassportgen.approvals.VerifyTestBase
 import org.simple.clinic.bppassportgen.util.readUuids
 import org.simple.clinic.bppassportgen.util.resourceFilePath
 
-private const val FONT_ID = "shortcode-font"
-private val FONT_PATH = ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file
-private val BLACK = PDColor(
-    floatArrayOf(0F, 0F, 0F, 1F),
+private const val FONT_ID = "Pacifico"
+private val FONT_PATH = ClassLoader.getSystemClassLoader().getResource("Pacifico-Regular.ttf")!!.file
+private val RED = PDColor(
+    floatArrayOf(0F, 1F, 1F, 0F),
     COSName.DEVICECMYK,
     PDDeviceCMYK.INSTANCE
 )
-private const val BLACK_CMYK = "color_black"
+private val BLUE = PDColor(
+    floatArrayOf(1F, 1F, 0F, 0F),
+    COSName.DEVICECMYK,
+    PDDeviceCMYK.INSTANCE
+)
+private const val RED_CMYK = "red_cmyk"
+private const val BLUE_CMYK = "blue_cmyk"
 
 class VerifyGenerationOfPdf : VerifyTestBase(
     templateFilePath = resourceFilePath("blank.pdf"),
@@ -36,7 +42,7 @@ class VerifyGenerationOfPdf : VerifyTestBase(
                 fontSize = 25F,
                 characterSpacing = 1.3F,
                 fontId = FONT_ID,
-                colorId = BLACK_CMYK
+                colorId = RED_CMYK
             )
         ),
         RenderableSpec(
@@ -48,7 +54,7 @@ class VerifyGenerationOfPdf : VerifyTestBase(
                 matrixScale = 2F,
                 positionX = 10F,
                 positionY = 10F,
-                colorId = BLACK_CMYK
+                colorId = BLUE_CMYK
             )
         )
     ),
@@ -56,7 +62,8 @@ class VerifyGenerationOfPdf : VerifyTestBase(
         FONT_ID to FONT_PATH
     ),
     colors = mapOf(
-        BLACK_CMYK to BLACK
+        BLUE_CMYK to BLUE,
+        RED_CMYK to RED
     )
 ) {
 
