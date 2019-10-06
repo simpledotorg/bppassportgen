@@ -39,7 +39,6 @@ abstract class VerifyTestBase(
         pageCount = pageCount,
         rowCount = rowCount,
         columnCount = columnCount,
-        isSticker = false,
         renderSpecs = renderSpecs
     )
   }

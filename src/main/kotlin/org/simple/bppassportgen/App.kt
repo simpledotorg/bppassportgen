@@ -73,6 +73,18 @@ fun main(args: Array<String>) {
       require(rowCount * columnCount <= numberOfPassports) { "row count * column count of passports must be <= count!" }
 
       val uuidsToGenerate = (0 until numberOfPassports).map { UUID.randomUUID() }
+      val renderSpecs = listOf(
+          RenderableSpec(0, PassportQrCode, if (isSticker) {
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = BLACK)
+          } else {
+            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = BLACK)
+          }),
+          RenderableSpec(0, PassportShortcode, if (isSticker) {
+            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = BLACK, fontId = FONT_ID)
+          } else {
+            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = BLACK, fontId = FONT_ID)
+          })
+      )
 
       App(
           templateFilePath = templateFilePath,
@@ -80,7 +92,7 @@ fun main(args: Array<String>) {
           pageCount = pageCount,
           rowCount = rowCount,
           columnCount = columnCount,
-          isSticker = isSticker
+          renderSpecs = renderSpecs
       ).run(uuidsToGenerate = uuidsToGenerate)
     }
   }
@@ -96,20 +108,8 @@ class App(
     private val pageCount: Int,
     private val rowCount: Int,
     private val columnCount: Int,
-    private val isSticker: Boolean,
     private val fonts: Map<String, String> = mapOf(FONT_ID to FONT_PATH),
-    private val renderSpecs: List<RenderableSpec> = listOf(
-        RenderableSpec(0, PassportQrCode, if (isSticker) {
-          BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, color = BLACK)
-        } else {
-          BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, color = BLACK)
-        }),
-        RenderableSpec(0, PassportShortcode, if (isSticker) {
-          ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, color = BLACK, fontId = FONT_ID)
-        } else {
-          ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, color = BLACK, fontId = FONT_ID)
-        })
-    )
+    private val renderSpecs: List<RenderableSpec>
 ) {
 
   fun run(uuidsToGenerate: List<UUID>) {
