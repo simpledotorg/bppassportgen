@@ -29,7 +29,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
 private const val FONT_ID = "Metropolis-Medium"
-const val BLACK_CMYK = "cmyk_black"
+private const val BLACK_CMYK = "cmyk_black"
 private val FONT_PATH = ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file
 private val BLACK = PDColor(
     floatArrayOf(0F, 0F, 0F, 1F),

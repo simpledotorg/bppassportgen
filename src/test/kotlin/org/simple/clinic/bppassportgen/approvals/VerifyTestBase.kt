@@ -2,6 +2,7 @@ package org.simple.clinic.bppassportgen.approvals
 
 import com.google.common.util.concurrent.MoreExecutors
 import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.approvaltests.Approvals
 import org.approvaltests.namer.NamerFactory
 import org.junit.Before
@@ -23,7 +24,8 @@ abstract class VerifyTestBase(
     private val rowCount: Int,
     private val columnCount: Int,
     private val renderSpecs: List<RenderableSpec>,
-    private val fonts: Map<String, String>
+    private val fonts: Map<String, String>,
+    private val colors: Map<String, PDColor>
 ) {
   private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
   private val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
@@ -40,7 +42,8 @@ abstract class VerifyTestBase(
         rowCount = rowCount,
         columnCount = columnCount,
         renderSpecs = renderSpecs,
-        fonts = fonts
+        fonts = fonts,
+        colorMap = colors
     )
   }
 
