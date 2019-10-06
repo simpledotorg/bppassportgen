@@ -1,7 +1,6 @@
 package org.simple.clinic.bppassportgen.approvals.verifypdfs
 
 import org.junit.Test
-import org.simple.bppassportgen.BLACK
 import org.simple.bppassportgen.BLACK_CMYK
 import org.simple.bppassportgen.RenderableSpec
 import org.simple.bppassportgen.renderable.Renderable.Type
@@ -28,7 +27,6 @@ class VerifyGenerationOfPdf : VerifyTestBase(
                 positionY = 115F,
                 fontSize = 25F,
                 characterSpacing = 1.3F,
-                color = BLACK,
                 fontId = FONT_ID,
                 colorId = BLACK_CMYK
             )

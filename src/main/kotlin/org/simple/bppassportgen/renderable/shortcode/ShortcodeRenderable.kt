@@ -17,7 +17,7 @@ class ShortcodeRenderable(
     val shortCode = shortCodeForUuid(uuid)
     PdfUtil.streamForPage(document.document, page).use { contentStream ->
       contentStream.beginText()
-      contentStream.setNonStrokingColor(spec.color)
+      contentStream.setNonStrokingColor(colorProvider.colorById(spec.colorId))
       contentStream.newLineAtOffset(spec.positionX, spec.positionY)
       contentStream.setCharacterSpacing(spec.characterSpacing)
       contentStream.setFont(document.fontById(spec.fontId), spec.fontSize)
