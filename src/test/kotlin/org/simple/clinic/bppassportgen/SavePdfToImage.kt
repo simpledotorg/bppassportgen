@@ -9,6 +9,6 @@ object SavePdfToImage {
   fun save(document: PDDocument): List<BufferedImage> {
     val renderer = PDFRenderer(document)
 
-    return (0 until document.numberOfPages).map { renderer.renderImageWithDPI(it, 150F) }
+    return (0 until document.numberOfPages).map { renderer.renderImageWithDPI(it, 72F) }
   }
 }
