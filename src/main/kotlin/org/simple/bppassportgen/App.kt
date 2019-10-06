@@ -29,6 +29,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
 private const val FONT_ID = "Metropolis-Medium"
+private const val BLACK_CMYK = "cmyk_black"
 private val FONT_PATH = ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file
 val BLACK = PDColor(
     floatArrayOf(0F, 0F, 0F, 1F),
@@ -111,7 +112,10 @@ class App(
     private val rowCount: Int,
     private val columnCount: Int,
     private val fonts: Map<String, String>,
-    private val renderSpecs: List<RenderableSpec>
+    private val renderSpecs: List<RenderableSpec>,
+    private val colorProvider: ColorProvider = ColorProvider(colorMap = mapOf(
+        BLACK_CMYK to BLACK
+    ))
 ) {
 
   fun run(uuidsToGenerate: List<UUID>) {
@@ -204,7 +208,7 @@ class App(
 
   private fun generateRenderable(uuid: UUID, qrCodeGenerator: QrCodeGenerator, spec: RenderableSpec): Renderable {
     return when (spec.type) {
-      PassportQrCode -> QrCodeRenderable(qrCodeGenerator, uuid, spec.getSpecAs())
+      PassportQrCode -> QrCodeRenderable(qrCodeGenerator, uuid, spec.getSpecAs(), colorProvider)
       PassportShortcode -> ShortcodeRenderable(uuid, spec.getSpecAs())
     }
   }
