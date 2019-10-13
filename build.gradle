@@ -39,6 +39,7 @@ dependencies {
   implementation "org.apache.pdfbox:pdfbox:$versions.pdfbox"
   implementation "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$versions.jackson"
+  implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$versions.jackson"
 
   testImplementation "junit:junit:$versions.junit"
   testImplementation "pl.pragmatists:JUnitParams:$versions.JUnitParams"
