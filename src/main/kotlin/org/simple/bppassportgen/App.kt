@@ -77,7 +77,7 @@ fun main(args: Array<String>) {
           RenderableSpec(0, PassportShortcode, if (isSticker) {
             ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, fontId = metropolisFontId, colorId = blackCmykId)
           } else {
-            ShortcodeRenderSpec(positionX = 72.5F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, fontId = metropolisFontId, colorId = blackCmykId)
+            ShortcodeRenderSpec(positionX = 88F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, fontId = metropolisFontId, colorId = blackCmykId)
           })
       )
       val fonts = mapOf(metropolisFontId to ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file)
