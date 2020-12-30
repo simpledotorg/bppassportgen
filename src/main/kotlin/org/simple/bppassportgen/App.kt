@@ -80,7 +80,7 @@ fun main(args: Array<String>) {
             ShortcodeRenderSpec(positionX = 88F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, fontId = metropolisFontId, colorId = blackCmykId)
           })
       )
-      val fonts = mapOf(metropolisFontId to ClassLoader.getSystemClassLoader().getResource("Metropolis-Medium.ttf")!!.file)
+      val fonts = mapOf(metropolisFontId to "Metropolis-Medium.ttf")
       val colors = mapOf(blackCmykId to PDColor(
           floatArrayOf(0F, 0F, 0F, 1F),
           COSName.DEVICECMYK,
@@ -134,7 +134,8 @@ class App(
 
     val qrCodeGenerator: QrCodeGenerator = QrCodeGeneratorImpl(errorCorrectionLevel = ErrorCorrectionLevel.Q, margin = 0)
     val documentFactory = PdDocumentFactory(
-        fontsToLoad = fonts.mapValues { (_, filePath) -> File(filePath) }
+        fontsToLoad = fonts
+            .mapValues { (_, fontName) -> javaClass.classLoader.getResourceAsStream(fontName)!!.readBytes() }
     )
     val colorProvider = ColorProvider(colorMap)
 
