@@ -5,6 +5,7 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import org.apache.pdfbox.cos.COSName
+import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import org.simple.bppassportgen.consoleprinter.ConsolePrinter
@@ -122,7 +123,9 @@ class App(
 
     outDirectory.mkdirs()
 
-    val pdfInputBytes = File(templateFilePath).readBytes()
+    val pdfTemplateFile = File(templateFilePath)
+    val pdfInputBytes = pdfTemplateFile.readBytes()
+    val pageCount = readNumberOfPagesInPdf(pdfTemplateFile)
 
     val uuidBatches = uuidsToGenerate
         .distinct()
@@ -198,6 +201,10 @@ class App(
 
     computationThreadPool.shutdown()
     ioThreadPool.shutdown()
+  }
+
+  private fun readNumberOfPagesInPdf(file: File): Int {
+    return PDDocument.load(file).use { it.numberOfPages }
   }
 
   private fun generateRenderables(
