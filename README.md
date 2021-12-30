@@ -24,7 +24,6 @@
   * `-c,--count <arg>`           Number of BP Passports to generate
   * `-h,--help`                  Print this message
   * `-o,--output <arg>`          Directory to save the generated BP passports
-  * `-p,--pages <arg>`           Number of pages in the PDF
   * `-rc,--row-count <arg>`      Number of rows in a page
   * `-cc,--column-count <arg>`   Number of columns in a page
   * `-t,--template <arg>`        Path to the template file

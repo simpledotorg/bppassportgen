@@ -13,7 +13,6 @@ import org.simple.clinic.bppassportgen.util.readUuids
 import org.simple.clinic.bppassportgen.util.resourceFilePath
 
 private const val FONT_ID = "Pacifico"
-private val FONT_PATH = ClassLoader.getSystemClassLoader().getResource("Pacifico-Regular.ttf")!!.file
 private val RED = PDColor(
     floatArrayOf(0F, 1F, 1F, 0F),
     COSName.DEVICECMYK,
@@ -29,7 +28,6 @@ private const val BLUE_CMYK = "blue_cmyk"
 
 class VerifyGenerationOfPdf : VerifyTestBase(
     templateFilePath = resourceFilePath("blank.pdf"),
-    pageCount = 2,
     rowCount = 2,
     columnCount = 2,
     renderSpecs = listOf(
@@ -59,7 +57,7 @@ class VerifyGenerationOfPdf : VerifyTestBase(
         )
     ),
     fonts = mapOf(
-        FONT_ID to FONT_PATH
+        FONT_ID to "Pacifico-Regular.ttf"
     ),
     colors = mapOf(
         BLUE_CMYK to BLUE,

@@ -20,7 +20,6 @@ import java.nio.file.Paths
 
 abstract class VerifyTestBase(
     private val templateFilePath: String,
-    private val pageCount: Int,
     private val rowCount: Int,
     private val columnCount: Int,
     private val renderSpecs: List<RenderableSpec>,
@@ -38,7 +37,6 @@ abstract class VerifyTestBase(
         consolePrinter = NoOpConsolePrinter(),
         templateFilePath = templateFilePath,
         outDirectory = outputDirectory,
-        pageCount = pageCount,
         rowCount = rowCount,
         columnCount = columnCount,
         renderSpecs = renderSpecs,
