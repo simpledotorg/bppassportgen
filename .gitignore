@@ -166,3 +166,6 @@ gradle-app.setting
 
 # For approval tests
 **/*.received.*
+
+# Android SDK
+local.properties
