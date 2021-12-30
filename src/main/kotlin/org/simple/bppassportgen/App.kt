@@ -35,7 +35,6 @@ fun main(args: Array<String>) {
         addRequiredOption("c", "count", true, "Number of BP Passports to generate")
         addRequiredOption("t", "template", true, "Path to the template file")
         addOption("o", "output", true, "Directory to save the generated BP passports")
-        addOption("p", "pages", true, "Number of pages in a passport")
         addOption("rc", "row-count", true, "Number of rows in a page")
         addOption("cc", "column-count", true, "Number of columns in a page")
         addOption("h", "help", false, "Print this message")
@@ -57,7 +56,6 @@ fun main(args: Array<String>) {
       val numberOfPassports = cmd.getOptionValue("c").toInt()
       val templateFilePath = cmd.getOptionValue("t")
       val outDirectory = File(cmd.getOptionValue("o", "./out"))
-      val pageCount = cmd.getOptionValue("p", "1").toInt()
       val rowCount = cmd.getOptionValue("rc", "1").toInt()
       val columnCount = cmd.getOptionValue("cc", "1").toInt()
       val isSticker = cmd.hasOption("sticker")
@@ -91,7 +89,6 @@ fun main(args: Array<String>) {
       App(
           templateFilePath = templateFilePath,
           outDirectory = outDirectory,
-          pageCount = pageCount,
           rowCount = rowCount,
           columnCount = columnCount,
           renderSpecs = renderSpecs,
@@ -109,7 +106,6 @@ class App(
     private val consolePrinter: ConsolePrinter = RealConsolePrinter(),
     private val templateFilePath: String,
     private val outDirectory: File,
-    private val pageCount: Int,
     private val rowCount: Int,
     private val columnCount: Int,
     private val fonts: Map<String, String>,

@@ -28,7 +28,6 @@ private const val BLUE_CMYK = "blue_cmyk"
 
 class VerifyGenerationOfPdf : VerifyTestBase(
     templateFilePath = resourceFilePath("blank.pdf"),
-    pageCount = 2,
     rowCount = 2,
     columnCount = 2,
     renderSpecs = listOf(
