@@ -6,6 +6,12 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.util.Matrix
 import java.awt.Color
 
+/**
+ * The reason this class exists is because we need to render the QR code to the PDF in the CMYK color space.
+ *
+ * The default image generation mechanism does not support rendering as CMYK, so we read the BitMatrix from Zxing and
+ * manually draw lines as required to render the QR code on the PDF.
+ **/
 class RenderBitMatrixOnPdContentStream(bitMatrix: BitMatrix, private val matrixScale: Float = 1F) {
   val lines: List<Line>
 
