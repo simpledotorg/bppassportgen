@@ -10,7 +10,8 @@ buildscript {
       strikt       : '0.19.7',
       approvaltests: '4.0.2',
       guava        : '28.1-jre',
-      jackson      : '2.10.0'
+      jackson      : '2.10.0',
+      mobius       : '1.5.6'
   ]
 }
 
@@ -59,12 +60,15 @@ dependencies {
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$versions.jackson"
   // TODO: Comment this dependency when generating CLI jar
   implementation compose.desktop.currentOs
+  implementation "com.spotify.mobius:mobius-core:$versions.mobius"
+  implementation "com.spotify.mobius:mobius-rx2:$versions.mobius"
 
   testImplementation "junit:junit:$versions.junit"
   testImplementation "pl.pragmatists:JUnitParams:$versions.JUnitParams"
   testImplementation "io.strikt:strikt-core:$versions.strikt"
   testImplementation "com.approvaltests:approvaltests:$versions.approvaltests"
   testImplementation "com.google.guava:guava:$versions.guava"
+  testImplementation "com.spotify.mobius:mobius-test:$versions.mobius"
 }
 
 compileKotlin {
