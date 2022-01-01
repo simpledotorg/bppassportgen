@@ -1,3 +1,5 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
 buildscript {
   ext.versions = [
       shadow       : '5.0.0',
@@ -15,17 +17,34 @@ buildscript {
 plugins {
   id 'com.github.johnrengelman.shadow' version "5.0.0"
   id 'org.jetbrains.kotlin.jvm' version "1.6.10"
-  id 'application'
+  // TODO: Comment this plugin when generating CLI
+  id 'org.jetbrains.compose' version '1.0.1'
+  // TODO: Uncomment this plugin when generating CLI
+//  id 'application'
 }
 
-application {
-  mainClassName = 'org.simple.bppassportgen.AppKt'
+// TODO: Uncomment this block when generating CLI jar
+//application {
+//  mainClassName = 'org.simple.bppassportgen.AppKt'
+//}
+
+// TODO: Comment this block when generating CLI jar
+compose.desktop {
+  application {
+    mainClass = "org.simple.bppassportgen.AppKt"
+    nativeDistributions {
+      targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+      packageName = "BP Passport Generator"
+      packageVersion = "1.2.3"
+    }
+  }
 }
 
-group 'org.simple'
-version '1.2.3'
+//group 'org.simple'
+//version '1.2.3'
 
 repositories {
+  google()
   mavenCentral()
   jcenter()
 }
@@ -38,6 +57,8 @@ dependencies {
   implementation "org.apache.pdfbox:pdfbox:$versions.pdfbox"
   implementation "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$versions.jackson"
+  // TODO: Comment this dependency when generating CLI jar
+  implementation compose.desktop.currentOs
 
   testImplementation "junit:junit:$versions.junit"
   testImplementation "pl.pragmatists:JUnitParams:$versions.JUnitParams"

@@ -1,2 +1,8 @@
-rootProject.name = 'bppassportgen'
+pluginManagement {
+  repositories {
+    google()
+    gradlePluginPortal()
+  }
+}
 
+rootProject.name = 'bppassportgen'
