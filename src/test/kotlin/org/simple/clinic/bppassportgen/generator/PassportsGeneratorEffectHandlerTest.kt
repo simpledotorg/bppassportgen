@@ -8,6 +8,7 @@ import org.simple.bppassportgen.PassportsGenerator
 import org.simple.bppassportgen.generator.GenerateBpPassports
 import org.simple.bppassportgen.generator.PassportsGenerated
 import org.simple.bppassportgen.generator.PassportsGeneratorEffectHandler
+import org.simple.clinic.bppassportgen.scheduler.TestSchedulersProvider
 import org.simple.clinic.bppassportgen.util.EffectHandlerTestCase
 import java.io.File
 import java.util.UUID
@@ -16,8 +17,10 @@ class PassportsGeneratorEffectHandlerTest {
 
   private val passportsGenerator = mock<PassportsGenerator>()
 
-  private val effectHandler = PassportsGeneratorEffectHandler(passportsGenerator)
-      .build()
+  private val effectHandler = PassportsGeneratorEffectHandler(
+      passportsGenerator = passportsGenerator,
+      schedulersProvider = TestSchedulersProvider()
+  ).build()
   private val effectHandlerTestCase = EffectHandlerTestCase(effectHandler)
 
   @Test
