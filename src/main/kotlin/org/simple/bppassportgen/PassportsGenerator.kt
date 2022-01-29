@@ -27,20 +27,21 @@ class PassportsGenerator(
     private val ioThreadPool: ExecutorService = Executors.newCachedThreadPool(),
     private val progressPoll: ProgressPoll = RealProgressPoll(Duration.ofSeconds(1)),
     private val consolePrinter: ConsolePrinter = RealConsolePrinter(),
-    private val templateFilePath: String,
-    private val outDirectory: File,
-    private val rowCount: Int,
-    private val columnCount: Int,
     private val fonts: Map<String, String>,
     private val renderSpecs: List<RenderableSpec>,
     private val colorMap: Map<String, PDColor>
 ) {
 
-  fun run(uuidsToGenerate: List<UUID>) {
-
+  fun run(
+      uuidsToGenerate: List<UUID>,
+      rowCount: Int,
+      columnCount: Int,
+      templateFilePath: String,
+      outputDirectory: File
+  ) {
     val mergeCount = rowCount * columnCount
 
-    outDirectory.mkdirs()
+    outputDirectory.mkdirs()
 
     val pdfTemplateFile = File(templateFilePath)
     val pdfInputBytes = pdfTemplateFile.readBytes()
@@ -96,7 +97,7 @@ class PassportsGenerator(
                 output = output,
                 taskNumber = taskNumber,
                 totalSize = uuidBatches.size,
-                directory = outDirectory
+                directory = outputDirectory
             )
           }
           .forEach {

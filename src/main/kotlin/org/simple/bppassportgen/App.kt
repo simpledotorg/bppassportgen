@@ -71,14 +71,16 @@ fun main(args: Array<String>) {
       ))
 
       PassportsGenerator(
-          templateFilePath = templateFilePath,
-          outDirectory = outDirectory,
+          fonts = fonts,
+          renderSpecs = renderSpecs,
+          colorMap = colors
+      ).run(
+          uuidsToGenerate = uuidsToGenerate,
           rowCount = rowCount,
           columnCount = columnCount,
-          renderSpecs = renderSpecs,
-          fonts = fonts,
-          colorMap = colors
-      ).run(uuidsToGenerate = uuidsToGenerate)
+          templateFilePath = templateFilePath,
+          outputDirectory = outDirectory
+      )
     }
   }
 }

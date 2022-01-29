@@ -19,15 +19,12 @@ import java.io.File
 import java.nio.file.Paths
 
 abstract class VerifyTestBase(
-    private val templateFilePath: String,
-    private val rowCount: Int,
-    private val columnCount: Int,
     private val renderSpecs: List<RenderableSpec>,
     private val fonts: Map<String, String>,
     private val colors: Map<String, PDColor>
 ) {
   private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
-  private val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
+  internal val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
 
   protected val passportsGenerator: PassportsGenerator by lazy {
     PassportsGenerator(
@@ -35,12 +32,8 @@ abstract class VerifyTestBase(
         ioThreadPool = MoreExecutors.newDirectExecutorService(),
         progressPoll = NoOpProgressPoll(),
         consolePrinter = NoOpConsolePrinter(),
-        templateFilePath = templateFilePath,
-        outDirectory = outputDirectory,
-        rowCount = rowCount,
-        columnCount = columnCount,
-        renderSpecs = renderSpecs,
         fonts = fonts,
+        renderSpecs = renderSpecs,
         colorMap = colors
     )
   }

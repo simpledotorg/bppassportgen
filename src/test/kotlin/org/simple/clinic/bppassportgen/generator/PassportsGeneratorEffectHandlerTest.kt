@@ -8,6 +8,7 @@ import org.simple.bppassportgen.generator.GenerateBpPassports
 import org.simple.bppassportgen.generator.PassportsGenerated
 import org.simple.bppassportgen.generator.PassportsGeneratorEffectHandler
 import org.simple.clinic.bppassportgen.util.EffectHandlerTestCase
+import java.io.File
 import java.util.UUID
 
 class PassportsGeneratorEffectHandlerTest {
@@ -37,7 +38,13 @@ class PassportsGeneratorEffectHandlerTest {
     ))
 
     // then
-    verify(passportsGenerator).run(uuidsToGenerate)
+    verify(passportsGenerator).run(
+        uuidsToGenerate = uuidsToGenerate,
+        rowCount = 2,
+        columnCount = 2,
+        templateFilePath = "/template-file.pdf",
+        outputDirectory = File("/passports")
+    )
 
     effectHandlerTestCase.assertOutgoingEvents(PassportsGenerated)
   }

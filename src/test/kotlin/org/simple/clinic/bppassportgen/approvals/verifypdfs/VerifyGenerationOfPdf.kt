@@ -27,9 +27,6 @@ private const val RED_CMYK = "red_cmyk"
 private const val BLUE_CMYK = "blue_cmyk"
 
 class VerifyGenerationOfPdf : VerifyTestBase(
-    templateFilePath = resourceFilePath("blank.pdf"),
-    rowCount = 2,
-    columnCount = 2,
     renderSpecs = listOf(
         RenderableSpec(
             pageNumber = 0,
@@ -67,7 +64,13 @@ class VerifyGenerationOfPdf : VerifyTestBase(
 
   @Test
   fun `verify generation of PDFs`() {
-    passportsGenerator.run(readUuids("uuids_pdfs.txt"))
+    passportsGenerator.run(
+        uuidsToGenerate = readUuids("uuids_pdfs.txt"),
+        rowCount = 2,
+        columnCount = 2,
+        templateFilePath = resourceFilePath("blank.pdf"),
+        outputDirectory = outputDirectory
+    )
 
     runApprovals(8) { pdfNumber, pageNumber: Int -> "bp pdf $pdfNumber.$pageNumber" }
   }
