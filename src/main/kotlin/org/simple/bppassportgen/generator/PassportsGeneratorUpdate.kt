@@ -1,6 +1,7 @@
 package org.simple.bppassportgen.generator
 
 import com.spotify.mobius.Next
+import com.spotify.mobius.Next.dispatch
 import com.spotify.mobius.Next.next
 import com.spotify.mobius.Next.noChange
 import com.spotify.mobius.Update
@@ -17,6 +18,13 @@ class PassportsGeneratorUpdate : Update<PassportsGeneratorModel, PassportsGenera
       is NumberOfPassportsChanged -> next(model.numberOfPassportChanged(event.numberOfPassports))
       is RowCountChanged -> next(model.rowCountChanged(event.rowCount))
       is ColumnCountChanged -> next(model.columnCountChanged(event.columnCount))
+      GeneratePassportsButtonClicked -> dispatch(setOf(GenerateBpPassports(
+          templateFilePath = model.templateFilePath!!,
+          outputDirectoryPath = model.outputDirectoryPath!!,
+          numberOfPassports = model.numberOfPassports!!,
+          rowCount = model.rowCount!!,
+          columnCount = model.columnCount!!
+      )))
     }
   }
 }

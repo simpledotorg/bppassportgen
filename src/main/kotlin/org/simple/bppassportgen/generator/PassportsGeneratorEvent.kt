@@ -15,3 +15,5 @@ data class NumberOfPassportsChanged(val numberOfPassports: Int) : PassportsGener
 data class RowCountChanged(val rowCount: Int) : PassportsGeneratorEvent()
 
 data class ColumnCountChanged(val columnCount: Int) : PassportsGeneratorEvent()
+
+object GeneratePassportsButtonClicked : PassportsGeneratorEvent()
