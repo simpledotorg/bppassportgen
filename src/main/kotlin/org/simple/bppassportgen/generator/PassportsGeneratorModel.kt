@@ -3,14 +3,16 @@ package org.simple.bppassportgen.generator
 data class PassportsGeneratorModel(
     val generatorType: GeneratorType,
     val templateFilePath: String?,
-    val outputDirectoryPath: String?
+    val outputDirectoryPath: String?,
+    val numberOfPassports: Int?
 ) {
 
   companion object {
     fun create() = PassportsGeneratorModel(
         generatorType = GeneratorType.Passport,
         templateFilePath = null,
-        outputDirectoryPath = null
+        outputDirectoryPath = null,
+        numberOfPassports = null
     )
   }
 
@@ -24,5 +26,9 @@ data class PassportsGeneratorModel(
 
   fun outputDirectorySelected(outputDirectoryPath: String): PassportsGeneratorModel {
     return copy(outputDirectoryPath = outputDirectoryPath)
+  }
+
+  fun numberOfPassportChanged(numberOfPassports: Int): PassportsGeneratorModel {
+    return copy(numberOfPassports = numberOfPassports)
   }
 }
