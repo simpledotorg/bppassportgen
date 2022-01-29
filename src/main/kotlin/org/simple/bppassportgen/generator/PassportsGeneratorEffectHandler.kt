@@ -4,6 +4,7 @@ import com.spotify.mobius.rx2.RxMobius
 import io.reactivex.ObservableTransformer
 import org.simple.bppassportgen.PassportsGenerator
 import java.io.File
+import java.util.UUID
 
 class PassportsGeneratorEffectHandler(
     private val passportsGenerator: PassportsGenerator
@@ -20,8 +21,9 @@ class PassportsGeneratorEffectHandler(
     return ObservableTransformer { effects ->
       effects
           .doOnNext { effect ->
+            val uuidsToGenerate = (0 until effect.numberOfPassports).map { UUID.randomUUID() }
             passportsGenerator.run(
-                uuidsToGenerate = effect.uuidsToGenerate,
+                uuidsToGenerate = uuidsToGenerate,
                 rowCount = effect.rowCount,
                 columnCount = effect.columnCount,
                 templateFilePath = effect.templateFilePath,

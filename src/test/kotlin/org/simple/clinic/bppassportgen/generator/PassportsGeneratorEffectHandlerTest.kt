@@ -1,6 +1,7 @@
 package org.simple.clinic.bppassportgen.generator
 
 import org.junit.Test
+import org.mockito.Mockito
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.simple.bppassportgen.PassportsGenerator
@@ -22,24 +23,24 @@ class PassportsGeneratorEffectHandlerTest {
   @Test
   fun `when generate bp passports effect is received, then generate the passports`() {
     // given
-    val uuidsToGenerate = listOf(
-        UUID.fromString("b6bf0aaf-960e-4389-b683-790cf960933d"),
-        UUID.fromString("1c287cdf-7439-41a6-807f-c015a8d39fca"),
-        UUID.fromString("67710382-cc4d-4b1e-91ac-2ec4594d42ce")
-    )
+    val uuid = UUID.fromString("b6bf0aaf-960e-4389-b683-790cf960933d")
+
+    Mockito.mockStatic(UUID::class.java)
+        .`when`<UUID>(UUID::randomUUID)
+        .thenReturn(uuid)
 
     // when
     effectHandlerTestCase.dispatch(GenerateBpPassports(
         templateFilePath = "/template-file.pdf",
         outputDirectoryPath = "/passports",
+        numberOfPassports = 1,
         rowCount = 2,
-        columnCount = 2,
-        uuidsToGenerate = uuidsToGenerate
+        columnCount = 2
     ))
 
     // then
     verify(passportsGenerator).run(
-        uuidsToGenerate = uuidsToGenerate,
+        uuidsToGenerate = listOf(uuid),
         rowCount = 2,
         columnCount = 2,
         templateFilePath = "/template-file.pdf",
