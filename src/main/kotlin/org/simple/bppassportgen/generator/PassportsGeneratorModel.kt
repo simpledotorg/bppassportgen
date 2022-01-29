@@ -4,7 +4,8 @@ data class PassportsGeneratorModel(
     val generatorType: GeneratorType,
     val templateFilePath: String?,
     val outputDirectoryPath: String?,
-    val numberOfPassports: Int?
+    val numberOfPassports: Int?,
+    val rowCount: Int?
 ) {
 
   companion object {
@@ -12,7 +13,8 @@ data class PassportsGeneratorModel(
         generatorType = GeneratorType.Passport,
         templateFilePath = null,
         outputDirectoryPath = null,
-        numberOfPassports = null
+        numberOfPassports = null,
+        rowCount = null
     )
   }
 
@@ -30,5 +32,9 @@ data class PassportsGeneratorModel(
 
   fun numberOfPassportChanged(numberOfPassports: Int): PassportsGeneratorModel {
     return copy(numberOfPassports = numberOfPassports)
+  }
+
+  fun rowCountChanged(rowCount: Int): PassportsGeneratorModel {
+    return copy(rowCount = rowCount)
   }
 }
