@@ -11,6 +11,7 @@ import org.simple.bppassportgen.generator.NumberOfPassportsChanged
 import org.simple.bppassportgen.generator.OutputDirectorySelected
 import org.simple.bppassportgen.generator.PassportsGeneratorModel
 import org.simple.bppassportgen.generator.PassportsGeneratorUpdate
+import org.simple.bppassportgen.generator.RowCountChanged
 import org.simple.bppassportgen.generator.TemplateFileSelected
 
 class PassportsGeneratorUpdateTest {
@@ -62,6 +63,17 @@ class PassportsGeneratorUpdateTest {
         .whenEvent(NumberOfPassportsChanged(10))
         .then(assertThatNext(
             hasModel(defaultModel.numberOfPassportChanged(10)),
+            hasNoEffects()
+        ))
+  }
+
+  @Test
+  fun `when row count is changed, then update the model`() {
+    updateSpec
+        .given(defaultModel)
+        .whenEvent(RowCountChanged(2))
+        .then(assertThatNext(
+            hasModel(defaultModel.rowCountChanged(2)),
             hasNoEffects()
         ))
   }

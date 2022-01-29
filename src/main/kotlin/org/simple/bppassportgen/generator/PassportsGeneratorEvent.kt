@@ -11,3 +11,5 @@ data class TemplateFileSelected(val templateFilePath: String) : PassportsGenerat
 data class OutputDirectorySelected(val outputDirectoryPath: String) : PassportsGeneratorEvent()
 
 data class NumberOfPassportsChanged(val numberOfPassports: Int) : PassportsGeneratorEvent()
+
+data class RowCountChanged(val rowCount: Int) : PassportsGeneratorEvent()
