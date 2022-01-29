@@ -7,6 +7,7 @@ import com.spotify.mobius.test.UpdateSpec.assertThatNext
 import org.junit.Test
 import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.generator.GeneratorTypeChanged
+import org.simple.bppassportgen.generator.NumberOfPassportsChanged
 import org.simple.bppassportgen.generator.OutputDirectorySelected
 import org.simple.bppassportgen.generator.PassportsGeneratorModel
 import org.simple.bppassportgen.generator.PassportsGeneratorUpdate
@@ -50,6 +51,17 @@ class PassportsGeneratorUpdateTest {
         .whenEvent(OutputDirectorySelected(outputDirectoryPath))
         .then(assertThatNext(
             hasModel(defaultModel.outputDirectorySelected(outputDirectoryPath)),
+            hasNoEffects()
+        ))
+  }
+
+  @Test
+  fun `when the number of passports count is changed, then update the model`() {
+    updateSpec
+        .given(defaultModel)
+        .whenEvent(NumberOfPassportsChanged(10))
+        .then(assertThatNext(
+            hasModel(defaultModel.numberOfPassportChanged(10)),
             hasNoEffects()
         ))
   }

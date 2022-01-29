@@ -14,6 +14,7 @@ class PassportsGeneratorUpdate : Update<PassportsGeneratorModel, PassportsGenera
       PassportsGenerated -> noChange()
       is TemplateFileSelected -> next(model.templateFileSelected(event.templateFilePath))
       is OutputDirectorySelected -> next(model.outputDirectorySelected(event.outputDirectoryPath))
+      is NumberOfPassportsChanged -> next(model.numberOfPassportChanged(event.numberOfPassports))
     }
   }
 }

@@ -9,3 +9,5 @@ data class GeneratorTypeChanged(val generatorType: GeneratorType) : PassportsGen
 data class TemplateFileSelected(val templateFilePath: String) : PassportsGeneratorEvent()
 
 data class OutputDirectorySelected(val outputDirectoryPath: String) : PassportsGeneratorEvent()
+
+data class NumberOfPassportsChanged(val numberOfPassports: Int) : PassportsGeneratorEvent()
