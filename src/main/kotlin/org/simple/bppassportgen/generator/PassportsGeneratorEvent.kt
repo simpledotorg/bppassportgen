@@ -13,3 +13,5 @@ data class OutputDirectorySelected(val outputDirectoryPath: String) : PassportsG
 data class NumberOfPassportsChanged(val numberOfPassports: Int) : PassportsGeneratorEvent()
 
 data class RowCountChanged(val rowCount: Int) : PassportsGeneratorEvent()
+
+data class ColumnCountChanged(val columnCount: Int) : PassportsGeneratorEvent()
