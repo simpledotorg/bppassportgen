@@ -7,6 +7,7 @@ import com.spotify.mobius.test.UpdateSpec.assertThatNext
 import org.junit.Test
 import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.generator.GeneratorTypeChanged
+import org.simple.bppassportgen.generator.OutputDirectorySelected
 import org.simple.bppassportgen.generator.PassportsGeneratorModel
 import org.simple.bppassportgen.generator.PassportsGeneratorUpdate
 import org.simple.bppassportgen.generator.TemplateFileSelected
@@ -36,6 +37,19 @@ class PassportsGeneratorUpdateTest {
         .whenEvent(TemplateFileSelected(templateFilePath))
         .then(assertThatNext(
             hasModel(defaultModel.templateFileSelected(templateFilePath)),
+            hasNoEffects()
+        ))
+  }
+
+  @Test
+  fun `when the output director is selected, then update the model`() {
+    val outputDirectoryPath = "/passports"
+
+    updateSpec
+        .given(defaultModel)
+        .whenEvent(OutputDirectorySelected(outputDirectoryPath))
+        .then(assertThatNext(
+            hasModel(defaultModel.outputDirectorySelected(outputDirectoryPath)),
             hasNoEffects()
         ))
   }

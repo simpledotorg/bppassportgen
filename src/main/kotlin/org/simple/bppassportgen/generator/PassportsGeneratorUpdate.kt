@@ -13,6 +13,7 @@ class PassportsGeneratorUpdate : Update<PassportsGeneratorModel, PassportsGenera
       // TODO (SM): Reset state once passports are generator progress state
       PassportsGenerated -> noChange()
       is TemplateFileSelected -> next(model.templateFileSelected(event.templateFilePath))
+      is OutputDirectorySelected -> next(model.outputDirectorySelected(event.outputDirectoryPath))
     }
   }
 }
