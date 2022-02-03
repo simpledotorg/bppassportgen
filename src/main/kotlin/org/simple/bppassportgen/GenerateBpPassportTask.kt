@@ -10,7 +10,7 @@ class GenerateBpPassportTask(
     private val rowCount: Int,
     private val columnCount: Int,
     private val pageSpecs: List<List<PageSpec>>,
-    private val openedDocument: OpenedDocument
+    private val documentFactory: PdDocumentFactory
 ) : Callable<Output> {
 
   override fun call(): Output {
@@ -18,6 +18,7 @@ class GenerateBpPassportTask(
   }
 
   private fun generatePages(): Output {
+    val openedDocument = documentFactory.emptyDocument()
     val sourceDocument = PDDocument.load(pdfBytes)
 
     pageSpecs

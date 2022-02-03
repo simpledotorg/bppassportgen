@@ -140,8 +140,6 @@ class App(
 
     uuidBatches
         .mapIndexed { index, uuidBatch ->
-          val openedDocument = documentFactory.emptyDocument()
-
           val pageSpecs = uuidBatch
               .map { uuidsInEachPage ->
                 uuidsInEachPage.map { uuid ->
@@ -154,8 +152,8 @@ class App(
               pdfInputBytes = pdfInputBytes,
               rowCount = rowCount,
               columnCount = columnCount,
-              openedDocument = openedDocument,
-              pageSpecs = pageSpecs
+              pageSpecs = pageSpecs,
+              documentFactory = documentFactory
           )
 
           task to index + 1
@@ -229,15 +227,15 @@ class App(
       pdfInputBytes: ByteArray,
       rowCount: Int,
       columnCount: Int,
-      openedDocument: OpenedDocument,
-      pageSpecs: List<List<PageSpec>>
+      pageSpecs: List<List<PageSpec>>,
+      documentFactory: PdDocumentFactory
   ): Callable<Output> {
     return GenerateBpPassportTask(
         pdfBytes = pdfInputBytes,
         rowCount = rowCount,
         columnCount = columnCount,
         pageSpecs = pageSpecs,
-        openedDocument = openedDocument
+        documentFactory = documentFactory
     )
   }
 }
