@@ -6,7 +6,7 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.approvaltests.Approvals
 import org.approvaltests.namer.NamerFactory
 import org.junit.Before
-import org.simple.bppassportgen.App
+import org.simple.bppassportgen.PassportsGenerator
 import org.simple.bppassportgen.RenderableSpec
 import org.simple.clinic.bppassportgen.SavePdfToImage
 import org.simple.clinic.bppassportgen.util.ImageApprover
@@ -19,28 +19,21 @@ import java.io.File
 import java.nio.file.Paths
 
 abstract class VerifyTestBase(
-    private val templateFilePath: String,
-    private val rowCount: Int,
-    private val columnCount: Int,
     private val renderSpecs: List<RenderableSpec>,
     private val fonts: Map<String, String>,
     private val colors: Map<String, PDColor>
 ) {
   private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
-  private val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
+  internal val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
 
-  protected val app: App by lazy {
-    App(
+  protected val passportsGenerator: PassportsGenerator by lazy {
+    PassportsGenerator(
         computationThreadPool = MoreExecutors.newDirectExecutorService(),
         ioThreadPool = MoreExecutors.newDirectExecutorService(),
         progressPoll = NoOpProgressPoll(),
         consolePrinter = NoOpConsolePrinter(),
-        templateFilePath = templateFilePath,
-        outDirectory = outputDirectory,
-        rowCount = rowCount,
-        columnCount = columnCount,
-        renderSpecs = renderSpecs,
         fonts = fonts,
+        renderSpecs = renderSpecs,
         colorMap = colors
     )
   }
