@@ -6,7 +6,7 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.approvaltests.Approvals
 import org.approvaltests.namer.NamerFactory
 import org.junit.Before
-import org.simple.bppassportgen.App
+import org.simple.bppassportgen.PassportsGenerator
 import org.simple.bppassportgen.RenderableSpec
 import org.simple.clinic.bppassportgen.SavePdfToImage
 import org.simple.clinic.bppassportgen.util.ImageApprover
@@ -29,8 +29,8 @@ abstract class VerifyTestBase(
   private val bpPassportGenerationDirectoryName = "org.simple.bppassportgen.approvals_gen"
   private val outputDirectory: File = Paths.get(System.getProperty("java.io.tmpdir"), bpPassportGenerationDirectoryName).toFile()
 
-  protected val app: App by lazy {
-    App(
+  protected val passportsGenerator: PassportsGenerator by lazy {
+    PassportsGenerator(
         computationThreadPool = MoreExecutors.newDirectExecutorService(),
         ioThreadPool = MoreExecutors.newDirectExecutorService(),
         progressPoll = NoOpProgressPoll(),

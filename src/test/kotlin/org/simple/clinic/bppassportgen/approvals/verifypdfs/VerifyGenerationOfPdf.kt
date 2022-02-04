@@ -67,7 +67,7 @@ class VerifyGenerationOfPdf : VerifyTestBase(
 
   @Test
   fun `verify generation of PDFs`() {
-    app.run(readUuids("uuids_pdfs.txt"))
+    passportsGenerator.run(readUuids("uuids_pdfs.txt"))
 
     runApprovals(8) { pdfNumber, pageNumber: Int -> "bp pdf $pdfNumber.$pageNumber" }
   }
