@@ -1,4 +1,4 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+//import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 buildscript {
   ext.versions = [
@@ -20,27 +20,27 @@ plugins {
   id 'com.github.johnrengelman.shadow' version "5.0.0"
   id 'org.jetbrains.kotlin.jvm' version "1.6.10"
   // TODO: Comment this plugin when generating CLI
-  id 'org.jetbrains.compose' version '1.0.1'
+//  id 'org.jetbrains.compose' version '1.0.1'
   // TODO: Uncomment this plugin when generating CLI
-//  id 'application'
+  id 'application'
 }
 
 // TODO: Uncomment this block when generating CLI jar
-//application {
-//  mainClassName = 'org.simple.bppassportgen.AppKt'
-//}
+application {
+  mainClassName = 'org.simple.bppassportgen.AppKt'
+}
 
 // TODO: Comment this block when generating CLI jar
-compose.desktop {
-  application {
-    mainClass = "org.simple.bppassportgen.AppKt"
-    nativeDistributions {
-      targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-      packageName = "BP Passport Generator"
-      packageVersion = "1.2.3"
-    }
-  }
-}
+//compose.desktop {
+//  application {
+//    mainClass = "org.simple.bppassportgen.AppKt"
+//    nativeDistributions {
+//      targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+//      packageName = "BP Passport Generator"
+//      packageVersion = "1.2.3"
+//    }
+//  }
+//}
 
 //group 'org.simple'
 //version '1.2.3'
@@ -60,7 +60,7 @@ dependencies {
   implementation "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$versions.jackson"
   // TODO: Comment this dependency when generating CLI jar
-  implementation compose.desktop.currentOs
+//  implementation compose.desktop.currentOs
   implementation "com.spotify.mobius:mobius-core:$versions.mobius"
   implementation "com.spotify.mobius:mobius-rx2:$versions.mobius"
 
