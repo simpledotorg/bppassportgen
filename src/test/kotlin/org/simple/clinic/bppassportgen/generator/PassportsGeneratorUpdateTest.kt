@@ -7,16 +7,16 @@ import com.spotify.mobius.test.NextMatchers.hasNoModel
 import com.spotify.mobius.test.UpdateSpec
 import com.spotify.mobius.test.UpdateSpec.assertThatNext
 import org.junit.Test
-import org.simple.bppassportgen.generator.ColumnCountChanged
 import org.simple.bppassportgen.generator.GenerateBpPassports
 import org.simple.bppassportgen.generator.GeneratePassportsButtonClicked
 import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.generator.GeneratorTypeChanged
 import org.simple.bppassportgen.generator.NumberOfPassportsChanged
 import org.simple.bppassportgen.generator.OutputDirectorySelected
+import org.simple.bppassportgen.generator.PageSize
+import org.simple.bppassportgen.generator.PageSizeChanged
 import org.simple.bppassportgen.generator.PassportsGeneratorModel
 import org.simple.bppassportgen.generator.PassportsGeneratorUpdate
-import org.simple.bppassportgen.generator.RowCountChanged
 import org.simple.bppassportgen.generator.TemplateFileSelected
 
 class PassportsGeneratorUpdateTest {
@@ -73,36 +73,13 @@ class PassportsGeneratorUpdateTest {
   }
 
   @Test
-  fun `when row count is changed, then update the model`() {
-    updateSpec
-        .given(defaultModel)
-        .whenEvent(RowCountChanged(2))
-        .then(assertThatNext(
-            hasModel(defaultModel.rowCountChanged(2)),
-            hasNoEffects()
-        ))
-  }
-
-  @Test
-  fun `when column count is changed, then update the model`() {
-    updateSpec
-        .given(defaultModel)
-        .whenEvent(ColumnCountChanged(2))
-        .then(assertThatNext(
-            hasModel(defaultModel.columnCountChanged(2)),
-            hasNoEffects()
-        ))
-  }
-
-  @Test
   fun `when generate passports button is clicked, then generate the passports`() {
     val model = defaultModel
         .generatorTypeChanged(GeneratorType.Passport)
         .templateFileSelected("/template.pdf")
         .outputDirectorySelected("/output")
         .numberOfPassportChanged(10)
-        .rowCountChanged(2)
-        .columnCountChanged(2)
+        .pageSizeChanged(PageSize.A4)
 
     updateSpec
         .given(model)
@@ -113,9 +90,20 @@ class PassportsGeneratorUpdateTest {
                 templateFilePath = "/template.pdf",
                 outputDirectoryPath = "/output",
                 numberOfPassports = 10,
-                rowCount = 2,
+                rowCount = 1,
                 columnCount = 2
             ))
         ))
+  }
+
+  @Test
+  fun `when page size is changed, then update the model`() {
+    updateSpec
+      .given(defaultModel)
+      .whenEvent(PageSizeChanged(PageSize.A2))
+      .then(assertThatNext(
+        hasModel(defaultModel.pageSizeChanged(PageSize.A2)),
+        hasNoEffects()
+      ))
   }
 }
