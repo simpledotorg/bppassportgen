@@ -25,6 +25,7 @@ class PassportsGeneratorUpdate : Update<PassportsGeneratorModel, PassportsGenera
           rowCount = model.rowCount!!,
           columnCount = model.columnCount!!
       )))
+      is PageSizeChanged -> next(model.pageSizeChanged(event.pageSize))
     }
   }
 }

@@ -14,6 +14,8 @@ import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.generator.GeneratorTypeChanged
 import org.simple.bppassportgen.generator.NumberOfPassportsChanged
 import org.simple.bppassportgen.generator.OutputDirectorySelected
+import org.simple.bppassportgen.generator.PageSize
+import org.simple.bppassportgen.generator.PageSizeChanged
 import org.simple.bppassportgen.generator.PassportsGeneratorModel
 import org.simple.bppassportgen.generator.PassportsGeneratorUpdate
 import org.simple.bppassportgen.generator.RowCountChanged
@@ -117,5 +119,16 @@ class PassportsGeneratorUpdateTest {
                 columnCount = 2
             ))
         ))
+  }
+
+  @Test
+  fun `when page size is changed, then update the model`() {
+    updateSpec
+      .given(defaultModel)
+      .whenEvent(PageSizeChanged(PageSize.A2))
+      .then(assertThatNext(
+        hasModel(defaultModel.pageSizeChanged(PageSize.A2)),
+        hasNoEffects()
+      ))
   }
 }

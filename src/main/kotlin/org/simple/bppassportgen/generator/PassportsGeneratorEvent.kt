@@ -17,3 +17,5 @@ data class RowCountChanged(val rowCount: Int) : PassportsGeneratorEvent()
 data class ColumnCountChanged(val columnCount: Int) : PassportsGeneratorEvent()
 
 object GeneratePassportsButtonClicked : PassportsGeneratorEvent()
+
+data class PageSizeChanged(val pageSize: PageSize) : PassportsGeneratorEvent()
