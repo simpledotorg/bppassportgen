@@ -79,8 +79,7 @@ class PassportsGeneratorUpdateTest {
         .templateFileSelected("/template.pdf")
         .outputDirectorySelected("/output")
         .numberOfPassportChanged(10)
-        .rowCountChanged(2)
-        .columnCountChanged(2)
+        .pageSizeChanged(PageSize.A4)
 
     updateSpec
         .given(model)
@@ -91,7 +90,7 @@ class PassportsGeneratorUpdateTest {
                 templateFilePath = "/template.pdf",
                 outputDirectoryPath = "/output",
                 numberOfPassports = 10,
-                rowCount = 2,
+                rowCount = 1,
                 columnCount = 2
             ))
         ))

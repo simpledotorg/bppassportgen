@@ -20,8 +20,8 @@ class PassportsGeneratorUpdate : Update<PassportsGeneratorModel, PassportsGenera
           templateFilePath = model.templateFilePath!!,
           outputDirectoryPath = model.outputDirectoryPath!!,
           numberOfPassports = model.numberOfPassports!!,
-          rowCount = model.rowCount!!,
-          columnCount = model.columnCount!!
+          rowCount = model.pageSize.rows,
+          columnCount = model.pageSize.columns
       )))
       is PageSizeChanged -> next(model.pageSizeChanged(event.pageSize))
     }
