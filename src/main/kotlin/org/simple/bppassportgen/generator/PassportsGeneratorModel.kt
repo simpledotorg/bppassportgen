@@ -5,8 +5,6 @@ data class PassportsGeneratorModel(
   val templateFilePath: String?,
   val outputDirectoryPath: String?,
   val numberOfPassports: Int?,
-  val rowCount: Int?,
-  val columnCount: Int?,
   val pageSize: PageSize
 ) {
 
@@ -16,8 +14,6 @@ data class PassportsGeneratorModel(
       templateFilePath = null,
       outputDirectoryPath = null,
       numberOfPassports = null,
-      rowCount = null,
-      columnCount = null,
       pageSize = PageSize.A4
     )
   }
@@ -36,14 +32,6 @@ data class PassportsGeneratorModel(
 
   fun numberOfPassportChanged(numberOfPassports: Int): PassportsGeneratorModel {
     return copy(numberOfPassports = numberOfPassports)
-  }
-
-  fun rowCountChanged(rowCount: Int): PassportsGeneratorModel {
-    return copy(rowCount = rowCount)
-  }
-
-  fun columnCountChanged(columnCount: Int): PassportsGeneratorModel {
-    return copy(columnCount = columnCount)
   }
 
   fun pageSizeChanged(pageSize: PageSize): PassportsGeneratorModel {
