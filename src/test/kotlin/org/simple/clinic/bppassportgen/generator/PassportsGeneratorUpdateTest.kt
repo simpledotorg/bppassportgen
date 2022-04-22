@@ -7,7 +7,6 @@ import com.spotify.mobius.test.NextMatchers.hasNoModel
 import com.spotify.mobius.test.UpdateSpec
 import com.spotify.mobius.test.UpdateSpec.assertThatNext
 import org.junit.Test
-import org.simple.bppassportgen.generator.ColumnCountChanged
 import org.simple.bppassportgen.generator.GenerateBpPassports
 import org.simple.bppassportgen.generator.GeneratePassportsButtonClicked
 import org.simple.bppassportgen.generator.GeneratorType
@@ -69,17 +68,6 @@ class PassportsGeneratorUpdateTest {
         .whenEvent(NumberOfPassportsChanged(10))
         .then(assertThatNext(
             hasModel(defaultModel.numberOfPassportChanged(10)),
-            hasNoEffects()
-        ))
-  }
-
-  @Test
-  fun `when column count is changed, then update the model`() {
-    updateSpec
-        .given(defaultModel)
-        .whenEvent(ColumnCountChanged(2))
-        .then(assertThatNext(
-            hasModel(defaultModel.columnCountChanged(2)),
             hasNoEffects()
         ))
   }
