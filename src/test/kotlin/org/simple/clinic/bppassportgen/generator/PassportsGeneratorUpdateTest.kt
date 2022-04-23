@@ -9,11 +9,13 @@ import com.spotify.mobius.test.UpdateSpec.assertThatNext
 import org.junit.Test
 import org.simple.bppassportgen.generator.GenerateBpPassports
 import org.simple.bppassportgen.generator.GeneratePassportsButtonClicked
+import org.simple.bppassportgen.generator.GeneratorProgress
 import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.generator.GeneratorTypeChanged
 import org.simple.bppassportgen.generator.NumberOfPassportsChanged
 import org.simple.bppassportgen.generator.PageSize
 import org.simple.bppassportgen.generator.PageSizeChanged
+import org.simple.bppassportgen.generator.PassportsGenerated
 import org.simple.bppassportgen.generator.PassportsGeneratorModel
 import org.simple.bppassportgen.generator.PassportsGeneratorUpdate
 import org.simple.bppassportgen.generator.TemplateFileSelected
@@ -91,7 +93,7 @@ class PassportsGeneratorUpdateTest {
         .given(model)
         .whenEvent(GeneratePassportsButtonClicked("/output"))
         .then(assertThatNext(
-            hasNoModel(),
+            hasModel(model.generatorProgressChanged(GeneratorProgress.IN_PROGRESS)),
             hasEffects(GenerateBpPassports(
                 templateFilePath = "/template.pdf",
                 outputDirectoryPath = "/output",
@@ -120,6 +122,28 @@ class PassportsGeneratorUpdateTest {
           label = "A4",
           labelWithCount = "2 passports per page"
         ))),
+        hasNoEffects()
+      ))
+  }
+
+  @Test
+  fun `when passports are generated, then set the progress state to done`() {
+    val model = defaultModel
+      .generatorTypeChanged(GeneratorType.Passport)
+      .templateFileSelected("/template.pdf")
+      .numberOfPassportChanged(10)
+      .pageSizeChanged(PageSize(
+        rows = 1,
+        columns = 2,
+        label = "A4",
+        labelWithCount = "2 passports per page"
+      ))
+
+    updateSpec
+      .given(model)
+      .whenEvent(PassportsGenerated)
+      .then(assertThatNext(
+        hasModel(model.generatorProgressChanged(GeneratorProgress.DONE)),
         hasNoEffects()
       ))
   }
