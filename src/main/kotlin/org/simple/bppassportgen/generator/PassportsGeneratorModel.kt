@@ -19,7 +19,10 @@ data class PassportsGeneratorModel(
   }
 
   fun generatorTypeChanged(type: GeneratorType): PassportsGeneratorModel {
-    return copy(generatorType = type)
+    return copy(
+      generatorType = type,
+      pageSize = null
+    )
   }
 
   fun templateFileSelected(templateFilePath: String): PassportsGeneratorModel {

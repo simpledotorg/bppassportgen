@@ -36,6 +36,22 @@ class PassportsGeneratorUpdateTest {
   }
 
   @Test
+  fun `when generator type is changed, then update the generator type and reset page size`() {
+    updateSpec
+      .given(defaultModel.pageSizeChanged(pageSize = PageSize(
+        rows = 1,
+        columns = 2,
+        label = "A4",
+        labelWithCount = "2 passports per page"
+      )))
+      .whenEvent(GeneratorTypeChanged(GeneratorType.Sticker))
+      .then(assertThatNext(
+        hasModel(defaultModel.generatorTypeChanged(GeneratorType.Sticker)),
+        hasNoEffects()
+      ))
+  }
+
+  @Test
   fun `when the template file path is selected, then update the model`() {
     val templateFilePath = "/template.pdf"
 
