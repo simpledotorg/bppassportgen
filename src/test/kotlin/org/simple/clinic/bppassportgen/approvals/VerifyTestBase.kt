@@ -34,7 +34,6 @@ abstract class VerifyTestBase(
         progressPoll = NoOpProgressPoll(),
         consolePrinter = NoOpConsolePrinter(),
         fonts = fonts,
-        renderSpecs = renderSpecs,
         renderSpecProvider = TestRenderSpecProvider(),
         colorMap = colors
     )

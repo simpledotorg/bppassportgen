@@ -1,7 +1,6 @@
 package org.simple.bppassportgen
 
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
-import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.simple.bppassportgen.consoleprinter.ConsolePrinter
 import org.simple.bppassportgen.consoleprinter.RealConsolePrinter
@@ -30,7 +29,6 @@ class PassportsGenerator(
     private val progressPoll: ProgressPoll = RealProgressPoll(Duration.ofSeconds(1)),
     private val consolePrinter: ConsolePrinter = RealConsolePrinter(),
     private val fonts: Map<String, String>,
-    private val renderSpecs: List<RenderableSpec>,
     private val renderSpecProvider: RenderSpecProvider,
     private val colorMap: Map<String, PDColor>,
     private val pageCount: Int = 100
