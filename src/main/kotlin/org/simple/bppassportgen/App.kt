@@ -6,6 +6,8 @@ import org.apache.commons.cli.Options
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
+import org.simple.bppassportgen.generator.GeneratorType
+import org.simple.bppassportgen.renderable.RenderSpecProviderImpl
 import org.simple.bppassportgen.renderable.Renderable.Type.PassportQrCode
 import org.simple.bppassportgen.renderable.Renderable.Type.PassportShortcode
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
@@ -51,18 +53,6 @@ fun main(args: Array<String>) {
       val blackCmykId = "cmyk_black"
 
       val uuidsToGenerate = (0 until numberOfPassports).map { UUID.randomUUID() }
-      val renderSpecs = listOf(
-          RenderableSpec(0, PassportQrCode, if (isSticker) {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 0.85F, positionX = 4.5F, positionY = 17F, colorId = blackCmykId)
-          } else {
-            BarcodeRenderSpec(width = 80, height = 80, matrixScale = 1.35F, positionX = 196F, positionY = 107.5F, colorId = blackCmykId)
-          }),
-          RenderableSpec(0, PassportShortcode, if (isSticker) {
-            ShortcodeRenderSpec(positionX = 16F, positionY = 8F, fontSize = 8F, characterSpacing = 1.2F, fontId = metropolisFontId, colorId = blackCmykId)
-          } else {
-            ShortcodeRenderSpec(positionX = 88F, positionY = 210F, fontSize = 12F, characterSpacing = 2.4F, fontId = metropolisFontId, colorId = blackCmykId)
-          })
-      )
       val fonts = mapOf(metropolisFontId to "Metropolis-Medium.ttf")
       val colors = mapOf(blackCmykId to PDColor(
           floatArrayOf(0F, 0F, 0F, 1F),
@@ -72,14 +62,15 @@ fun main(args: Array<String>) {
 
       PassportsGenerator(
           fonts = fonts,
-          renderSpecs = renderSpecs,
+          renderSpecProvider = RenderSpecProviderImpl(),
           colorMap = colors
       ).run(
           uuidsToGenerate = uuidsToGenerate,
           rowCount = rowCount,
           columnCount = columnCount,
           templateFilePath = templateFilePath,
-          outputDirectory = outDirectory
+          outputDirectory = outDirectory,
+          generatorType = if (isSticker) GeneratorType.Sticker else GeneratorType.Passport
       )
     }
   }

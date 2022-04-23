@@ -30,7 +30,9 @@ class PassportsGeneratorEffectHandler(
                 rowCount = effect.rowCount,
                 columnCount = effect.columnCount,
                 templateFilePath = effect.templateFilePath,
-                outputDirectory = File(effect.outputDirectoryPath))
+                outputDirectory = File(effect.outputDirectoryPath),
+                generatorType = effect.generatorType
+            )
           }
           .map { PassportsGenerated }
     }

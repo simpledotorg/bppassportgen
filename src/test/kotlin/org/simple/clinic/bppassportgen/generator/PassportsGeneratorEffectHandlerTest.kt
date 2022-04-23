@@ -6,6 +6,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.simple.bppassportgen.PassportsGenerator
 import org.simple.bppassportgen.generator.GenerateBpPassports
+import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.generator.PassportsGenerated
 import org.simple.bppassportgen.generator.PassportsGeneratorEffectHandler
 import org.simple.clinic.bppassportgen.scheduler.TestSchedulersProvider
@@ -38,7 +39,8 @@ class PassportsGeneratorEffectHandlerTest {
         outputDirectoryPath = "/passports",
         numberOfPassports = 1,
         rowCount = 2,
-        columnCount = 2
+        columnCount = 2,
+        generatorType = GeneratorType.Passport
     ))
 
     // then
@@ -47,7 +49,8 @@ class PassportsGeneratorEffectHandlerTest {
         rowCount = 2,
         columnCount = 2,
         templateFilePath = "/template-file.pdf",
-        outputDirectory = File("/passports")
+        outputDirectory = File("/passports"),
+        generatorType = GeneratorType.Passport
     )
 
     effectHandlerTestCase.assertOutgoingEvents(PassportsGenerated)

@@ -1,14 +1,15 @@
 package org.simple.bppassportgen
 
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
-import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.simple.bppassportgen.consoleprinter.ConsolePrinter
 import org.simple.bppassportgen.consoleprinter.RealConsolePrinter
+import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.progresspoll.ProgressPoll
 import org.simple.bppassportgen.progresspoll.RealProgressPoll
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.qrcodegen.QrCodeGeneratorImpl
+import org.simple.bppassportgen.renderable.RenderSpecProvider
 import org.simple.bppassportgen.renderable.Renderable
 import org.simple.bppassportgen.renderable.Renderable.Type.PassportQrCode
 import org.simple.bppassportgen.renderable.Renderable.Type.PassportShortcode
@@ -28,7 +29,7 @@ class PassportsGenerator(
     private val progressPoll: ProgressPoll = RealProgressPoll(Duration.ofSeconds(1)),
     private val consolePrinter: ConsolePrinter = RealConsolePrinter(),
     private val fonts: Map<String, String>,
-    private val renderSpecs: List<RenderableSpec>,
+    private val renderSpecProvider: RenderSpecProvider,
     private val colorMap: Map<String, PDColor>,
     private val pageCount: Int = 100
 ) {
@@ -38,7 +39,8 @@ class PassportsGenerator(
       rowCount: Int,
       columnCount: Int,
       templateFilePath: String,
-      outputDirectory: File
+      outputDirectory: File,
+      generatorType: GeneratorType
   ) {
     val mergeCount = rowCount * columnCount
 
@@ -67,7 +69,7 @@ class PassportsGenerator(
           val pageSpecs = uuidBatch
               .map { uuidsInEachPage ->
                 uuidsInEachPage.map { uuid ->
-                  PageSpec(generateRenderables(qrCodeGenerator, uuid, colorProvider))
+                  PageSpec(generateRenderables(qrCodeGenerator, uuid, colorProvider, renderSpecProvider.renderSpecs(generatorType)))
                 }
               }
               .toList()
@@ -124,7 +126,8 @@ class PassportsGenerator(
   private fun generateRenderables(
       qrCodeGenerator: QrCodeGenerator,
       uuid: UUID,
-      colorProvider: ColorProvider
+      colorProvider: ColorProvider,
+      renderSpecs: List<RenderableSpec>
   ): Map<Int, List<Renderable>> {
     return renderSpecs
         .map { it.pageNumber to generateRenderable(uuid, qrCodeGenerator, it, colorProvider) }

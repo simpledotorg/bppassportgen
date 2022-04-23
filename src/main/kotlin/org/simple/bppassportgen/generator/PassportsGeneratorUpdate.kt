@@ -24,7 +24,8 @@ class PassportsGeneratorUpdate : Update<PassportsGeneratorModel, PassportsGenera
           outputDirectoryPath = model.outputDirectoryPath!!,
           numberOfPassports = model.numberOfPassports!!,
           rowCount = model.pageSize.rows,
-          columnCount = model.pageSize.columns
+          columnCount = model.pageSize.columns,
+          generatorType = model.generatorType
         )))
       }
       is PageSizeChanged -> next(model.pageSizeChanged(event.pageSize))
