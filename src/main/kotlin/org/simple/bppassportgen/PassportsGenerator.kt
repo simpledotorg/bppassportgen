@@ -10,6 +10,7 @@ import org.simple.bppassportgen.progresspoll.ProgressPoll
 import org.simple.bppassportgen.progresspoll.RealProgressPoll
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
 import org.simple.bppassportgen.qrcodegen.QrCodeGeneratorImpl
+import org.simple.bppassportgen.renderable.RenderSpecProvider
 import org.simple.bppassportgen.renderable.Renderable
 import org.simple.bppassportgen.renderable.Renderable.Type.PassportQrCode
 import org.simple.bppassportgen.renderable.Renderable.Type.PassportShortcode
@@ -30,6 +31,7 @@ class PassportsGenerator(
     private val consolePrinter: ConsolePrinter = RealConsolePrinter(),
     private val fonts: Map<String, String>,
     private val renderSpecs: List<RenderableSpec>,
+    private val renderSpecProvider: RenderSpecProvider,
     private val colorMap: Map<String, PDColor>,
     private val pageCount: Int = 100
 ) {

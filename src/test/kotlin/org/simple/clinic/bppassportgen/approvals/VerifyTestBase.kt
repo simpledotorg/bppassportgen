@@ -9,6 +9,7 @@ import org.junit.Before
 import org.simple.bppassportgen.PassportsGenerator
 import org.simple.bppassportgen.RenderableSpec
 import org.simple.clinic.bppassportgen.SavePdfToImage
+import org.simple.clinic.bppassportgen.renderable.TestRenderSpecProvider
 import org.simple.clinic.bppassportgen.util.ImageApprover
 import org.simple.clinic.bppassportgen.util.NoOpConsolePrinter
 import org.simple.clinic.bppassportgen.util.NoOpProgressPoll
@@ -34,6 +35,7 @@ abstract class VerifyTestBase(
         consolePrinter = NoOpConsolePrinter(),
         fonts = fonts,
         renderSpecs = renderSpecs,
+        renderSpecProvider = TestRenderSpecProvider(),
         colorMap = colors
     )
   }

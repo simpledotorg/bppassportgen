@@ -7,6 +7,7 @@ import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import org.simple.bppassportgen.generator.GeneratorType
+import org.simple.bppassportgen.renderable.RenderSpecProviderImpl
 import org.simple.bppassportgen.renderable.Renderable.Type.PassportQrCode
 import org.simple.bppassportgen.renderable.Renderable.Type.PassportShortcode
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
@@ -74,6 +75,7 @@ fun main(args: Array<String>) {
       PassportsGenerator(
           fonts = fonts,
           renderSpecs = renderSpecs,
+          renderSpecProvider = RenderSpecProviderImpl(),
           colorMap = colors
       ).run(
           uuidsToGenerate = uuidsToGenerate,
