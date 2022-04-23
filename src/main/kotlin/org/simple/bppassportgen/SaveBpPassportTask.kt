@@ -4,10 +4,10 @@ import java.io.File
 import java.util.Locale
 
 class SaveBpPassportTask(
-    val output: Output,
-    val taskNumber: Int,
-    val totalSize: Int,
-    val directory: File
+  val output: Output,
+  val taskNumber: Int,
+  val totalSize: Int,
+  val directory: File
 ) : Runnable {
 
   override fun run() {

@@ -24,23 +24,25 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
 class PassportsGenerator(
-    private val computationThreadPool: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
-    private val ioThreadPool: ExecutorService = Executors.newCachedThreadPool(),
-    private val progressPoll: ProgressPoll = RealProgressPoll(Duration.ofSeconds(1)),
-    private val consolePrinter: ConsolePrinter = RealConsolePrinter(),
-    private val fonts: Map<String, String>,
-    private val renderSpecProvider: RenderSpecProvider,
-    private val colorMap: Map<String, PDColor>,
-    private val pageCount: Int = 100
+  private val computationThreadPool: ExecutorService = Executors.newFixedThreadPool(
+    Runtime.getRuntime().availableProcessors()
+  ),
+  private val ioThreadPool: ExecutorService = Executors.newCachedThreadPool(),
+  private val progressPoll: ProgressPoll = RealProgressPoll(Duration.ofSeconds(1)),
+  private val consolePrinter: ConsolePrinter = RealConsolePrinter(),
+  private val fonts: Map<String, String>,
+  private val renderSpecProvider: RenderSpecProvider,
+  private val colorMap: Map<String, PDColor>,
+  private val pageCount: Int = 100
 ) {
 
   fun run(
-      uuidsToGenerate: List<UUID>,
-      rowCount: Int,
-      columnCount: Int,
-      templateFilePath: String,
-      outputDirectory: File,
-      generatorType: GeneratorType
+    uuidsToGenerate: List<UUID>,
+    rowCount: Int,
+    columnCount: Int,
+    templateFilePath: String,
+    outputDirectory: File,
+    generatorType: GeneratorType
   ) {
     val mergeCount = rowCount * columnCount
 
@@ -50,65 +52,73 @@ class PassportsGenerator(
     val pdfInputBytes = pdfTemplateFile.readBytes()
 
     val uuidBatches = uuidsToGenerate
-        .distinct()
-        .windowed(size = mergeCount, step = mergeCount, partialWindows = true)
-        .windowed(size = pageCount, step = pageCount, partialWindows = true)
+      .distinct()
+      .windowed(size = mergeCount, step = mergeCount, partialWindows = true)
+      .windowed(size = pageCount, step = pageCount, partialWindows = true)
 
     val generatingPdfTasks = mutableMapOf<Int, Future<Output>>()
     val savePdfTasks = mutableListOf<Future<Any>>()
 
-    val qrCodeGenerator: QrCodeGenerator = QrCodeGeneratorImpl(errorCorrectionLevel = ErrorCorrectionLevel.Q, margin = 0)
+    val qrCodeGenerator: QrCodeGenerator =
+      QrCodeGeneratorImpl(errorCorrectionLevel = ErrorCorrectionLevel.Q, margin = 0)
     val documentFactory = PdDocumentFactory(
-        fontsToLoad = fonts
-            .mapValues { (_, fontName) -> javaClass.classLoader.getResourceAsStream(fontName)!!.readBytes() }
+      fontsToLoad = fonts
+        .mapValues { (_, fontName) -> javaClass.classLoader.getResourceAsStream(fontName)!!.readBytes() }
     )
     val colorProvider = ColorProvider(colorMap)
 
     uuidBatches
-        .mapIndexed { index, uuidBatch ->
-          val pageSpecs = uuidBatch
-              .map { uuidsInEachPage ->
-                uuidsInEachPage.map { uuid ->
-                  PageSpec(generateRenderables(qrCodeGenerator, uuid, colorProvider, renderSpecProvider.renderSpecs(generatorType)))
-                }
-              }
-              .toList()
+      .mapIndexed { index, uuidBatch ->
+        val pageSpecs = uuidBatch
+          .map { uuidsInEachPage ->
+            uuidsInEachPage.map { uuid ->
+              PageSpec(
+                generateRenderables(
+                  qrCodeGenerator,
+                  uuid,
+                  colorProvider,
+                  renderSpecProvider.renderSpecs(generatorType)
+                )
+              )
+            }
+          }
+          .toList()
 
-          val task = createPassportGenerationTask(
-              pdfInputBytes = pdfInputBytes,
-              rowCount = rowCount,
-              columnCount = columnCount,
-              pageSpecs = pageSpecs,
-              documentFactory = documentFactory
-          )
+        val task = createPassportGenerationTask(
+          pdfInputBytes = pdfInputBytes,
+          rowCount = rowCount,
+          columnCount = columnCount,
+          pageSpecs = pageSpecs,
+          documentFactory = documentFactory
+        )
 
-          task to index + 1
-        }
-        .forEach { (task, taskNumber) ->
-          generatingPdfTasks[taskNumber] = computationThreadPool.submit(task)
-        }
+        task to index + 1
+      }
+      .forEach { (task, taskNumber) ->
+        generatingPdfTasks[taskNumber] = computationThreadPool.submit(task)
+      }
 
     var tasksComplete = false
     while (tasksComplete.not()) {
       val generated = generatingPdfTasks.filter { (_, future) -> future.isDone }
 
       generated
-          .map { it.key to it.value.get() }
-          .map { (taskNumber, output) ->
-            SaveBpPassportTask(
-                output = output,
-                taskNumber = taskNumber,
-                totalSize = uuidBatches.size,
-                directory = outputDirectory
-            )
-          }
-          .forEach {
-            savePdfTasks += ioThreadPool.submit(it, Any())
-          }
+        .map { it.key to it.value.get() }
+        .map { (taskNumber, output) ->
+          SaveBpPassportTask(
+            output = output,
+            taskNumber = taskNumber,
+            totalSize = uuidBatches.size,
+            directory = outputDirectory
+          )
+        }
+        .forEach {
+          savePdfTasks += ioThreadPool.submit(it, Any())
+        }
 
       generated
-          .map { it.key }
-          .forEach { generatingPdfTasks.remove(it) }
+        .map { it.key }
+        .forEach { generatingPdfTasks.remove(it) }
 
       val numberOfSavedPdfs = savePdfTasks.count { it.isDone }
       consolePrinter.print("Finished $numberOfSavedPdfs/${uuidBatches.size} Passports!")
@@ -124,21 +134,21 @@ class PassportsGenerator(
   }
 
   private fun generateRenderables(
-      qrCodeGenerator: QrCodeGenerator,
-      uuid: UUID,
-      colorProvider: ColorProvider,
-      renderSpecs: List<RenderableSpec>
+    qrCodeGenerator: QrCodeGenerator,
+    uuid: UUID,
+    colorProvider: ColorProvider,
+    renderSpecs: List<RenderableSpec>
   ): Map<Int, List<Renderable>> {
     return renderSpecs
-        .map { it.pageNumber to generateRenderable(uuid, qrCodeGenerator, it, colorProvider) }
-        .groupBy({ (pageNumber, _) -> pageNumber }, { (_, renderable) -> renderable })
+      .map { it.pageNumber to generateRenderable(uuid, qrCodeGenerator, it, colorProvider) }
+      .groupBy({ (pageNumber, _) -> pageNumber }, { (_, renderable) -> renderable })
   }
 
   private fun generateRenderable(
-      uuid: UUID,
-      qrCodeGenerator: QrCodeGenerator,
-      spec: RenderableSpec,
-      colorProvider: ColorProvider
+    uuid: UUID,
+    qrCodeGenerator: QrCodeGenerator,
+    spec: RenderableSpec,
+    colorProvider: ColorProvider
   ): Renderable {
     return when (spec.type) {
       PassportQrCode -> QrCodeRenderable(qrCodeGenerator, uuid, spec.getSpecAs(), colorProvider)
@@ -147,18 +157,18 @@ class PassportsGenerator(
   }
 
   private fun createPassportGenerationTask(
-      pdfInputBytes: ByteArray,
-      rowCount: Int,
-      columnCount: Int,
-      pageSpecs: List<List<PageSpec>>,
-      documentFactory: PdDocumentFactory
+    pdfInputBytes: ByteArray,
+    rowCount: Int,
+    columnCount: Int,
+    pageSpecs: List<List<PageSpec>>,
+    documentFactory: PdDocumentFactory
   ): Callable<Output> {
     return GenerateBpPassportTask(
-        pdfBytes = pdfInputBytes,
-        rowCount = rowCount,
-        columnCount = columnCount,
-        pageSpecs = pageSpecs,
-        documentFactory = documentFactory
+      pdfBytes = pdfInputBytes,
+      rowCount = rowCount,
+      columnCount = columnCount,
+      pageSpecs = pageSpecs,
+      documentFactory = documentFactory
     )
   }
 }

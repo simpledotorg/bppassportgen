@@ -21,11 +21,11 @@ object PdfUtil {
 
   fun mergePagesIntoOne(document: PDDocument, pdPages: List<PDPage>, rowCount: Int, columnCount: Int): PDPage {
     val targetRectangle = pdPages
-        .first()
-        .mediaBox
-        .let { sourceRectangle ->
-          PDRectangle(sourceRectangle.width * columnCount, sourceRectangle.height * rowCount)
-        }
+      .first()
+      .mediaBox
+      .let { sourceRectangle ->
+        PDRectangle(sourceRectangle.width * columnCount, sourceRectangle.height * rowCount)
+      }
 
     val target = PDPage(targetRectangle)
 
@@ -33,41 +33,41 @@ object PdfUtil {
     document.addPage(target)
 
     val pageMatrix = pdPages
-        .map { page -> asXObject(document, page) }
-        .toMutableList()
-        .let { pageXObjects ->
-          val pageMatrix: MutableList<MutableList<PDFormXObject?>> = mutableListOf()
-          (0 until rowCount).forEach { _ ->
-            pageMatrix.add(MutableList(columnCount) { null })
-          }
-
-          (0 until columnCount).forEach { columnIndex ->
-            (0 until rowCount).forEach { rowIndex ->
-              pageMatrix[rowIndex][columnIndex] = if (pageXObjects.isNotEmpty()) pageXObjects.removeAt(0) else null
-            }
-          }
-
-          pageMatrix
+      .map { page -> asXObject(document, page) }
+      .toMutableList()
+      .let { pageXObjects ->
+        val pageMatrix: MutableList<MutableList<PDFormXObject?>> = mutableListOf()
+        (0 until rowCount).forEach { _ ->
+          pageMatrix.add(MutableList(columnCount) { null })
         }
+
+        (0 until columnCount).forEach { columnIndex ->
+          (0 until rowCount).forEach { rowIndex ->
+            pageMatrix[rowIndex][columnIndex] = if (pageXObjects.isNotEmpty()) pageXObjects.removeAt(0) else null
+          }
+        }
+
+        pageMatrix
+      }
 
     streamForPage(document, target).use { contentStream ->
 
       val (pageWidth, pageHeight) = pdPages
-          .first()
-          .mediaBox
-          .let { sourceRectangle ->
-            sourceRectangle.width to sourceRectangle.height
-          }
+        .first()
+        .mediaBox
+        .let { sourceRectangle ->
+          sourceRectangle.width to sourceRectangle.height
+        }
 
       pageMatrix.forEach { row ->
 
         row
-            .filterNotNull()
-            .forEach { xObject ->
-              target.resources.add(xObject)
-              contentStream.drawForm(xObject)
-              contentStream.transform(Matrix.getTranslateInstance(pageWidth, 0F))
-            }
+          .filterNotNull()
+          .forEach { xObject ->
+            target.resources.add(xObject)
+            contentStream.drawForm(xObject)
+            contentStream.transform(Matrix.getTranslateInstance(pageWidth, 0F))
+          }
 
         contentStream.transform(Matrix.getTranslateInstance(-pageWidth * columnCount, pageHeight))
       }
@@ -92,10 +92,10 @@ object PdfUtil {
   }
 
   fun streamForPage(
-      document: PDDocument,
-      page: PDPage,
-      appendMode: AppendMode = AppendMode.APPEND,
-      compress: Boolean = false
+    document: PDDocument,
+    page: PDPage,
+    appendMode: AppendMode = AppendMode.APPEND,
+    compress: Boolean = false
   ): PDPageContentStream {
     return PDPageContentStream(document, page, appendMode, compress)
   }

@@ -4,8 +4,8 @@ import junitparams.JUnitParamsRunner
 import junitparams.Parameters
 import org.junit.Test
 import org.junit.runner.RunWith
-import strikt.api.*
-import strikt.assertions.*
+import strikt.api.expectThat
+import strikt.assertions.isEqualTo
 
 @RunWith(JUnitParamsRunner::class)
 class CanaryUnitTest {
@@ -16,13 +16,15 @@ class CanaryUnitTest {
   }
 
   @Test
-  @Parameters(value = [
-    "4|4",
-    "-1|-1"
-  ])
+  @Parameters(
+    value = [
+      "4|4",
+      "-1|-1"
+    ]
+  )
   fun `parameterized tests should work as expected`(
-      actual: Int,
-      expected: Int
+    actual: Int,
+    expected: Int
   ) {
     expectThat(actual).isEqualTo(expected)
   }

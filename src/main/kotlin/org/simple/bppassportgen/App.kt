@@ -8,24 +8,20 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.renderable.RenderSpecProviderImpl
-import org.simple.bppassportgen.renderable.Renderable.Type.PassportQrCode
-import org.simple.bppassportgen.renderable.Renderable.Type.PassportShortcode
-import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
-import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
 import java.io.File
 import java.util.UUID
 
 fun main(args: Array<String>) {
   val options = Options()
-      .apply {
-        addRequiredOption("c", "count", true, "Number of BP Passports to generate")
-        addRequiredOption("t", "template", true, "Path to the template file")
-        addOption("o", "output", true, "Directory to save the generated BP passports")
-        addOption("rc", "row-count", true, "Number of rows in a page")
-        addOption("cc", "column-count", true, "Number of columns in a page")
-        addOption("h", "help", false, "Print this message")
-        addOption("sticker", false, "Generate stickers instead of the BP Passports")
-      }
+    .apply {
+      addRequiredOption("c", "count", true, "Number of BP Passports to generate")
+      addRequiredOption("t", "template", true, "Path to the template file")
+      addOption("o", "output", true, "Directory to save the generated BP passports")
+      addOption("rc", "row-count", true, "Number of rows in a page")
+      addOption("cc", "column-count", true, "Number of columns in a page")
+      addOption("h", "help", false, "Print this message")
+      addOption("sticker", false, "Generate stickers instead of the BP Passports")
+    }
 
   val helpFormatter = HelpFormatter()
 
@@ -54,23 +50,25 @@ fun main(args: Array<String>) {
 
       val uuidsToGenerate = (0 until numberOfPassports).map { UUID.randomUUID() }
       val fonts = mapOf(metropolisFontId to "Metropolis-Medium.ttf")
-      val colors = mapOf(blackCmykId to PDColor(
+      val colors = mapOf(
+        blackCmykId to PDColor(
           floatArrayOf(0F, 0F, 0F, 1F),
           COSName.DEVICECMYK,
           PDDeviceCMYK.INSTANCE
-      ))
+        )
+      )
 
       PassportsGenerator(
-          fonts = fonts,
-          renderSpecProvider = RenderSpecProviderImpl(),
-          colorMap = colors
+        fonts = fonts,
+        renderSpecProvider = RenderSpecProviderImpl(),
+        colorMap = colors
       ).run(
-          uuidsToGenerate = uuidsToGenerate,
-          rowCount = rowCount,
-          columnCount = columnCount,
-          templateFilePath = templateFilePath,
-          outputDirectory = outDirectory,
-          generatorType = if (isSticker) GeneratorType.Sticker else GeneratorType.Passport
+        uuidsToGenerate = uuidsToGenerate,
+        rowCount = rowCount,
+        columnCount = columnCount,
+        templateFilePath = templateFilePath,
+        outputDirectory = outDirectory,
+        generatorType = if (isSticker) GeneratorType.Sticker else GeneratorType.Passport
       )
     }
   }
