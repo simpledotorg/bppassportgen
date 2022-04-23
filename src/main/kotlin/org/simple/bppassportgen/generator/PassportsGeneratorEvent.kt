@@ -14,4 +14,4 @@ data class NumberOfPassportsChanged(val numberOfPassports: Int) : PassportsGener
 
 object GeneratePassportsButtonClicked : PassportsGeneratorEvent()
 
-data class PageSizeChanged(val pageSize: PageSize_Old) : PassportsGeneratorEvent()
+data class PageSizeChanged(val pageSize: PageSize) : PassportsGeneratorEvent()
