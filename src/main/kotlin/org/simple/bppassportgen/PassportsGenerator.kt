@@ -71,7 +71,7 @@ class PassportsGenerator(
           val pageSpecs = uuidBatch
               .map { uuidsInEachPage ->
                 uuidsInEachPage.map { uuid ->
-                  PageSpec(generateRenderables(qrCodeGenerator, uuid, colorProvider))
+                  PageSpec(generateRenderables(qrCodeGenerator, uuid, colorProvider, renderSpecProvider.renderSpecs(generatorType)))
                 }
               }
               .toList()
@@ -128,7 +128,8 @@ class PassportsGenerator(
   private fun generateRenderables(
       qrCodeGenerator: QrCodeGenerator,
       uuid: UUID,
-      colorProvider: ColorProvider
+      colorProvider: ColorProvider,
+      renderSpecs: List<RenderableSpec>
   ): Map<Int, List<Renderable>> {
     return renderSpecs
         .map { it.pageNumber to generateRenderable(uuid, qrCodeGenerator, it, colorProvider) }
