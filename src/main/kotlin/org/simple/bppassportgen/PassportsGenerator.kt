@@ -29,7 +29,8 @@ class PassportsGenerator(
     private val consolePrinter: ConsolePrinter = RealConsolePrinter(),
     private val fonts: Map<String, String>,
     private val renderSpecs: List<RenderableSpec>,
-    private val colorMap: Map<String, PDColor>
+    private val colorMap: Map<String, PDColor>,
+    private val pageCount: Int = 100
 ) {
 
   fun run(
@@ -45,12 +46,11 @@ class PassportsGenerator(
 
     val pdfTemplateFile = File(templateFilePath)
     val pdfInputBytes = pdfTemplateFile.readBytes()
-    val pageCount = readNumberOfPagesInPdf(pdfTemplateFile)
 
     val uuidBatches = uuidsToGenerate
         .distinct()
-        .windowed(size = mergeCount, step = mergeCount)
-        .windowed(size = pageCount, step = pageCount)
+        .windowed(size = mergeCount, step = mergeCount, partialWindows = true)
+        .windowed(size = pageCount, step = pageCount, partialWindows = true)
 
     val generatingPdfTasks = mutableMapOf<Int, Future<Output>>()
     val savePdfTasks = mutableListOf<Future<Any>>()
@@ -119,10 +119,6 @@ class PassportsGenerator(
 
     computationThreadPool.shutdown()
     ioThreadPool.shutdown()
-  }
-
-  private fun readNumberOfPagesInPdf(file: File): Int {
-    return PDDocument.load(file).use { it.numberOfPages }
   }
 
   private fun generateRenderables(
