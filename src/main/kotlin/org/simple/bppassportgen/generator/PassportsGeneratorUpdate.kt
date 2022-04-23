@@ -11,8 +11,7 @@ class PassportsGeneratorUpdate : Update<PassportsGeneratorModel, PassportsGenera
   override fun update(model: PassportsGeneratorModel, event: PassportsGeneratorEvent): Next<PassportsGeneratorModel, PassportsGeneratorEffect> {
     return when (event) {
       is GeneratorTypeChanged -> next(model.generatorTypeChanged(event.generatorType))
-      // TODO (SM): Reset state once passports are generator progress state
-      PassportsGenerated -> noChange()
+      PassportsGenerated -> next(model.generatorProgressChanged(GeneratorProgress.DONE))
       is TemplateFileSelected -> next(model.templateFileSelected(event.templateFilePath))
       is NumberOfPassportsChanged -> next(model.numberOfPassportChanged(event.numberOfPassports))
       is GeneratePassportsButtonClicked -> {
