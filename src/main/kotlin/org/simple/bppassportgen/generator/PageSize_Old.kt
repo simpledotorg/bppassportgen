@@ -7,3 +7,10 @@ enum class PageSize_Old(val rows: Int, val columns: Int) {
   A3(rows = 2, columns = 2),
   A4(rows = 1, columns = 2)
 }
+
+data class PageSize(
+  val rows: Int,
+  val columns: Int,
+  val label: String,
+  val labelWithCount: String
+)
