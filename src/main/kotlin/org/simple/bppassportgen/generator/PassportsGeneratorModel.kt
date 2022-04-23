@@ -23,6 +23,9 @@ data class PassportsGeneratorModel(
         numberOfPassports != null && numberOfPassports > 0 &&
         pageSize != null
 
+  val isInProgress: Boolean
+    get() = generatorProgress == GeneratorProgress.IN_PROGRESS
+
   fun generatorTypeChanged(type: GeneratorType): PassportsGeneratorModel {
     return copy(
       generatorType = type,
