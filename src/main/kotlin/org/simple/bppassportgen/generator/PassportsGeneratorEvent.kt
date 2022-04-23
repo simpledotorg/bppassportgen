@@ -12,6 +12,6 @@ data class OutputDirectorySelected(val outputDirectoryPath: String) : PassportsG
 
 data class NumberOfPassportsChanged(val numberOfPassports: Int) : PassportsGeneratorEvent()
 
-object GeneratePassportsButtonClicked : PassportsGeneratorEvent()
+data class GeneratePassportsButtonClicked(val outputDirectory: String) : PassportsGeneratorEvent()
 
 data class PageSizeChanged(val pageSize: PageSize) : PassportsGeneratorEvent()

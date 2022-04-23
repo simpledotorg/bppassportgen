@@ -93,7 +93,6 @@ class PassportsGeneratorUpdateTest {
     val model = defaultModel
         .generatorTypeChanged(GeneratorType.Passport)
         .templateFileSelected("/template.pdf")
-        .outputDirectorySelected("/output")
         .numberOfPassportChanged(10)
         .pageSizeChanged(PageSize(
           rows = 1,
@@ -104,7 +103,7 @@ class PassportsGeneratorUpdateTest {
 
     updateSpec
         .given(model)
-        .whenEvent(GeneratePassportsButtonClicked)
+        .whenEvent(GeneratePassportsButtonClicked("/output"))
         .then(assertThatNext(
             hasNoModel(),
             hasEffects(GenerateBpPassports(
