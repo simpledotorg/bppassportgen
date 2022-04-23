@@ -14,14 +14,13 @@ class PassportsGeneratorUpdate : Update<PassportsGeneratorModel, PassportsGenera
       // TODO (SM): Reset state once passports are generator progress state
       PassportsGenerated -> noChange()
       is TemplateFileSelected -> next(model.templateFileSelected(event.templateFilePath))
-      is OutputDirectorySelected -> next(model.outputDirectorySelected(event.outputDirectoryPath))
       is NumberOfPassportsChanged -> next(model.numberOfPassportChanged(event.numberOfPassports))
-      GeneratePassportsButtonClicked -> {
+      is GeneratePassportsButtonClicked -> {
         requireNotNull(model.pageSize)
 
         dispatch(setOf(GenerateBpPassports(
           templateFilePath = model.templateFilePath!!,
-          outputDirectoryPath = model.outputDirectoryPath!!,
+          outputDirectoryPath = event.outputDirectory,
           numberOfPassports = model.numberOfPassports!!,
           rowCount = model.pageSize.rows,
           columnCount = model.pageSize.columns,

@@ -12,7 +12,6 @@ import org.simple.bppassportgen.generator.GeneratePassportsButtonClicked
 import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.generator.GeneratorTypeChanged
 import org.simple.bppassportgen.generator.NumberOfPassportsChanged
-import org.simple.bppassportgen.generator.OutputDirectorySelected
 import org.simple.bppassportgen.generator.PageSize
 import org.simple.bppassportgen.generator.PageSizeChanged
 import org.simple.bppassportgen.generator.PassportsGeneratorModel
@@ -65,19 +64,6 @@ class PassportsGeneratorUpdateTest {
   }
 
   @Test
-  fun `when the output director is selected, then update the model`() {
-    val outputDirectoryPath = "/passports"
-
-    updateSpec
-        .given(defaultModel)
-        .whenEvent(OutputDirectorySelected(outputDirectoryPath))
-        .then(assertThatNext(
-            hasModel(defaultModel.outputDirectorySelected(outputDirectoryPath)),
-            hasNoEffects()
-        ))
-  }
-
-  @Test
   fun `when the number of passports count is changed, then update the model`() {
     updateSpec
         .given(defaultModel)
@@ -93,7 +79,6 @@ class PassportsGeneratorUpdateTest {
     val model = defaultModel
         .generatorTypeChanged(GeneratorType.Passport)
         .templateFileSelected("/template.pdf")
-        .outputDirectorySelected("/output")
         .numberOfPassportChanged(10)
         .pageSizeChanged(PageSize(
           rows = 1,
@@ -104,7 +89,7 @@ class PassportsGeneratorUpdateTest {
 
     updateSpec
         .given(model)
-        .whenEvent(GeneratePassportsButtonClicked)
+        .whenEvent(GeneratePassportsButtonClicked("/output"))
         .then(assertThatNext(
             hasNoModel(),
             hasEffects(GenerateBpPassports(
