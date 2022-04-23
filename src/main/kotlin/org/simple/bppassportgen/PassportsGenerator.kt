@@ -46,7 +46,6 @@ class PassportsGenerator(
 
     val pdfTemplateFile = File(templateFilePath)
     val pdfInputBytes = pdfTemplateFile.readBytes()
-    val pageCount = readNumberOfPagesInPdf(pdfTemplateFile)
 
     val uuidBatches = uuidsToGenerate
         .distinct()
@@ -120,10 +119,6 @@ class PassportsGenerator(
 
     computationThreadPool.shutdown()
     ioThreadPool.shutdown()
-  }
-
-  private fun readNumberOfPagesInPdf(file: File): Int {
-    return PDDocument.load(file).use { it.numberOfPages }
   }
 
   private fun generateRenderables(
