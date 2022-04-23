@@ -5,6 +5,7 @@ import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.simple.bppassportgen.consoleprinter.ConsolePrinter
 import org.simple.bppassportgen.consoleprinter.RealConsolePrinter
+import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.progresspoll.ProgressPoll
 import org.simple.bppassportgen.progresspoll.RealProgressPoll
 import org.simple.bppassportgen.qrcodegen.QrCodeGenerator
@@ -38,7 +39,8 @@ class PassportsGenerator(
       rowCount: Int,
       columnCount: Int,
       templateFilePath: String,
-      outputDirectory: File
+      outputDirectory: File,
+      generatorType: GeneratorType
   ) {
     val mergeCount = rowCount * columnCount
 

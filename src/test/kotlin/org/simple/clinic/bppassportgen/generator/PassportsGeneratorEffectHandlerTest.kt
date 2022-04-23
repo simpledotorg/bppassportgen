@@ -49,7 +49,8 @@ class PassportsGeneratorEffectHandlerTest {
         rowCount = 2,
         columnCount = 2,
         templateFilePath = "/template-file.pdf",
-        outputDirectory = File("/passports")
+        outputDirectory = File("/passports"),
+        generatorType = GeneratorType.Passport
     )
 
     effectHandlerTestCase.assertOutgoingEvents(PassportsGenerated)

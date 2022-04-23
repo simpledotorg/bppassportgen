@@ -5,6 +5,7 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
 import org.junit.Test
 import org.simple.bppassportgen.RenderableSpec
+import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.renderable.Renderable.Type
 import org.simple.bppassportgen.renderable.qrcode.BarcodeRenderSpec
 import org.simple.bppassportgen.renderable.shortcode.ShortcodeRenderSpec
@@ -69,7 +70,8 @@ class VerifyGenerationOfPdf : VerifyTestBase(
         rowCount = 2,
         columnCount = 2,
         templateFilePath = resourceFilePath("blank.pdf"),
-        outputDirectory = outputDirectory
+        outputDirectory = outputDirectory,
+        generatorType = GeneratorType.Passport
     )
 
     runApprovals(8) { pdfNumber, pageNumber: Int -> "bp pdf $pdfNumber.$pageNumber" }
