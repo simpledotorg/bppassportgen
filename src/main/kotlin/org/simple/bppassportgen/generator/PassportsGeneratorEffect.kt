@@ -7,5 +7,6 @@ data class GenerateBpPassports(
     val outputDirectoryPath: String,
     val numberOfPassports: Int,
     val rowCount: Int,
-    val columnCount: Int
+    val columnCount: Int,
+    val generatorType: GeneratorType
 ) : PassportsGeneratorEffect()

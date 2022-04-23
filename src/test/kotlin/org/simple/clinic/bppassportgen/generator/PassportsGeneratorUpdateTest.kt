@@ -112,7 +112,8 @@ class PassportsGeneratorUpdateTest {
                 outputDirectoryPath = "/output",
                 numberOfPassports = 10,
                 rowCount = 1,
-                columnCount = 2
+                columnCount = 2,
+                generatorType = GeneratorType.Passport
             ))
         ))
   }
