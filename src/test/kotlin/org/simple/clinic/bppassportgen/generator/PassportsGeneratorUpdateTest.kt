@@ -12,7 +12,6 @@ import org.simple.bppassportgen.generator.GeneratePassportsButtonClicked
 import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.generator.GeneratorTypeChanged
 import org.simple.bppassportgen.generator.NumberOfPassportsChanged
-import org.simple.bppassportgen.generator.OutputDirectorySelected
 import org.simple.bppassportgen.generator.PageSize
 import org.simple.bppassportgen.generator.PageSizeChanged
 import org.simple.bppassportgen.generator.PassportsGeneratorModel
@@ -60,19 +59,6 @@ class PassportsGeneratorUpdateTest {
         .whenEvent(TemplateFileSelected(templateFilePath))
         .then(assertThatNext(
             hasModel(defaultModel.templateFileSelected(templateFilePath)),
-            hasNoEffects()
-        ))
-  }
-
-  @Test
-  fun `when the output director is selected, then update the model`() {
-    val outputDirectoryPath = "/passports"
-
-    updateSpec
-        .given(defaultModel)
-        .whenEvent(OutputDirectorySelected(outputDirectoryPath))
-        .then(assertThatNext(
-            hasModel(defaultModel.outputDirectorySelected(outputDirectoryPath)),
             hasNoEffects()
         ))
   }
