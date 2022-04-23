@@ -29,7 +29,8 @@ class PassportsGenerator(
     private val consolePrinter: ConsolePrinter = RealConsolePrinter(),
     private val fonts: Map<String, String>,
     private val renderSpecs: List<RenderableSpec>,
-    private val colorMap: Map<String, PDColor>
+    private val colorMap: Map<String, PDColor>,
+    private val pageCount: Int = 100
 ) {
 
   fun run(
