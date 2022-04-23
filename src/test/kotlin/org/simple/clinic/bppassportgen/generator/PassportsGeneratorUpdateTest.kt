@@ -13,7 +13,7 @@ import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.generator.GeneratorTypeChanged
 import org.simple.bppassportgen.generator.NumberOfPassportsChanged
 import org.simple.bppassportgen.generator.OutputDirectorySelected
-import org.simple.bppassportgen.generator.PageSize
+import org.simple.bppassportgen.generator.PageSize_Old
 import org.simple.bppassportgen.generator.PageSizeChanged
 import org.simple.bppassportgen.generator.PassportsGeneratorModel
 import org.simple.bppassportgen.generator.PassportsGeneratorUpdate
@@ -79,7 +79,7 @@ class PassportsGeneratorUpdateTest {
         .templateFileSelected("/template.pdf")
         .outputDirectorySelected("/output")
         .numberOfPassportChanged(10)
-        .pageSizeChanged(PageSize.A4)
+        .pageSizeChanged(PageSize_Old.A4)
 
     updateSpec
         .given(model)
@@ -100,9 +100,9 @@ class PassportsGeneratorUpdateTest {
   fun `when page size is changed, then update the model`() {
     updateSpec
       .given(defaultModel)
-      .whenEvent(PageSizeChanged(PageSize.A2))
+      .whenEvent(PageSizeChanged(PageSize_Old.A2))
       .then(assertThatNext(
-        hasModel(defaultModel.pageSizeChanged(PageSize.A2)),
+        hasModel(defaultModel.pageSizeChanged(PageSize_Old.A2)),
         hasNoEffects()
       ))
   }

@@ -5,7 +5,7 @@ data class PassportsGeneratorModel(
   val templateFilePath: String?,
   val outputDirectoryPath: String?,
   val numberOfPassports: Int?,
-  val pageSize: PageSize
+  val pageSize: PageSize_Old
 ) {
 
   companion object {
@@ -14,7 +14,7 @@ data class PassportsGeneratorModel(
       templateFilePath = null,
       outputDirectoryPath = null,
       numberOfPassports = null,
-      pageSize = PageSize.A4
+      pageSize = PageSize_Old.A4
     )
   }
 
@@ -34,7 +34,7 @@ data class PassportsGeneratorModel(
     return copy(numberOfPassports = numberOfPassports)
   }
 
-  fun pageSizeChanged(pageSize: PageSize): PassportsGeneratorModel {
+  fun pageSizeChanged(pageSize: PageSize_Old): PassportsGeneratorModel {
     return copy(pageSize = pageSize)
   }
 }
