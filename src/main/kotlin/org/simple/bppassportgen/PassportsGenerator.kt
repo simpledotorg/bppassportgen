@@ -49,8 +49,8 @@ class PassportsGenerator(
 
     val uuidBatches = uuidsToGenerate
         .distinct()
-        .windowed(size = mergeCount, step = mergeCount)
-        .windowed(size = pageCount, step = pageCount)
+        .windowed(size = mergeCount, step = mergeCount, partialWindows = true)
+        .windowed(size = pageCount, step = pageCount, partialWindows = true)
 
     val generatingPdfTasks = mutableMapOf<Int, Future<Output>>()
     val savePdfTasks = mutableListOf<Future<Any>>()
