@@ -79,7 +79,12 @@ class PassportsGeneratorUpdateTest {
         .templateFileSelected("/template.pdf")
         .outputDirectorySelected("/output")
         .numberOfPassportChanged(10)
-        .pageSizeChanged(PageSize.A4)
+        .pageSizeChanged(PageSize(
+          rows = 1,
+          columns = 2,
+          label = "A4",
+          labelWithCount = "2 passports per page"
+        ))
 
     updateSpec
         .given(model)
@@ -100,9 +105,19 @@ class PassportsGeneratorUpdateTest {
   fun `when page size is changed, then update the model`() {
     updateSpec
       .given(defaultModel)
-      .whenEvent(PageSizeChanged(PageSize.A2))
+      .whenEvent(PageSizeChanged(PageSize(
+        rows = 1,
+        columns = 2,
+        label = "A4",
+        labelWithCount = "2 passports per page"
+      )))
       .then(assertThatNext(
-        hasModel(defaultModel.pageSizeChanged(PageSize.A2)),
+        hasModel(defaultModel.pageSizeChanged(PageSize(
+          rows = 1,
+          columns = 2,
+          label = "A4",
+          labelWithCount = "2 passports per page"
+        ))),
         hasNoEffects()
       ))
   }

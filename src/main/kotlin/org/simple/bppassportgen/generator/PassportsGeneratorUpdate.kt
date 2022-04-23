@@ -16,13 +16,17 @@ class PassportsGeneratorUpdate : Update<PassportsGeneratorModel, PassportsGenera
       is TemplateFileSelected -> next(model.templateFileSelected(event.templateFilePath))
       is OutputDirectorySelected -> next(model.outputDirectorySelected(event.outputDirectoryPath))
       is NumberOfPassportsChanged -> next(model.numberOfPassportChanged(event.numberOfPassports))
-      GeneratePassportsButtonClicked -> dispatch(setOf(GenerateBpPassports(
+      GeneratePassportsButtonClicked -> {
+        requireNotNull(model.pageSize)
+
+        dispatch(setOf(GenerateBpPassports(
           templateFilePath = model.templateFilePath!!,
           outputDirectoryPath = model.outputDirectoryPath!!,
           numberOfPassports = model.numberOfPassports!!,
           rowCount = model.pageSize.rows,
           columnCount = model.pageSize.columns
-      )))
+        )))
+      }
       is PageSizeChanged -> next(model.pageSizeChanged(event.pageSize))
     }
   }
