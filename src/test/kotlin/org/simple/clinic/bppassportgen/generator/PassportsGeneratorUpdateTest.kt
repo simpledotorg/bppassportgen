@@ -9,6 +9,7 @@ import com.spotify.mobius.test.UpdateSpec.assertThatNext
 import org.junit.Test
 import org.simple.bppassportgen.generator.GenerateBpPassports
 import org.simple.bppassportgen.generator.GeneratePassportsButtonClicked
+import org.simple.bppassportgen.generator.GeneratorProgress
 import org.simple.bppassportgen.generator.GeneratorType
 import org.simple.bppassportgen.generator.GeneratorTypeChanged
 import org.simple.bppassportgen.generator.NumberOfPassportsChanged
@@ -91,7 +92,7 @@ class PassportsGeneratorUpdateTest {
         .given(model)
         .whenEvent(GeneratePassportsButtonClicked("/output"))
         .then(assertThatNext(
-            hasNoModel(),
+            hasModel(model.generatorProgressChanged(GeneratorProgress.IN_PROGRESS)),
             hasEffects(GenerateBpPassports(
                 templateFilePath = "/template.pdf",
                 outputDirectoryPath = "/output",

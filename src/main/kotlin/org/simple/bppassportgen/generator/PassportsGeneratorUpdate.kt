@@ -18,7 +18,7 @@ class PassportsGeneratorUpdate : Update<PassportsGeneratorModel, PassportsGenera
       is GeneratePassportsButtonClicked -> {
         requireNotNull(model.pageSize)
 
-        dispatch(setOf(GenerateBpPassports(
+        next(model.generatorProgressChanged(GeneratorProgress.IN_PROGRESS), setOf(GenerateBpPassports(
           templateFilePath = model.templateFilePath!!,
           outputDirectoryPath = event.outputDirectory,
           numberOfPassports = model.numberOfPassports!!,
