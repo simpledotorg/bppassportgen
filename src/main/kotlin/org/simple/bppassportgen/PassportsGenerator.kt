@@ -128,9 +128,6 @@ class PassportsGenerator(
       }
       progressPoll.poll()
     }
-
-    computationThreadPool.shutdown()
-    ioThreadPool.shutdown()
   }
 
   private fun generateRenderables(
