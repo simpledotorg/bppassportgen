@@ -27,13 +27,26 @@ compose.desktop {
     mainClass = "org.simple.bppassportgen.AppKt"
     nativeDistributions {
       targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-      packageName = "passportgenerator"
+      packageName = "QR Code Generator"
+      packageVersion = "2.0.0"
+      vendor = "Simple.org"
+      includeAllModules = true
+
+      macOS {
+        iconFile.set(project.file("src/main/resources/drawable/app_icon_mac.icns"))
+      }
+      windows {
+        iconFile.set(project.file("/src/main/resources/drawable/app_icon_windows.ico"))
+        menuGroup = "QR Code Generator"
+        // see https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html
+        upgradeUuid = "b9522ebf-7243-4769-9ed2-3ac7c3bc7dec"
+      }
+      linux {
+        iconFile.set(project.file("/src/main/resources/drawable/app_icon_linux.png"))
+      }
     }
   }
 }
-
-group 'org.simple'
-version '1.2.3'
 
 repositories {
   google()
