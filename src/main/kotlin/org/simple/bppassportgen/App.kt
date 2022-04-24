@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Minimize
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,14 +48,24 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.spotify.mobius.rx2.RxMobius
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK
+import org.simple.bppassportgen.generator.GeneratePassportsButtonClicked
+import org.simple.bppassportgen.generator.GeneratorTypeChanged
+import org.simple.bppassportgen.generator.NumberOfPassportsChanged
+import org.simple.bppassportgen.generator.PageSizeChanged
+import org.simple.bppassportgen.generator.PassportsGeneratorEffectHandler
 import org.simple.bppassportgen.generator.PassportsGeneratorModel
+import org.simple.bppassportgen.generator.PassportsGeneratorUpdate
+import org.simple.bppassportgen.generator.TemplateFileSelected
 import org.simple.bppassportgen.generator.ui.AppTheme
 import org.simple.bppassportgen.generator.ui.GeneratorWindow
 import org.simple.bppassportgen.generator.ui.body2Bold
 import org.simple.bppassportgen.generator.ui.toolbarPrimary
+import org.simple.bppassportgen.renderable.RenderSpecProviderImpl
+import org.simple.bppassportgen.scheduler.RealSchedulersProvider
 import java.awt.Desktop
 import java.net.URI
 import javax.swing.JFileChooser
@@ -75,7 +86,8 @@ fun main() = application {
     transparent = true,
     onCloseRequest = ::exitApplication
   ) {
-    var model by remember { mutableStateOf(PassportsGeneratorModel.create()) }
+    val defaultModel = PassportsGeneratorModel.create()
+    var model by remember { mutableStateOf(defaultModel) }
     val metropolisFontId = "Metropolis-Medium"
     val blackCmykId = "cmyk_black"
 
@@ -87,6 +99,23 @@ fun main() = application {
         PDDeviceCMYK.INSTANCE
       )
     )
+    val loop = RxMobius
+      .loop(
+        PassportsGeneratorUpdate(),
+        PassportsGeneratorEffectHandler(
+          passportsGenerator = PassportsGenerator(
+            renderSpecProvider = RenderSpecProviderImpl(),
+            fonts = fonts,
+            colorMap = colors
+          ),
+          schedulersProvider = RealSchedulersProvider()
+        ).build()
+      )
+      .startFrom(defaultModel)
+
+    loop.observe { updatedModel ->
+      model = updatedModel
+    }
 
     AppTheme {
       Scaffold(
@@ -105,15 +134,22 @@ fun main() = application {
         content = {
           GeneratorWindow(
             model = model,
-            onGeneratorTypeChanged = {},
-            onNumberOfQrCodesChanged = {},
-            onPageSizeChanged = {},
+            onGeneratorTypeChanged = { generatorType ->
+              loop.dispatchEvent(GeneratorTypeChanged(generatorType))
+            },
+            onNumberOfQrCodesChanged = { numberOfQrCodes ->
+              loop.dispatchEvent(NumberOfPassportsChanged(numberOfQrCodes))
+            },
+            onPageSizeChanged = { pageSize ->
+              loop.dispatchEvent(PageSizeChanged(pageSize))
+            },
             onOpenTemplateFileClick = {
               val templateFilePath = openFilePicker(
                 currentDirectory = model.templateFilePath,
                 filterExtensions = "pdf",
                 fileSelectionMode = JFileChooser.FILES_ONLY
               )
+              loop.dispatchEvent(TemplateFileSelected(templateFilePath.orEmpty()))
             }
           )
         },
@@ -138,11 +174,21 @@ fun main() = application {
                   currentDirectory = null,
                   fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
                 )
+
+                if (outputDirectoryPath.isNullOrBlank().not()) {
+                  loop.dispatchEvent(GeneratePassportsButtonClicked(outputDirectoryPath!!))
+                }
               }
             }
           }
         },
       )
+    }
+
+    DisposableEffect(Unit) {
+      onDispose {
+        loop.dispose()
+      }
     }
   }
 }
