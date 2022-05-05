@@ -258,8 +258,7 @@ private fun ExtendedAppBar(
       text = "Template",
       imageVector = Icons.Filled.Download
     ) {
-      // TODO (SM): Update template link
-      openLink("https://simple.org")
+      openLink("https://drive.google.com/drive/folders/1-V94ufms5k4ZeoMzaF-EQPYPjhaQ9wze?usp=sharing")
     }
 
     Spacer(Modifier.width(16.dp))
