@@ -267,8 +267,7 @@ private fun ExtendedAppBar(
       text = "Help",
       imageVector = Icons.Filled.HelpOutline
     ) {
-      // TODO (SM): Update help link
-      openLink("https://simple.org")
+      openLink("https://docs.google.com/document/d/1tpns-PgoPsXSDRyVrFfU2bJ98ZyYq1YCzMhj2MHJhiE/edit#")
     }
   }
 }
