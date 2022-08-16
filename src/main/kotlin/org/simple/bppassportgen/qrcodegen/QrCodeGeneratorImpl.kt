@@ -7,14 +7,14 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 
 class QrCodeGeneratorImpl(
-    errorCorrectionLevel: ErrorCorrectionLevel,
-    margin: Int
+  errorCorrectionLevel: ErrorCorrectionLevel,
+  margin: Int
 ) : QrCodeGenerator {
 
   private val qrCodeWriter = QRCodeWriter()
   private val hints = mapOf(
-      EncodeHintType.ERROR_CORRECTION to errorCorrectionLevel,
-      EncodeHintType.MARGIN to margin
+    EncodeHintType.ERROR_CORRECTION to errorCorrectionLevel,
+    EncodeHintType.MARGIN to margin
   )
 
   override fun generateQrCode(content: String, width: Int, height: Int): BitMatrix {

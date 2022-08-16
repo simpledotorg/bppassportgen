@@ -18,6 +18,14 @@ data class PassportsGeneratorModel(
     )
   }
 
+  val isRequiredDataFilled: Boolean
+    get() = templateFilePath.isNullOrBlank().not() &&
+        numberOfPassports != null && numberOfPassports > 0 &&
+        pageSize != null
+
+  val isInProgress: Boolean
+    get() = generatorProgress == GeneratorProgress.IN_PROGRESS
+
   fun generatorTypeChanged(type: GeneratorType): PassportsGeneratorModel {
     return copy(
       generatorType = type,

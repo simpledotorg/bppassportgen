@@ -8,10 +8,10 @@ import org.simple.bppassportgen.renderable.Renderable
 import java.util.UUID
 
 class ShortcodeRenderable(
-    private val uuid: UUID,
-    private val spec: ShortcodeRenderSpec,
-    private val colorProvider: ColorProvider
-): Renderable {
+  private val uuid: UUID,
+  private val spec: ShortcodeRenderSpec,
+  private val colorProvider: ColorProvider
+) : Renderable {
 
   override fun render(document: OpenedDocument, page: PDPage) {
     val shortCode = shortCodeForUuid(uuid)
@@ -28,14 +28,14 @@ class ShortcodeRenderable(
 
   private fun shortCodeForUuid(uuid: UUID): String {
     return uuid
-        .toString()
-        .filter { it.isDigit() }
-        .take(7)
-        .let { shortCode ->
-          val prefix = shortCode.substring(0, 3)
-          val suffix = shortCode.substring(3)
+      .toString()
+      .filter { it.isDigit() }
+      .take(7)
+      .let { shortCode ->
+        val prefix = shortCode.substring(0, 3)
+        val suffix = shortCode.substring(3)
 
-          "$prefix $suffix"
-        }
+        "$prefix $suffix"
+      }
   }
 }

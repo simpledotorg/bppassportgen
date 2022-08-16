@@ -22,61 +22,61 @@ class RenderBitMatrixOnPdContentStream(bitMatrix: BitMatrix, private val matrixS
   private fun generateLines(bitMatrix: BitMatrix): List<Line> {
 
     return (0 until bitMatrix.height)
-        .map { rowIndex ->
-          rowIndex to bitMatrix.getRow(rowIndex, null)
-        }
-        .flatMap { (rowIndex, bitArray) -> bitArrayToLines(bitArray, rowIndex) }
-        .toList()
+      .map { rowIndex ->
+        rowIndex to bitMatrix.getRow(rowIndex, null)
+      }
+      .flatMap { (rowIndex, bitArray) -> bitArrayToLines(bitArray, rowIndex) }
+      .toList()
   }
 
   private fun bitArrayToLines(bitArray: BitArray, rowIndex: Int): List<Line> {
 
     return (0 until bitArray.size)
-        .fold(LineAccumulator(0, bitArray.state(0))) { accumulator, columnIndex ->
-          val state = bitArray.state(columnIndex)
+      .fold(LineAccumulator(0, bitArray.state(0))) { accumulator, columnIndex ->
+        val state = bitArray.state(columnIndex)
 
-          if (state != accumulator.state) {
-            // Add a new line, reset the line start in the accumulator
-            val line = Line(
-                xStart = accumulator.lineStart.toFloat(),
-                yStart = rowIndex.toFloat(),
-                xEnd = (columnIndex - 1).coerceAtLeast(0).toFloat(),
-                yEnd = rowIndex.toFloat(),
-                state = accumulator.state
-            )
+        if (state != accumulator.state) {
+          // Add a new line, reset the line start in the accumulator
+          val line = Line(
+            xStart = accumulator.lineStart.toFloat(),
+            yStart = rowIndex.toFloat(),
+            xEnd = (columnIndex - 1).coerceAtLeast(0).toFloat(),
+            yEnd = rowIndex.toFloat(),
+            state = accumulator.state
+          )
 
-            accumulator.lines += line
-            accumulator.lineStart = columnIndex
-            accumulator.state = state
-          }
+          accumulator.lines += line
+          accumulator.lineStart = columnIndex
+          accumulator.state = state
+        }
 
-          // Handle the last line
-          val shouldCreateLastLine = (columnIndex == bitArray.size - 1) &&
-              (accumulator.lines.isEmpty() || accumulator.lines.last().xEnd != columnIndex.toFloat())
+        // Handle the last line
+        val shouldCreateLastLine = (columnIndex == bitArray.size - 1) &&
+            (accumulator.lines.isEmpty() || accumulator.lines.last().xEnd != columnIndex.toFloat())
 
-          if (shouldCreateLastLine) {
-            val line = Line(
-                xStart = accumulator.lineStart.toFloat(),
-                yStart = rowIndex.toFloat(),
-                xEnd = columnIndex.toFloat(),
-                yEnd = rowIndex.toFloat(),
-                state = state
-            )
+        if (shouldCreateLastLine) {
+          val line = Line(
+            xStart = accumulator.lineStart.toFloat(),
+            yStart = rowIndex.toFloat(),
+            xEnd = columnIndex.toFloat(),
+            yEnd = rowIndex.toFloat(),
+            state = state
+          )
 
-            accumulator.lines += line
-          }
+          accumulator.lines += line
+        }
 
-          accumulator
-        }.lines
+        accumulator
+      }.lines
   }
 
   fun render(
-      contentStream: PDPageContentStream,
-      x: Float,
-      y: Float,
-      drawBackground: Boolean = false,
-      applyForegroundColor: (PDPageContentStream) -> Unit = { it.setStrokingColor(Color.BLACK) },
-      applyBackgroundColor: (PDPageContentStream) -> Unit = { it.setStrokingColor(Color.WHITE) }
+    contentStream: PDPageContentStream,
+    x: Float,
+    y: Float,
+    drawBackground: Boolean = false,
+    applyForegroundColor: (PDPageContentStream) -> Unit = { it.setStrokingColor(Color.BLACK) },
+    applyBackgroundColor: (PDPageContentStream) -> Unit = { it.setStrokingColor(Color.WHITE) }
   ) {
     val matrix = Matrix()
     matrix.scale(matrixScale, matrixScale)
@@ -103,10 +103,10 @@ class RenderBitMatrixOnPdContentStream(bitMatrix: BitMatrix, private val matrixS
   }
 
   private fun drawLine(
-      line: Line,
-      x: Float,
-      y: Float,
-      contentStream: PDPageContentStream
+    line: Line,
+    x: Float,
+    y: Float,
+    contentStream: PDPageContentStream
   ) {
     val lineStartX = line.xStart + x
     val lineStartY = line.yStart + y
@@ -119,9 +119,9 @@ class RenderBitMatrixOnPdContentStream(bitMatrix: BitMatrix, private val matrixS
   }
 
   private data class LineAccumulator(
-      var lineStart: Int,
-      var state: Line.State,
-      val lines: MutableList<Line> = mutableListOf()
+    var lineStart: Int,
+    var state: Line.State,
+    val lines: MutableList<Line> = mutableListOf()
   )
 
   private fun BitArray.state(index: Int): Line.State {
@@ -132,11 +132,11 @@ class RenderBitMatrixOnPdContentStream(bitMatrix: BitMatrix, private val matrixS
   }
 
   data class Line(
-      val xStart: Float,
-      val yStart: Float,
-      val xEnd: Float,
-      val yEnd: Float,
-      val state: State
+    val xStart: Float,
+    val yStart: Float,
+    val xEnd: Float,
+    val yEnd: Float,
+    val state: State
   ) {
 
     enum class State {

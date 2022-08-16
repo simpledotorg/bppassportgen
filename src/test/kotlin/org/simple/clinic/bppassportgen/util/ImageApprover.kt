@@ -12,9 +12,9 @@ import java.io.File
 import javax.imageio.ImageIO
 
 class ImageApprover(
-    namer: ApprovalNamer,
-    private val writer: ApprovalWriter,
-    private val minimumSimilarity: Double
+  namer: ApprovalNamer,
+  private val writer: ApprovalWriter,
+  private val minimumSimilarity: Double
 ) : ApprovalApprover {
 
   private val baseFilePath = "${namer.sourceFilePath}${namer.approvalName}"
@@ -25,9 +25,9 @@ class ImageApprover(
   companion object {
     fun create(image: BufferedImage, minimumSimilarity: Double): ImageApprover {
       return ImageApprover(
-          namer = Approvals.createApprovalNamer(),
-          writer = ImageApprovalWriter(image),
-          minimumSimilarity = minimumSimilarity
+        namer = Approvals.createApprovalNamer(),
+        writer = ImageApprovalWriter(image),
+        minimumSimilarity = minimumSimilarity
       )
     }
   }

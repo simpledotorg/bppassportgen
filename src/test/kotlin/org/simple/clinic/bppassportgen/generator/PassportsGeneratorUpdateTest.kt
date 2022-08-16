@@ -3,7 +3,6 @@ package org.simple.clinic.bppassportgen.generator
 import com.spotify.mobius.test.NextMatchers.hasEffects
 import com.spotify.mobius.test.NextMatchers.hasModel
 import com.spotify.mobius.test.NextMatchers.hasNoEffects
-import com.spotify.mobius.test.NextMatchers.hasNoModel
 import com.spotify.mobius.test.UpdateSpec
 import com.spotify.mobius.test.UpdateSpec.assertThatNext
 import org.junit.Test
@@ -28,28 +27,36 @@ class PassportsGeneratorUpdateTest {
   @Test
   fun `when generator type is changed, then update the model`() {
     updateSpec
-        .given(defaultModel)
-        .whenEvent(GeneratorTypeChanged(GeneratorType.Sticker))
-        .then(assertThatNext(
-            hasModel(defaultModel.generatorTypeChanged(GeneratorType.Sticker)),
-            hasNoEffects()
-        ))
+      .given(defaultModel)
+      .whenEvent(GeneratorTypeChanged(GeneratorType.Sticker))
+      .then(
+        assertThatNext(
+          hasModel(defaultModel.generatorTypeChanged(GeneratorType.Sticker)),
+          hasNoEffects()
+        )
+      )
   }
 
   @Test
   fun `when generator type is changed, then update the generator type and reset page size`() {
     updateSpec
-      .given(defaultModel.pageSizeChanged(pageSize = PageSize(
-        rows = 1,
-        columns = 2,
-        label = "A4",
-        labelWithCount = "2 passports per page"
-      )))
+      .given(
+        defaultModel.pageSizeChanged(
+          pageSize = PageSize(
+            rows = 1,
+            columns = 2,
+            label = "A4",
+            labelWithCount = "2 passports per page"
+          )
+        )
+      )
       .whenEvent(GeneratorTypeChanged(GeneratorType.Sticker))
-      .then(assertThatNext(
-        hasModel(defaultModel.generatorTypeChanged(GeneratorType.Sticker)),
-        hasNoEffects()
-      ))
+      .then(
+        assertThatNext(
+          hasModel(defaultModel.generatorTypeChanged(GeneratorType.Sticker)),
+          hasNoEffects()
+        )
+      )
   }
 
   @Test
@@ -57,73 +64,93 @@ class PassportsGeneratorUpdateTest {
     val templateFilePath = "/template.pdf"
 
     updateSpec
-        .given(defaultModel)
-        .whenEvent(TemplateFileSelected(templateFilePath))
-        .then(assertThatNext(
-            hasModel(defaultModel.templateFileSelected(templateFilePath)),
-            hasNoEffects()
-        ))
+      .given(defaultModel)
+      .whenEvent(TemplateFileSelected(templateFilePath))
+      .then(
+        assertThatNext(
+          hasModel(defaultModel.templateFileSelected(templateFilePath)),
+          hasNoEffects()
+        )
+      )
   }
 
   @Test
   fun `when the number of passports count is changed, then update the model`() {
     updateSpec
-        .given(defaultModel)
-        .whenEvent(NumberOfPassportsChanged(10))
-        .then(assertThatNext(
-            hasModel(defaultModel.numberOfPassportChanged(10)),
-            hasNoEffects()
-        ))
+      .given(defaultModel)
+      .whenEvent(NumberOfPassportsChanged(10))
+      .then(
+        assertThatNext(
+          hasModel(defaultModel.numberOfPassportChanged(10)),
+          hasNoEffects()
+        )
+      )
   }
 
   @Test
   fun `when generate passports button is clicked, then generate the passports`() {
     val model = defaultModel
-        .generatorTypeChanged(GeneratorType.Passport)
-        .templateFileSelected("/template.pdf")
-        .numberOfPassportChanged(10)
-        .pageSizeChanged(PageSize(
+      .generatorTypeChanged(GeneratorType.Passport)
+      .templateFileSelected("/template.pdf")
+      .numberOfPassportChanged(10)
+      .pageSizeChanged(
+        PageSize(
           rows = 1,
           columns = 2,
           label = "A4",
           labelWithCount = "2 passports per page"
-        ))
+        )
+      )
 
     updateSpec
-        .given(model)
-        .whenEvent(GeneratePassportsButtonClicked("/output"))
-        .then(assertThatNext(
-            hasModel(model.generatorProgressChanged(GeneratorProgress.IN_PROGRESS)),
-            hasEffects(GenerateBpPassports(
-                templateFilePath = "/template.pdf",
-                outputDirectoryPath = "/output",
-                numberOfPassports = 10,
-                rowCount = 1,
-                columnCount = 2,
-                generatorType = GeneratorType.Passport
-            ))
-        ))
+      .given(model)
+      .whenEvent(GeneratePassportsButtonClicked("/output"))
+      .then(
+        assertThatNext(
+          hasModel(model.generatorProgressChanged(GeneratorProgress.IN_PROGRESS)),
+          hasEffects(
+            GenerateBpPassports(
+              templateFilePath = "/template.pdf",
+              outputDirectoryPath = "/output",
+              numberOfPassports = 10,
+              rowCount = 1,
+              columnCount = 2,
+              generatorType = GeneratorType.Passport
+            )
+          )
+        )
+      )
   }
 
   @Test
   fun `when page size is changed, then update the model`() {
     updateSpec
       .given(defaultModel)
-      .whenEvent(PageSizeChanged(PageSize(
-        rows = 1,
-        columns = 2,
-        label = "A4",
-        labelWithCount = "2 passports per page"
-      )))
-      .then(assertThatNext(
-        hasModel(defaultModel.pageSizeChanged(PageSize(
-          rows = 1,
-          columns = 2,
-          label = "A4",
-          labelWithCount = "2 passports per page"
-        ))),
-        hasNoEffects()
-      ))
+      .whenEvent(
+        PageSizeChanged(
+          PageSize(
+            rows = 1,
+            columns = 2,
+            label = "A4",
+            labelWithCount = "2 passports per page"
+          )
+        )
+      )
+      .then(
+        assertThatNext(
+          hasModel(
+            defaultModel.pageSizeChanged(
+              PageSize(
+                rows = 1,
+                columns = 2,
+                label = "A4",
+                labelWithCount = "2 passports per page"
+              )
+            )
+          ),
+          hasNoEffects()
+        )
+      )
   }
 
   @Test
@@ -132,19 +159,23 @@ class PassportsGeneratorUpdateTest {
       .generatorTypeChanged(GeneratorType.Passport)
       .templateFileSelected("/template.pdf")
       .numberOfPassportChanged(10)
-      .pageSizeChanged(PageSize(
-        rows = 1,
-        columns = 2,
-        label = "A4",
-        labelWithCount = "2 passports per page"
-      ))
+      .pageSizeChanged(
+        PageSize(
+          rows = 1,
+          columns = 2,
+          label = "A4",
+          labelWithCount = "2 passports per page"
+        )
+      )
 
     updateSpec
       .given(model)
       .whenEvent(PassportsGenerated)
-      .then(assertThatNext(
-        hasModel(model.generatorProgressChanged(GeneratorProgress.DONE)),
-        hasNoEffects()
-      ))
+      .then(
+        assertThatNext(
+          hasModel(model.generatorProgressChanged(GeneratorProgress.DONE)),
+          hasNoEffects()
+        )
+      )
   }
 }

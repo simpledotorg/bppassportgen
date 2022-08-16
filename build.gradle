@@ -1,4 +1,4 @@
-//import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 buildscript {
   ext.versions = [
@@ -19,31 +19,34 @@ buildscript {
 plugins {
   id 'com.github.johnrengelman.shadow' version "5.0.0"
   id 'org.jetbrains.kotlin.jvm' version "1.6.10"
-  // TODO: Comment this plugin when generating CLI
-//  id 'org.jetbrains.compose' version '1.0.1'
-  // TODO: Uncomment this plugin when generating CLI
-  id 'application'
+  id 'org.jetbrains.compose' version '1.0.1'
 }
 
-// TODO: Uncomment this block when generating CLI jar
-application {
-  mainClassName = 'org.simple.bppassportgen.AppKt'
+compose.desktop {
+  application {
+    mainClass = "org.simple.bppassportgen.AppKt"
+    nativeDistributions {
+      targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+      packageName = "QR Code Generator"
+      packageVersion = "2.0.0"
+      vendor = "Simple.org"
+      includeAllModules = true
+
+      macOS {
+        iconFile.set(project.file("src/main/resources/drawable/app_icon_mac.icns"))
+      }
+      windows {
+        iconFile.set(project.file("/src/main/resources/drawable/app_icon_windows.ico"))
+        menuGroup = "QR Code Generator"
+        // see https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html
+        upgradeUuid = "b9522ebf-7243-4769-9ed2-3ac7c3bc7dec"
+      }
+      linux {
+        iconFile.set(project.file("/src/main/resources/drawable/app_icon_linux.png"))
+      }
+    }
+  }
 }
-
-// TODO: Comment this block when generating CLI jar
-//compose.desktop {
-//  application {
-//    mainClass = "org.simple.bppassportgen.AppKt"
-//    nativeDistributions {
-//      targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-//      packageName = "BP Passport Generator"
-//      packageVersion = "1.2.3"
-//    }
-//  }
-//}
-
-//group 'org.simple'
-//version '1.2.3'
 
 repositories {
   google()
@@ -59,8 +62,8 @@ dependencies {
   implementation "org.apache.pdfbox:pdfbox:$versions.pdfbox"
   implementation "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$versions.jackson"
-  // TODO: Comment this dependency when generating CLI jar
-//  implementation compose.desktop.currentOs
+  implementation compose.desktop.currentOs
+  implementation compose.materialIconsExtended
   implementation "com.spotify.mobius:mobius-core:$versions.mobius"
   implementation "com.spotify.mobius:mobius-rx2:$versions.mobius"
 

@@ -19,8 +19,8 @@ class PassportsGeneratorEffectHandlerTest {
   private val passportsGenerator = mock<PassportsGenerator>()
 
   private val effectHandler = PassportsGeneratorEffectHandler(
-      passportsGenerator = passportsGenerator,
-      schedulersProvider = TestSchedulersProvider()
+    passportsGenerator = passportsGenerator,
+    schedulersProvider = TestSchedulersProvider()
   ).build()
   private val effectHandlerTestCase = EffectHandlerTestCase(effectHandler)
 
@@ -30,27 +30,29 @@ class PassportsGeneratorEffectHandlerTest {
     val uuid = UUID.fromString("b6bf0aaf-960e-4389-b683-790cf960933d")
 
     Mockito.mockStatic(UUID::class.java)
-        .`when`<UUID>(UUID::randomUUID)
-        .thenReturn(uuid)
+      .`when`<UUID>(UUID::randomUUID)
+      .thenReturn(uuid)
 
     // when
-    effectHandlerTestCase.dispatch(GenerateBpPassports(
+    effectHandlerTestCase.dispatch(
+      GenerateBpPassports(
         templateFilePath = "/template-file.pdf",
         outputDirectoryPath = "/passports",
         numberOfPassports = 1,
         rowCount = 2,
         columnCount = 2,
         generatorType = GeneratorType.Passport
-    ))
+      )
+    )
 
     // then
     verify(passportsGenerator).run(
-        uuidsToGenerate = listOf(uuid),
-        rowCount = 2,
-        columnCount = 2,
-        templateFilePath = "/template-file.pdf",
-        outputDirectory = File("/passports"),
-        generatorType = GeneratorType.Passport
+      uuidsToGenerate = listOf(uuid),
+      rowCount = 2,
+      columnCount = 2,
+      templateFilePath = "/template-file.pdf",
+      outputDirectory = File("/passports"),
+      generatorType = GeneratorType.Passport
     )
 
     effectHandlerTestCase.assertOutgoingEvents(PassportsGenerated)

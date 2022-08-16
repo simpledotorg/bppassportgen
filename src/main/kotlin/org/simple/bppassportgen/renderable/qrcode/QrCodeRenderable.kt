@@ -9,10 +9,10 @@ import org.simple.bppassportgen.renderable.Renderable
 import java.util.UUID
 
 class QrCodeRenderable(
-    private val qrCodeGenerator: QrCodeGenerator,
-    private val uuid: UUID,
-    private val spec: BarcodeRenderSpec,
-    private val colorProvider: ColorProvider
+  private val qrCodeGenerator: QrCodeGenerator,
+  private val uuid: UUID,
+  private val spec: BarcodeRenderSpec,
+  private val colorProvider: ColorProvider
 ) : Renderable {
 
   override fun render(document: OpenedDocument, page: PDPage) {
@@ -22,10 +22,10 @@ class QrCodeRenderable(
     PdfUtil.streamForPage(document.document, page).use { contentStream ->
 
       renderBitMatrix.render(
-          contentStream,
-          spec.positionX,
-          spec.positionY,
-          applyForegroundColor = { it.setStrokingColor(colorProvider.colorById(spec.colorId)) }
+        contentStream,
+        spec.positionX,
+        spec.positionY,
+        applyForegroundColor = { it.setStrokingColor(colorProvider.colorById(spec.colorId)) }
       )
     }
   }
